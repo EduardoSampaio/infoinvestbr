@@ -1,4 +1,5 @@
 import datetime
+from dataclasses import dataclass
 from typing import Optional, TypeVar
 
 from pydantic import BaseModel
@@ -16,28 +17,35 @@ class ValidationErrorResponse(BaseModel):
 class Response(GenericModel, Generic[T]):
     code: str
     status: str
-    message: str
+    message: Optional[str]
     result: Optional[T]
     errors: Optional[list[ValidationErrorResponse]]
 
 
 class UsuarioBaseSchema(BaseModel):
     nome: str
-    imagem: Optional[str] = None
     email: str
-    is_admin: bool
-    created_at: datetime.date
+    imagem: Optional[str] = None
 
 
-class UsuarioCreateSchema(UsuarioBaseSchema):
-    password: str
+class UsuarioRequestSchema(UsuarioBaseSchema):
+    senha: str
 
 
-class UsuarioSchema(UsuarioBaseSchema):
+@dataclass
+class UsuarioResponseSchema:
     usuario_id: int
+    is_admin: bool
+    nome: str
+    email: str
+    imagem: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    def __init__(self, usuario_id: int, nome: str, email: str, is_admin: bool, imagem: Optional[str] = None):
+        self.usuario_id = usuario_id
+        self.nome = nome
+        self.email = email
+        self.imagem = imagem
+        self.is_admin = is_admin
 
 
 class TransacaoSchema(BaseModel):

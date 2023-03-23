@@ -7,20 +7,26 @@ from datetime import datetime
 class Usuario(Base):
     __tablename__ = "usuarios"
 
-    id = Column("ID", Integer, primary_key=True, index=True)
+    id = Column("USUARIO_ID", Integer, primary_key=True, index=True)
     nome = Column("NOME", String(30), nullable=False)
     imagem = Column("IMAGEM", String(200), nullable=True)
     email = Column("EMAIL", String(30), unique=True, index=True, nullable=False)
     is_admin = Column("IS_ADMIN", Boolean, default=False)
-    hashed_password = Column("HASHED_PASSWORD", String(100), nullable=False)
+    senha = Column("SENHA", String(100), nullable=True)
     created_at = Column("CREATED_AT", DateTime, default=datetime.utcnow())
-    transacoes = relationship("Transacao", back_populates="usuarios")
+    # transacoes = relationship("Transacao", back_populates="usuarios")
+
+    def __init__(self, nome: str, email: str, senha: str = None, imagem: str = None):
+        self.nome = nome
+        self.email = email
+        self.senha = senha
+        self.imagem = imagem
 
 
 class Transacao(Base):
     __tablename__ = "transacoes"
 
-    id = Column("ID", Integer, index=True, primary_key=True)
+    transacao_id = Column("TRANSACAO_ID", Integer, index=True, primary_key=True)
     categoria = Column("CATEGORIA", String(30), nullable=False)
     codigo_ativo = Column("CODIGO_ATIVO", String(10), nullable=False)
     ordem = Column("ORDEM", String(30), nullable=False)
@@ -29,8 +35,8 @@ class Transacao(Base):
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
     preco = Column("PRECO", Numeric, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
-    usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.ID"), index=True, unique=True)
-    usuario = relationship("Usuario", back_populates="orders")
+    # usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.USUARIO_ID"), index=True)
+    # usuario = relationship("Usuario", back_populates="transacoes")
 
 
 class Provento(Base):
