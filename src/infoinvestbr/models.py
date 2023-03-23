@@ -14,6 +14,7 @@ class Usuario(Base):
     is_admin = Column("IS_ADMIN", Boolean, default=False)
     senha = Column("SENHA", String(100), nullable=True)
     created_at = Column("CREATED_AT", DateTime, default=datetime.utcnow())
+
     # transacoes = relationship("Transacao", back_populates="usuarios")
 
     def __init__(self, nome: str, email: str, senha: str = None, imagem: str = None):
@@ -35,8 +36,27 @@ class Transacao(Base):
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
     preco = Column("PRECO", Numeric, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
+
     # usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.USUARIO_ID"), index=True)
     # usuario = relationship("Usuario", back_populates="transacoes")
+
+    def __init__(self,
+                 categoria: str,
+                 codigo_ativo: str,
+                 ordem: str,
+                 corretora: str,
+                 data: datetime.date,
+                 quantidade: str,
+                 preco: float,
+                 total: float):
+        self.categoria = categoria
+        self.codigo_ativo = codigo_ativo
+        self.ordem = ordem
+        self.corretora = corretora
+        self.data = data
+        self.quantidade = quantidade
+        self.preco = preco
+        self.total = total
 
 
 class Provento(Base):
@@ -48,6 +68,18 @@ class Provento(Base):
     data_pagamento = Column("DATA_PAGAMENTO", DateTime, nullable=False)
     valor = Column("VALOR", Numeric, nullable=False)
     tipo = Column("TIPO", String(30), nullable=False)
+
+    def __init__(self,
+                 codigo_ativo: str,
+                 data_com: datetime.date,
+                 data_pagamento: datetime.date,
+                 valor: float,
+                 tipo: str):
+        self.codigo_ativo = codigo_ativo
+        self.data_com = data_com
+        self.data_pagamento = data_pagamento
+        self.valor = valor
+        self.tipo = tipo
 
 
 class FundosImobiliarios(Base):

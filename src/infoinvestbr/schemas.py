@@ -48,8 +48,8 @@ class UsuarioResponseSchema:
         self.is_admin = is_admin
 
 
-class TransacaoSchema(BaseModel):
-    transacao_id: Optional[int] = None
+class TransacaoRequestSchema(BaseModel):
+    transacao_id: Optional[int]
     categoria: str
     codigo_ativo: str
     ordem: str
@@ -64,8 +64,43 @@ class TransacaoSchema(BaseModel):
         orm_mode = True
 
 
-class ProventoSchema(BaseModel):
-    provendo_id: Optional[int] = None
+@dataclass
+class TransacaoResponseSchema:
+    transacao_id: int
+    categoria: str
+    codigo_ativo: str
+    ordem: str
+    corretora: str
+    data: datetime.date
+    quantidade: int
+    preco: float
+    total: float
+    usuario_id: int
+
+    def __init__(self, transacao_id: int,
+                 categoria: str,
+                 codigo_ativo: str,
+                 ordem: str,
+                 corretora: str,
+                 data: datetime.date,
+                 quantidade: int,
+                 preco: float,
+                 total: float,
+                 usuario_id: int):
+        self.transacao_id = transacao_id
+        self.usuario_id = usuario_id
+        self.codigo_ativo = codigo_ativo
+        self.ordem = ordem
+        self.corretora = corretora
+        self.data = data
+        self.quantidade = quantidade
+        self.preco = preco
+        self.total = total
+        self.categoria = categoria
+
+
+class ProventoRequestSchema(BaseModel):
+    provendo_id: Optional[int]
     codigo_ativo: str
     data_com: datetime.date
     data_pagamento: datetime.date
@@ -74,6 +109,30 @@ class ProventoSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+@dataclass()
+class ProventoResponseSchema:
+    provendo_id: int
+    codigo_ativo: str
+    data_com: datetime.date
+    data_pagamento: datetime.date
+    valor: float
+    tipo: str
+
+    def __init__(self,
+                 provendo_id: int,
+                 codigo_ativo: str,
+                 data_com: datetime.date,
+                 data_pagamento: datetime.date,
+                 valor: float,
+                 tipo: str):
+        self.provendo_id = provendo_id
+        self.codigo_ativo = codigo_ativo
+        self.data_com = data_com
+        self.data_pagamento = data_pagamento
+        self.valor = valor
+        self.tipo = tipo
 
 
 class FundosImobiliariosSchema(BaseModel):
@@ -111,7 +170,7 @@ class FundosImobiliariosSchema(BaseModel):
         orm_mode = True
 
 
-class AcaoBase(BaseModel):
+class AcaoBaseSchema(BaseModel):
     acao_id: Optional[int] = None
     codigo: Optional[str] = None
     nome: Optional[str] = None

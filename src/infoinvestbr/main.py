@@ -6,8 +6,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from config import settings
 from functools import lru_cache
 from database import engine, SessionLocal
-from usuarios import router as routerUsuario
+from src.usuarios import router as routerUsuario
 from provider import router as routerProvider
+from src.proventos import router as routerProvento
+from src.transacoes import router as routerTransacao
 import models
 
 
@@ -21,6 +23,8 @@ google_sso = GoogleSSO(settings.GOOGLE_CLIENT_ID, settings.GOOGLE_CLIENT_SECRET,
 # Routers
 app.include_router(routerUsuario.router)
 app.include_router(routerProvider)
+app.include_router(routerProvento.router)
+app.include_router(routerTransacao.router)
 
 
 # Database dependency

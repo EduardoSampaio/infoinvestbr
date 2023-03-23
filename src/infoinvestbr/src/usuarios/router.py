@@ -1,9 +1,9 @@
-from fastapi import Depends, HTTPException, APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status
 from database import SessionLocal
 from schemas import UsuarioRequestSchema, UsuarioResponseSchema, Response
-from usuarios import service
-from usuarios.exceptions import token_exception
-from usuarios.utils import create_refresh_token, create_access_token
+from src.usuarios import service
+from src.usuarios.exceptions import token_exception
+from src.usuarios.utils import create_refresh_token, create_access_token
 from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm

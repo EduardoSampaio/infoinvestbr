@@ -4,9 +4,9 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.requests import Request as StarletteRequest
 from database import SessionLocal
 from config import settings
-from usuarios.utils import create_access_token, create_refresh_token
+from src.usuarios.utils import create_access_token, create_refresh_token
+from src.usuarios import service
 from datetime import timedelta
-from usuarios import service
 from sqlalchemy.orm import Session
 
 google_sso = GoogleSSO(settings.GOOGLE_CLIENT_ID, settings.GOOGLE_CLIENT_SECRET,
@@ -28,19 +28,19 @@ def get_db():
         db.close()
 
 
-@router.get("/google/login", tags=['authentication'])
+@router.get("/google/login")
 async def google_login():
     """Generate login url and redirect"""
     return await google_sso.get_login_redirect()
 
 
-@router.get("/google/callback", tags=['authentication'])
+@router.get("/google/callback")
 async def google_callback(request: StarletteRequest, db: Session = Depends(get_db)):
     """Process login response from Google and return user info"""
     usuario = await google_sso.verify_and_process(request)
     request.session["usuario"] = dict(usuario)
 
-    if usuario is not None:
+    if usuario is None:
         service.create_usuario_google(db, nome=usuario.display_name, email=usuario.email, imagem=usuario.picture)
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
@@ -78,7 +78,7 @@ async def home(request: StarletteRequest):
     return HTMLResponse('<a href="/google/login">login</a>')
 
 
-@router.get('/logout', tags=['authentication'])
+@router.get('/logout')
 async def logout(request: StarletteRequest):
     request.session.pop('user', None)
     return RedirectResponse(url='/')
