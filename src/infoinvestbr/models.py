@@ -8,11 +8,11 @@ class Usuario(Base):
     __tablename__ = "usuarios"
 
     id = Column("ID", Integer, primary_key=True, index=True)
-    nome = Column("NOME", String, nullable=False)
-    imagem = Column("IMAGEM", String, nullable=True)
-    email = Column("EMAIL", String, unique=True, index=True, nullable=False)
+    nome = Column("NOME", String(30), nullable=False)
+    imagem = Column("IMAGEM", String(200), nullable=True)
+    email = Column("EMAIL", String(30), unique=True, index=True, nullable=False)
     is_admin = Column("IS_ADMIN", Boolean, default=False)
-    hashed_password = Column("HASHED_PASSWORD", String, nullable=False)
+    hashed_password = Column("HASHED_PASSWORD", String(100), nullable=False)
     created_at = Column("CREATED_AT", DateTime, default=datetime.utcnow())
     transacoes = relationship("Transacao", back_populates="usuarios")
 
@@ -21,9 +21,9 @@ class Transacao(Base):
     __tablename__ = "transacoes"
 
     id = Column("ID", Integer, index=True, primary_key=True)
-    categoria = Column("CATEGORIA", String, nullable=False)
-    ativo = Column("ATIVO", String, nullable=False)
-    ordem = Column("ORDEM", String, nullable=False)
+    categoria = Column("CATEGORIA", String(30), nullable=False)
+    codigo_ativo = Column("CODIGO_ATIVO", String(10), nullable=False)
+    ordem = Column("ORDEM", String(30), nullable=False)
     corretora = Column("CORRETORA", String, nullable=False)
     data = Column("DATA", DateTime, nullable=False)
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
@@ -37,11 +37,11 @@ class Provento(Base):
     __tablename__ = "proventos"
 
     id = Column("ID", Integer, index=True, primary_key=True)
-    ativo = Column("ATIVO", String, nullable=False)
+    codigo_ativo = Column("CODIGO_ATIVO", String(10), nullable=False)
     data_com = Column("DATA_COM", DateTime, nullable=False)
-    data_pagamento = Column("DATA_PAGAMENTO", Integer, nullable=False)
+    data_pagamento = Column("DATA_PAGAMENTO", DateTime, nullable=False)
     valor = Column("VALOR", Numeric, nullable=False)
-    tipo = Column("TIPO", Numeric, nullable=False)
+    tipo = Column("TIPO", String(30), nullable=False)
 
 
 class FundosImobiliarios(Base):
@@ -51,9 +51,9 @@ class FundosImobiliarios(Base):
     codigo_do_fundo = Column("CODIGO_DO_FUNDO", String(30), index=True, unique=True, nullable=False)
     nome = Column("NOME", String(30), nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
-    imagem = Column("IMAGEM", String, nullable=True)
+    imagem = Column("IMAGEM", String(200), nullable=True)
     administrador = Column("ADMINISTRADOR", String, nullable=True)
-    cnpj = Column("CNPJ", String, nullable=True)
+    cnpj = Column("CNPJ", String(30), nullable=True)
     taxa_administracao = Column("TAXA_ADMINISTRACAO", Numeric, nullable=True)
     taxa_gestao = Column("TAXA_GESTAO", Numeric, nullable=True)
     taxa_performance = Column("TAXA_PERFORMANCE", Numeric, nullable=True)
@@ -119,10 +119,10 @@ class Acao(Base):
     __tablename__ = "acoes"
 
     id = Column("ACAO_ID", Integer, index=True, primary_key=True)
-    codigo = Column("CODIGO", String, index=True, unique=True, nullable=False)
-    nome = Column("NOME", String, nullable=True)
+    codigo = Column("CODIGO", String(10), index=True, unique=True, nullable=False)
+    nome = Column("NOME", String(200), nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
-    imagem = Column("IMAGEM", String, nullable=True)
+    imagem = Column("IMAGEM", String(200), nullable=True)
     pl = Column("PL", Numeric, nullable=True)
     pvp = Column("PVP", Numeric, nullable=True)
     psr = Column("PSR", Numeric, nullable=True)
@@ -142,10 +142,11 @@ class Acao(Base):
     patrimonio_liquido = Column("PATRIMONIO_LIQUIDO", Numeric, nullable=True)
     div_bruta_patrim = Column("DIV_BRUTA_PATRIM", Numeric, nullable=True)
     cresc_rec_5a = Column("CRESC_REC_5A", Numeric, nullable=True)
-    setor = Column("SETOR", String, nullable=False)
+    setor = Column("SETOR", String(30), nullable=False)
     lpa = Column("LPA", Numeric, nullable=True)
     vpa = Column("VPA", Numeric, nullable=True)
-    cnpj = Column("CNPJ", String, nullable=True)
+    cnpj = Column("CNPJ", String(30), nullable=True)
+    tipo = Column("TIPO", String(30), nullable=True)
 
     def __init__(self,
                  codigo,
