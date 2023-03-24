@@ -60,9 +60,10 @@ async def get_proventos_by_data_pagamento(data_pagamento: datetime.date, db: Ses
 
 
 @router.post("/")
-async def create_provento(provento: ProventoRequestSchema, db: Session = Depends(get_db)):
-    service.create_provento(db, provento)
-    return Response(code=status.HTTP_201_CREATED, status="Created", message="Provento criado com sucesso!")
+async def create_provento(provento_request: ProventoRequestSchema, db: Session = Depends(get_db)):
+    provento = service.create_provento(db, provento_request)
+    return Response(code=status.HTTP_201_CREATED, status="Created", message="Provento criado com sucesso!",
+                    result=provento)
 
 
 @router.put("/")

@@ -82,7 +82,7 @@ class Provento(Base):
         self.tipo = tipo
 
 
-class FundosImobiliarios(Base):
+class FundosImobiliario(Base):
     __tablename__ = "fundos_imobiliarios"
 
     id = Column("FUNDO_ID", Integer, index=True, primary_key=True)

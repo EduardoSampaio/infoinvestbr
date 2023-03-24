@@ -10,6 +10,7 @@ from src.usuarios import router as routerUsuario
 from provider import router as routerProvider
 from src.proventos import router as routerProvento
 from src.transacoes import router as routerTransacao
+from src.analise import router as routerAnalise
 import models
 
 
@@ -25,6 +26,7 @@ app.include_router(routerUsuario.router)
 app.include_router(routerProvider)
 app.include_router(routerProvento.router)
 app.include_router(routerTransacao.router)
+app.include_router(routerAnalise.router)
 
 
 # Database dependency

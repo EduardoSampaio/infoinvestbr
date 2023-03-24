@@ -22,9 +22,10 @@ def get_db():
 
 
 @router.post("/")
-async def create(transacao: TransacaoRequestSchema, db: Session = Depends(get_db)):
-    service.create_transacao(db, transacao)
-    return Response(code=status.HTTP_201_CREATED, status="Created", message="Transação criada com sucesso!")
+async def create(transacao_request: TransacaoRequestSchema, db: Session = Depends(get_db)):
+    transacao = service.create_transacao(db, transacao_request)
+    return Response(code=status.HTTP_201_CREATED, status="Created", message="Transação criada com sucesso!",
+                    result=transacao)
 
 
 @router.delete("/{id}")

@@ -1,13 +1,249 @@
 import datetime
 
 from sqlalchemy.orm import Session
-from models import Acao, FundosImobiliarios
-from schemas import AcaoBaseSchema, FundosImobiliariosSchema, Response
+from models import Acao, FundosImobiliario
+from schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
+    FundosImobiliarioResponseSchema
 
 
-def get_acoes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Acao).offset(skip).limit(limit).all()
+def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
+    return AcaoResponseSchema(
+        codigo=model.codigo,
+        tipo=model.tipo,
+        nome=model.nome,
+        imagem=model.imagem,
+        lpa=model.lpa,
+        vpa=model.vpa,
+        descricao=model.descricao,
+        setor=model.setor,
+        cresc_rec_5a=model.cresc_rec_5a,
+        div_bruta_patrim=model.div_bruta_patrim,
+        ev_ebit=model.ev_ebit,
+        dividend_yield=model.dividend_yield,
+        liq_2meses=model.liq_2meses,
+        pl=model.pl,
+        pvp=model.pvp,
+        psr=model.psr,
+        p_ativo=model.p_ativo,
+        p_cap_giro=model.p_cap_giro,
+        p_ebit=model.p_ebit,
+        p_ativ_circ_liq=model.p_ativ_circ_liq,
+        ev_ebitda=model.ev_ebitda,
+        margem_ebit=model.margem_ebit,
+        margem_liquida=model.margem_liquida,
+        liq_corrente=model.liq_corrente,
+        roic=model.roic,
+        roe=model.roe,
+        patrimonio_liquido=model.patrimonio_liquido
+    )
 
 
-def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(FundosImobiliarios).offset(skip).limit(limit).all()
+def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioResponseSchema:
+    return FundosImobiliarioResponseSchema(
+        codigo_do_fundo=model.codigo_do_fundo,
+        nome=model.nome,
+        descricao=model.descricao,
+        imagem=model.imagem,
+        administrador=model.administrador,
+        cnpj=model.cnpj,
+        taxa_administracao=model.taxa_administracao,
+        taxa_gestao=model.taxa_gestao,
+        taxa_performance=model.taxa_performance,
+        tipo_gestao=model.tipo_gestao,
+        setor=model.setor,
+        liquidez_diaria=model.liquidez_diaria,
+        dividendo=model.dividendo,
+        dividend_yield=model.dividend_yield,
+        dy_ano=model.dy_ano,
+        variacao_preco=model.variacao_preco,
+        rentab_periodo=model.rentab_periodo,
+        rentab_acumulada=model.rentab_acumulada,
+        patrimonio_liq=model.patrimonio_liq,
+        vpa=model.vpa,
+        p_vpa=model.p_vpa,
+        dy_patrimonial=model.dy_patrimonial,
+        variacao_patrimonial=model.variacao_patrimonial,
+        rentab_patr_no_período=model.rentab_patr_no_período,
+        rentab_patr_acumulada=model.rentab_patr_acumulada,
+        vacancia_fisica=model.vacancia_fisica,
+        vacancia_financeira=model.vacancia_financeira,
+        quantidade_ativos=model.quantidade_ativos
+    )
+
+
+def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponseSchema]:
+    acoes = db.query(Acao).offset(skip).limit(limit).all()
+
+    list_acoes = list[AcaoResponseSchema]
+
+    for acao in acoes:
+        list_acoes.append(convert_acao_to_schema(acao))
+
+    return list_acoes
+
+
+def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100) -> list[FundosImobiliarioResponseSchema]:
+    fundos = db.query(FundosImobiliario).offset(skip).limit(limit).all()
+
+    list_fundos = list[FundosImobiliarioResponseSchema]
+    for fundos in fundos:
+        list_fundos.append(convert_fundo_to_schema(fundos))
+
+    return list_fundos
+
+
+def get_acoes_by_id(db: Session, acao_id: int) -> AcaoResponseSchema:
+    return convert_acao_to_schema(db.query(Acao).filter(Acao.id == acao_id).first())
+
+
+def get_fundos_imobiliarios_by_id(db: Session, fundos_id: int) -> FundosImobiliarioResponseSchema:
+    return convert_fundo_to_schema(db.query(FundosImobiliario).filter(FundosImobiliario.id == fundos_id).first())
+
+
+def get_acoes_by_codigo(db: Session, codigo: str) -> AcaoResponseSchema:
+    return convert_acao_to_schema(db.query(Acao).filter(Acao.codigo == codigo).first())
+
+
+def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str) -> FundosImobiliarioResponseSchema:
+    return convert_fundo_to_schema(
+        db.query(FundosImobiliario).filter(FundosImobiliario.codigo_do_fundo == codigo).first())
+
+
+def create_acoes(db: Session, acao: AcaoRequestSchema):
+    _acao = get_acoes_by_id(db, acao.acao_id)
+    _acao.codigo = acao.codigo
+    _acao.tipo = acao.tipo
+    _acao.nome = acao.nome
+    _acao.imagem = acao.imagem
+    _acao.lpa = acao.lpa
+    _acao.vpa = acao.vpa
+    _acao.setor = acao.setor
+    _acao.descricao = acao.descricao
+    _acao.cresc_rec_5a = acao.cresc_rec_5a
+    _acao.div_bruta_patrim = acao.div_bruta_patrim
+    _acao.ev_ebit = acao.ev_ebit
+    _acao.dividend_yield = acao.dividend_yield
+    _acao.liq_2meses = acao.liq_2meses
+    _acao.pl = acao.pl
+    _acao.pvp = acao.pvp
+    _acao.psr = acao.psr
+    _acao.p_ativo = acao.p_ativo
+    _acao.p_cap_giro = _acao.p_cap_giro
+    _acao.p_ebit = _acao.p_ebit
+    _acao.p_ativ_circ_liq = acao.p_ativ_circ_liq
+    _acao.ev_ebitda = acao.ev_ebitda
+    _acao.margem_ebit = acao.margem_ebit
+    _acao.margem_liquida = acao.margem_liquida
+    _acao.liq_corrente = acao.liq_corrente
+    _acao.roic = acao.roic
+    _acao.roe = acao.roe
+    _acao.patrimonio_liquido = acao.patrimonio_liquido
+
+    db.commit()
+    db.refresh(_acao)
+
+
+def update_acoes(db: Session, acao: AcaoRequestSchema):
+    _acao = Acao()
+    _acao.codigo = acao.codigo
+    _acao.tipo = acao.tipo
+    _acao.nome = acao.nome
+    _acao.imagem = acao.imagem
+    _acao.lpa = acao.lpa
+    _acao.vpa = acao.vpa
+    _acao.setor = acao.setor
+    _acao.descricao = acao.descricao
+    _acao.cresc_rec_5a = acao.cresc_rec_5a
+    _acao.div_bruta_patrim = acao.div_bruta_patrim
+    _acao.ev_ebit = acao.ev_ebit
+    _acao.dividend_yield = acao.dividend_yield
+    _acao.liq_2meses = acao.liq_2meses
+    _acao.pl = acao.pl
+    _acao.pvp = acao.pvp
+    _acao.psr = acao.psr
+    _acao.p_ativo = acao.p_ativo
+    _acao.p_cap_giro = _acao.p_cap_giro
+    _acao.p_ebit = _acao.p_ebit
+    _acao.p_ativ_circ_liq = acao.p_ativ_circ_liq
+    _acao.ev_ebit = acao.ev_ebit
+    _acao.ev_ebitda = acao.ev_ebitda
+    _acao.margem_ebit = acao.margem_ebit
+    _acao.margem_liquida = acao.margem_liquida
+    _acao.liq_corrente = acao.liq_corrente
+    _acao.roic = acao.roic
+    _acao.roe = acao.roe
+    _acao.patrimonio_liquido = acao.patrimonio_liquido
+
+    db.add(_acao)
+    db.commit()
+    db.refresh(_acao)
+
+
+def update_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
+    _fundo = FundosImobiliario()
+    _fundo.nome = fundo.nome
+    _fundo.descricao = fundo.descricao
+    _fundo.imagem = fundo.imagem
+    _fundo.administrador = fundo.administrador
+    _fundo.cnpj = fundo.cnpj
+    _fundo.taxa_administracao = fundo.taxa_administracao
+    _fundo.taxa_gestao = fundo.taxa_gestao
+    _fundo.taxa_performance = fundo.taxa_performance
+    _fundo.tipo_gestao = fundo.tipo_gestao
+    _fundo.setor = fundo.setor
+    _fundo.liquidez_diaria = fundo.liquidez_diaria
+    _fundo.dividendo = fundo.dividendo
+    _fundo.dividend_yield = fundo.dividend_yield
+    _fundo.dy_ano = fundo.dy_ano
+    _fundo.variacao_preco = fundo.variacao_preco
+    _fundo.rentab_periodo = fundo.rentab_periodo
+    _fundo.rentab_acumulada = fundo.rentab_acumulada
+    _fundo.patrimonio_liq = fundo.patrimonio_liq
+    _fundo.vpa = fundo.vpa
+    _fundo.p_vpa = fundo.p_vpa
+    _fundo.dy_patrimonial = fundo.dy_patrimonial
+    _fundo.variacao_patrimonial = fundo.variacao_patrimonial
+    _fundo.rentab_patr_no_período = fundo.rentab_patr_no_período
+    _fundo.rentab_patr_acumulada = fundo.rentab_patr_acumulada
+    _fundo.vacancia_fisica = fundo.vacancia_fisica
+    _fundo.vacancia_financeira = fundo.vacancia_financeira
+    _fundo.quantidade_ativos = fundo.quantidade_ativos
+
+    db.commit()
+    db.refresh(_fundo)
+
+
+def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
+    _fundo = FundosImobiliario()
+    _fundo.codigo_do_fundo = fundo.codigo_do_fundo
+    _fundo.nome = fundo.nome
+    _fundo.descricao = fundo.descricao
+    _fundo.imagem = fundo.imagem
+    _fundo.administrador = fundo.administrador
+    _fundo.cnpj = fundo.cnpj
+    _fundo.taxa_administracao = fundo.taxa_administracao
+    _fundo.taxa_gestao = fundo.taxa_gestao
+    _fundo.taxa_performance = fundo.taxa_performance
+    _fundo.tipo_gestao = fundo.tipo_gestao
+    _fundo.setor = fundo.setor
+    _fundo.liquidez_diaria = fundo.liquidez_diaria
+    _fundo.dividendo = fundo.dividendo
+    _fundo.dividend_yield = fundo.dividend_yield
+    _fundo.dy_ano = fundo.dy_ano
+    _fundo.variacao_preco = fundo.variacao_preco
+    _fundo.rentab_periodo = fundo.rentab_periodo
+    _fundo.rentab_acumulada = fundo.rentab_acumulada
+    _fundo.patrimonio_liq = fundo.patrimonio_liq
+    _fundo.vpa = fundo.vpa
+    _fundo.p_vpa = fundo.p_vpa
+    _fundo.dy_patrimonial = fundo.dy_patrimonial
+    _fundo.variacao_patrimonial = fundo.variacao_patrimonial
+    _fundo.rentab_patr_no_período = fundo.rentab_patr_no_período
+    _fundo.rentab_patr_acumulada = fundo.rentab_patr_acumulada
+    _fundo.vacancia_fisica = fundo.vacancia_fisica
+    _fundo.vacancia_financeira = fundo.vacancia_financeira
+    _fundo.quantidade_ativos = fundo.quantidade_ativos
+
+    db.add(_fundo)
+    db.commit()
+    db.refresh(_fundo)
