@@ -160,7 +160,7 @@ class FundosImobiliarioRequestSchema(BaseModel):
     p_vpa: Optional[float] = None
     dy_patrimonial: Optional[float] = None
     variacao_patrimonial: Optional[float] = None
-    rentab_patr_no_período: Optional[float] = None
+    rentab_patr_no_periodo: Optional[float] = None
     rentab_patr_acumulada: Optional[float] = None
     vacancia_fisica: Optional[float] = None
     vacancia_financeira: Optional[float] = None
@@ -196,13 +196,15 @@ class FundosImobiliarioResponseSchema:
     p_vpa: Optional[float] = None
     dy_patrimonial: Optional[float] = None
     variacao_patrimonial: Optional[float] = None
-    rentab_patr_no_período: Optional[float] = None
+    rentab_patr_no_periodo: Optional[float] = None
     rentab_patr_acumulada: Optional[float] = None
     vacancia_fisica: Optional[float] = None
     vacancia_financeira: Optional[float] = None
     quantidade_ativos: Optional[int] = None
 
-    def __init__(self, codigo_do_fundo,
+    def __init__(self,
+                 fundo_id,
+                 codigo_do_fundo,
                  setor,
                  liquidez_diaria,
                  dividendo,
@@ -216,7 +218,7 @@ class FundosImobiliarioResponseSchema:
                  p_vpa,
                  dy_patrimonial,
                  variacao_patrimonial,
-                 rentab_patr_no_período,
+                 rentab_patr_no_periodo,
                  rentab_patr_acumulada,
                  vacancia_financeira,
                  quantidade_ativos,
@@ -230,6 +232,7 @@ class FundosImobiliarioResponseSchema:
                  taxa_performance,
                  tipo_gestao,
                  vacancia_fisica):
+        self.fundo_id = fundo_id
         self.codigo_do_fundo = codigo_do_fundo
         self.setor = setor
         self.liquidez_diaria = liquidez_diaria
@@ -244,7 +247,7 @@ class FundosImobiliarioResponseSchema:
         self.p_vpa = p_vpa
         self.dy_patrimonial = dy_patrimonial
         self.variacao_patrimonial = variacao_patrimonial
-        self.rentab_patr_no_período = rentab_patr_no_período
+        self.rentab_patr_no_periodo = rentab_patr_no_periodo
         self.rentab_patr_acumulada = rentab_patr_acumulada
         self.vacancia_financeira = vacancia_financeira
         self.quantidade_ativos = quantidade_ativos
@@ -328,6 +331,7 @@ class AcaoResponseSchema:
     tipo: Optional[str] = None
 
     def __init__(self,
+                 acao_id,
                  codigo,
                  pl,
                  pvp,
@@ -354,9 +358,10 @@ class AcaoResponseSchema:
                  imagem,
                  lpa,
                  vpa,
-                 descricao
-
+                 descricao,
+                 cnpj
                  ):
+        self.acao_id = acao_id
         self.codigo = codigo
         self.pl = pl
         self.pvp = pvp
@@ -370,7 +375,7 @@ class AcaoResponseSchema:
         self.ev_ebitda = ev_ebitda
         self.margem_ebit = margem_ebit
         self.margem_liquida = margem_liquida
-        self.liq_corrent = liq_corrente
+        self.liq_corrente = liq_corrente
         self.roic = roic
         self.roe = roe
         self.liq_2meses = liq_2meses
@@ -384,3 +389,4 @@ class AcaoResponseSchema:
         self.lpa = lpa,
         self.vpa = vpa,
         self.descricao = descricao,
+        self.cnpj = cnpj

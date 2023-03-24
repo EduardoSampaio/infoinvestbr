@@ -1,5 +1,7 @@
 import datetime
-
+import time
+import models
+from openpyxl import load_workbook
 from sqlalchemy.orm import Session
 from models import Acao, FundosImobiliario
 from schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
@@ -8,6 +10,7 @@ from schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoRespo
 
 def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
     return AcaoResponseSchema(
+        acao_id=model.id,
         codigo=model.codigo,
         tipo=model.tipo,
         nome=model.nome,
@@ -34,12 +37,14 @@ def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
         liq_corrente=model.liq_corrente,
         roic=model.roic,
         roe=model.roe,
-        patrimonio_liquido=model.patrimonio_liquido
+        patrimonio_liquido=model.patrimonio_liquido,
+        cnpj=model.cnpj
     )
 
 
 def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioResponseSchema:
     return FundosImobiliarioResponseSchema(
+        fundo_id=model.id,
         codigo_do_fundo=model.codigo_do_fundo,
         nome=model.nome,
         descricao=model.descricao,
@@ -63,7 +68,7 @@ def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioRespon
         p_vpa=model.p_vpa,
         dy_patrimonial=model.dy_patrimonial,
         variacao_patrimonial=model.variacao_patrimonial,
-        rentab_patr_no_período=model.rentab_patr_no_período,
+        rentab_patr_no_periodo=model.rentab_patr_no_periodo,
         rentab_patr_acumulada=model.rentab_patr_acumulada,
         vacancia_fisica=model.vacancia_fisica,
         vacancia_financeira=model.vacancia_financeira,
@@ -74,7 +79,7 @@ def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioRespon
 def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponseSchema]:
     acoes = db.query(Acao).offset(skip).limit(limit).all()
 
-    list_acoes = list[AcaoResponseSchema]
+    list_acoes = []
 
     for acao in acoes:
         list_acoes.append(convert_acao_to_schema(acao))
@@ -85,7 +90,7 @@ def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponse
 def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100) -> list[FundosImobiliarioResponseSchema]:
     fundos = db.query(FundosImobiliario).offset(skip).limit(limit).all()
 
-    list_fundos = list[FundosImobiliarioResponseSchema]
+    list_fundos = []
     for fundos in fundos:
         list_fundos.append(convert_fundo_to_schema(fundos))
 
@@ -238,7 +243,7 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     _fundo.p_vpa = fundo.p_vpa
     _fundo.dy_patrimonial = fundo.dy_patrimonial
     _fundo.variacao_patrimonial = fundo.variacao_patrimonial
-    _fundo.rentab_patr_no_período = fundo.rentab_patr_no_período
+    _fundo.rentab_patr_no_periodo = fundo.rentab_patr_no_periodo
     _fundo.rentab_patr_acumulada = fundo.rentab_patr_acumulada
     _fundo.vacancia_fisica = fundo.vacancia_fisica
     _fundo.vacancia_financeira = fundo.vacancia_financeira
@@ -247,3 +252,76 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     db.add(_fundo)
     db.commit()
     db.refresh(_fundo)
+
+
+def import_fundos_imobiliarios(db: Session):
+    st = time.time()
+    workbook = load_workbook("src/analise/rendavariavel.xlsx")
+    sheet = workbook["FIIS"]
+    row_count = sheet.max_row
+    list_fii = []
+    for row in range(2, row_count + 1):
+        fii = FundosImobiliario(
+            codigo_do_fundo=sheet.cell(row=row, column=1).value,
+            setor=sheet.cell(row=row, column=2).value,
+            liquidez_diaria=sheet.cell(row=row, column=3).value,
+            dividendo=sheet.cell(row=row, column=4).value,
+            dividend_yield=sheet.cell(row=row, column=5).value,
+            dy_ano=sheet.cell(row=row, column=6).value,
+            variacao_preco=sheet.cell(row=row, column=7).value,
+            rentab_periodo=sheet.cell(row=row, column=8).value,
+            rentab_acumulada=sheet.cell(row=row, column=9).value,
+            patrimonio_liq=sheet.cell(row=row, column=10).value,
+            vpa=sheet.cell(row=row, column=11).value,
+            p_vpa=sheet.cell(row=row, column=12).value,
+            dy_patrimonial=sheet.cell(row=row, column=13).value,
+            variacao_patrimonial=sheet.cell(row=row, column=14).value,
+            rentab_patr_no_periodo=sheet.cell(row=row, column=15).value,
+            rentab_patr_acumulada=sheet.cell(row=row, column=16).value,
+            vacancia_fisica=sheet.cell(row=row, column=17).value,
+            vacancia_financeira=sheet.cell(row=row, column=18).value,
+            quantidade_ativos=sheet.cell(row=row, column=19).value
+        )
+        list_fii.append(fii)
+
+    count = db.query(models.FundosImobiliario).count()
+    if count == 0:
+        db.add_all(list_fii)
+        db.commit()
+
+
+def import_acoes(db: Session):
+    workbook = load_workbook("src/analise/rendavariavel.xlsx")
+    sheet = workbook["Ações"]
+    row_count = sheet.max_row
+    list_acoes = []
+    for row in range(2, row_count + 1):
+        acoes = Acao(
+            sheet.cell(row=row, column=1).value,
+            sheet.cell(row=row, column=2).value,
+            sheet.cell(row=row, column=3).value,
+            sheet.cell(row=row, column=4).value,
+            sheet.cell(row=row, column=5).value,
+            sheet.cell(row=row, column=6).value,
+            sheet.cell(row=row, column=7).value,
+            sheet.cell(row=row, column=8).value,
+            sheet.cell(row=row, column=9).value,
+            sheet.cell(row=row, column=10).value,
+            sheet.cell(row=row, column=11).value,
+            sheet.cell(row=row, column=12).value,
+            sheet.cell(row=row, column=13).value,
+            sheet.cell(row=row, column=14).value,
+            sheet.cell(row=row, column=15).value,
+            sheet.cell(row=row, column=16).value,
+            sheet.cell(row=row, column=17).value,
+            sheet.cell(row=row, column=18).value,
+            sheet.cell(row=row, column=19).value,
+            sheet.cell(row=row, column=20).value,
+            sheet.cell(row=row, column=21).value
+        )
+        list_acoes.append(acoes)
+
+    count = db.query(models.Acao).count()
+    if count == 0:
+        db.add_all(list_acoes)
+        db.commit()

@@ -86,17 +86,17 @@ class FundosImobiliario(Base):
     __tablename__ = "fundos_imobiliarios"
 
     id = Column("FUNDO_ID", Integer, index=True, primary_key=True)
-    codigo_do_fundo = Column("CODIGO_DO_FUNDO", String(30), index=True, unique=True, nullable=False)
-    nome = Column("NOME", String(30), nullable=True)
+    codigo_do_fundo = Column("CODIGO_DO_FUNDO", String, index=True, unique=True, nullable=False)
+    nome = Column("NOME", String, nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
     imagem = Column("IMAGEM", String(200), nullable=True)
     administrador = Column("ADMINISTRADOR", String, nullable=True)
-    cnpj = Column("CNPJ", String(30), nullable=True)
+    cnpj = Column("CNPJ", String, nullable=True)
     taxa_administracao = Column("TAXA_ADMINISTRACAO", Numeric, nullable=True)
     taxa_gestao = Column("TAXA_GESTAO", Numeric, nullable=True)
     taxa_performance = Column("TAXA_PERFORMANCE", Numeric, nullable=True)
-    tipo_gestao = Column("TIPO_GESTAO", String(1), nullable=True)
-    setor = Column("SETOR", String(30))
+    tipo_gestao = Column("TIPO_GESTAO", String, nullable=True)
+    setor = Column("SETOR", String)
     liquidez_diaria = Column("LIQUIDEZ_DIARIA", Numeric, nullable=True)
     dividendo = Column("DIVIDENDO", Numeric, nullable=True)
     dividend_yield = Column("DIVIDEND_YIELD", Numeric, nullable=True)
@@ -109,13 +109,14 @@ class FundosImobiliario(Base):
     p_vpa = Column("P_VPA", Numeric, nullable=True)
     dy_patrimonial = Column("DY_PATRIMONIAL", Numeric, nullable=True)
     variacao_patrimonial = Column("VARIAÇÃO_PATRIMONIAL", Numeric, nullable=True)
-    rentab_patr_no_período = Column("RENTAB_PATR_NO_PERÍODO", Numeric, nullable=True)
+    rentab_patr_no_periodo = Column("RENTAB_PATR_NO_PERÍODO", Numeric, nullable=True)
     rentab_patr_acumulada = Column("RENTAB_PATR_ACUMULADA", Numeric, nullable=True)
     vacancia_fisica = Column("VACANCIA_FISICA", Numeric, nullable=True)
     vacancia_financeira = Column("VACÂNCIA_FINANCEIRA", Numeric, nullable=True)
     quantidade_ativos = Column("QUANTIDADE_ATIVOS", Integer, nullable=True)
 
-    def __init__(self, codigo_do_fundo,
+    def __init__(self,
+                 codigo_do_fundo,
                  setor,
                  liquidez_diaria,
                  dividendo,
@@ -129,8 +130,9 @@ class FundosImobiliario(Base):
                  p_vpa,
                  dy_patrimonial,
                  variacao_patrimonial,
-                 rentab_patr_no_período,
+                 rentab_patr_no_periodo,
                  rentab_patr_acumulada,
+                 vacancia_fisica,
                  vacancia_financeira,
                  quantidade_ativos):
         self.codigo_do_fundo = codigo_do_fundo
@@ -147,8 +149,9 @@ class FundosImobiliario(Base):
         self.p_vpa = p_vpa
         self.dy_patrimonial = dy_patrimonial
         self.variacao_patrimonial = variacao_patrimonial
-        self.rentab_patr_no_período = rentab_patr_no_período
+        self.rentab_patr_no_periodo = rentab_patr_no_periodo
         self.rentab_patr_acumulada = rentab_patr_acumulada
+        self.vacancia_fisica = vacancia_fisica
         self.vacancia_financeira = vacancia_financeira
         self.quantidade_ativos = quantidade_ativos
 
@@ -157,8 +160,8 @@ class Acao(Base):
     __tablename__ = "acoes"
 
     id = Column("ACAO_ID", Integer, index=True, primary_key=True)
-    codigo = Column("CODIGO", String(10), index=True, unique=True, nullable=False)
-    nome = Column("NOME", String(200), nullable=True)
+    codigo = Column("CODIGO", String, index=True, unique=True, nullable=False)
+    nome = Column("NOME", String, nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
     imagem = Column("IMAGEM", String(200), nullable=True)
     pl = Column("PL", Numeric, nullable=True)
@@ -180,11 +183,11 @@ class Acao(Base):
     patrimonio_liquido = Column("PATRIMONIO_LIQUIDO", Numeric, nullable=True)
     div_bruta_patrim = Column("DIV_BRUTA_PATRIM", Numeric, nullable=True)
     cresc_rec_5a = Column("CRESC_REC_5A", Numeric, nullable=True)
-    setor = Column("SETOR", String(30), nullable=False)
+    setor = Column("SETOR", String, nullable=False)
     lpa = Column("LPA", Numeric, nullable=True)
     vpa = Column("VPA", Numeric, nullable=True)
-    cnpj = Column("CNPJ", String(30), nullable=True)
-    tipo = Column("TIPO", String(30), nullable=True)
+    cnpj = Column("CNPJ", String, nullable=True)
+    tipo = Column("TIPO", String, nullable=True)
 
     def __init__(self,
                  codigo,
@@ -200,7 +203,7 @@ class Acao(Base):
                  ev_ebitda,
                  margem_ebit,
                  margem_liquida,
-                 liq_corrent,
+                 liq_corrente,
                  roic,
                  roe,
                  liq_2meses,
@@ -223,7 +226,7 @@ class Acao(Base):
         self.ev_ebitda = ev_ebitda
         self.margem_ebit = margem_ebit
         self.margem_liquida = margem_liquida
-        self.liq_corrent = liq_corrent
+        self.liq_corrente = liq_corrente
         self.roic = roic
         self.roe = roe
         self.liq_2meses = liq_2meses

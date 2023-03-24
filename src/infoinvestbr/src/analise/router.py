@@ -26,25 +26,25 @@ def get_db():
 @router.get("/acao")
 async def get_acoes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes(db, skip, limit)
-    return Response(code=status.HTTP_200_OK, status="Ok", result=acoes)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios")
 async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios(db, skip, limit)
-    return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
 
 
 @router.get("/acao/{codigo}")
 async def get_acoes_by_codigo(codigo_id: int, db: Session = Depends(get_db)):
     acao = service.get_acoes_by_codigo(db, codigo_id)
-    return Response(code=status.HTTP_200_OK, status="Ok", result=acao)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=acao).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios/{codigo}")
 async def get_fundos_imobiliarios_by_codigo(provento_id: int, db: Session = Depends(get_db)):
     fundos_imobiliario = service.get_fundos_imobiliarios_by_codigo(db, provento_id)
-    return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliario)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliario).dict(exclude_none=True)
 
 
 @router.post("/fundos-imobiliarios")
@@ -73,3 +73,17 @@ async def update_fundos(fundo_imobilario_request: FundosImobiliarioRequestSchema
 async def update_acoes(acoes_request: AcaoRequestSchema, db: Session = Depends(get_db)):
     service.update_acoes(db, acoes_request)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Contentº", message="Ação atualizada com sucesso!")
+
+
+@router.post("/fundos-imobiliarios/importacao")
+async def importar_fundos(db: Session = Depends(get_db)):
+    service.import_fundos_imobiliarios(db)
+    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
+                    message="Fundos Imobiliário importados com sucesso!")
+
+
+@router.post("/acoes/importacao")
+async def importar_acoes(db: Session = Depends(get_db)):
+    service.import_acoes(db)
+    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
+                    message="Ações importadas com sucesso!")
