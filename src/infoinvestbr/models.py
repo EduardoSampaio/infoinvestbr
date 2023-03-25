@@ -1,5 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Numeric, Text, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, Integer, String, Numeric, Text, DateTime
 from database import Base
 from datetime import datetime
 
@@ -14,8 +13,6 @@ class Usuario(Base):
     is_admin = Column("IS_ADMIN", Boolean, default=False)
     senha = Column("SENHA", String(100), nullable=True)
     created_at = Column("CREATED_AT", DateTime, default=datetime.utcnow())
-
-    # transacoes = relationship("Transacao", back_populates="usuarios")
 
     def __init__(self, nome: str, email: str, senha: str = None, imagem: str = None):
         self.nome = nome
@@ -36,9 +33,6 @@ class Transacao(Base):
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
     preco = Column("PRECO", Numeric, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
-
-    # usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.USUARIO_ID"), index=True)
-    # usuario = relationship("Usuario", back_populates="transacoes")
 
     def __init__(self,
                  categoria: str,
@@ -134,7 +128,17 @@ class FundosImobiliario(Base):
                  rentab_patr_acumulada,
                  vacancia_fisica,
                  vacancia_financeira,
-                 quantidade_ativos):
+                 quantidade_ativos,
+                 nome="",
+                 descricao="",
+                 imagem="",
+                 administrador="",
+                 cnpj="",
+                 taxa_administracao="",
+                 taxa_gestao=0,
+                 taxa_performance=0,
+                 tipo_gestao="",
+                 ):
         self.codigo_do_fundo = codigo_do_fundo
         self.setor = setor
         self.liquidez_diaria = liquidez_diaria
@@ -154,6 +158,15 @@ class FundosImobiliario(Base):
         self.vacancia_fisica = vacancia_fisica
         self.vacancia_financeira = vacancia_financeira
         self.quantidade_ativos = quantidade_ativos
+        self.nome = nome
+        self.descricao = descricao
+        self.imagem = imagem
+        self.administrador = administrador
+        self.cnpj = cnpj
+        self.taxa_administracao = taxa_administracao
+        self.taxa_gestao = taxa_gestao
+        self.taxa_performance = taxa_gestao
+        self.tipo_gestao = tipo_gestao
 
 
 class Acao(Base):
@@ -210,8 +223,13 @@ class Acao(Base):
                  patrimonio_liquido,
                  div_bruta_patrim,
                  cresc_rec_5a,
-                 setor
-
+                 setor,
+                 tipo="",
+                 nome="",
+                 imagem="",
+                 lpa=0,
+                 vpa=0,
+                 descricao="",
                  ):
         self.codigo = codigo
         self.pl = pl
@@ -234,3 +252,9 @@ class Acao(Base):
         self.div_bruta_patrim = div_bruta_patrim
         self.cresc_rec_5a = cresc_rec_5a
         self.setor = setor
+        self.tipo = tipo,
+        self.nome = nome,
+        self.imagem = imagem,
+        self.lpa = lpa,
+        self.vpa = vpa,
+        self.descricao = descricao

@@ -11,6 +11,7 @@ from provider import router as routerProvider
 from src.proventos import router as routerProvento
 from src.transacoes import router as routerTransacao
 from src.analise import router as routerAnalise
+from src.cotacoes import router as routerCotacao
 import models
 
 
@@ -27,6 +28,7 @@ app.include_router(routerProvider)
 app.include_router(routerProvento.router)
 app.include_router(routerTransacao.router)
 app.include_router(routerAnalise.router)
+app.include_router(routerCotacao.router)
 
 
 # Database dependency

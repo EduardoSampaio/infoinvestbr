@@ -29,6 +29,18 @@ async def get_acoes(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 
+@router.get("/fundos-imobiliarios/setor/{setor}")
+async def get_fundos_imobiliarios(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    fundos_imobiliarios = service.get_fundos_imobiliarios_setor(db, setor, skip, limit)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
+
+
+@router.get("/acao/setor/{setor}")
+async def get_acoes(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    acoes = service.get_acoes_by_setor(db, setor, skip, limit)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
+
+
 @router.get("/fundos-imobiliarios")
 async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios(db, skip, limit)
@@ -75,15 +87,29 @@ async def update_acoes(acoes_request: AcaoRequestSchema, db: Session = Depends(g
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Contentº", message="Ação atualizada com sucesso!")
 
 
-@router.post("/fundos-imobiliarios/importacao")
+@router.post("/fundos-imobiliarios/importacao", tags=["Importação"])
 async def importar_fundos(db: Session = Depends(get_db)):
     service.import_fundos_imobiliarios(db)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
                     message="Fundos Imobiliário importados com sucesso!")
 
 
-@router.post("/acoes/importacao")
+@router.post("/acoes/importacao", tags=["Importação"])
 async def importar_acoes(db: Session = Depends(get_db)):
     service.import_acoes(db)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
                     message="Ações importadas com sucesso!")
+
+
+@router.delete("/fundos-imobiliarios/importacao", tags=["Importação"])
+async def importar_fundos(db: Session = Depends(get_db)):
+    service.remove_todos_fundos(db)
+    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
+                    message="Todos os Fundos Imobiliário foram removidos com sucesso!")
+
+
+@router.delete("/acoes/importacao", tags=["Importação"])
+async def importar_acoes(db: Session = Depends(get_db)):
+    service.remove_todas_acoes(db)
+    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
+                    message="Todas as Ações foram removidas com sucesso!")

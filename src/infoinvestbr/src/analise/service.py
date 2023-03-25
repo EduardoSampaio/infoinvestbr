@@ -1,4 +1,3 @@
-import datetime
 import time
 import models
 from openpyxl import load_workbook
@@ -6,6 +5,8 @@ from sqlalchemy.orm import Session
 from models import Acao, FundosImobiliario
 from schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
     FundosImobiliarioResponseSchema
+
+import requests
 
 
 def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
@@ -87,8 +88,30 @@ def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponse
     return list_acoes
 
 
+def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100) -> list[AcaoResponseSchema]:
+    acoes = db.query(Acao).filter(Acao.setor == setor).offset(skip).limit(limit).all()
+
+    list_acoes = []
+
+    for acao in acoes:
+        list_acoes.append(convert_acao_to_schema(acao))
+
+    return list_acoes
+
+
 def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100) -> list[FundosImobiliarioResponseSchema]:
     fundos = db.query(FundosImobiliario).offset(skip).limit(limit).all()
+
+    list_fundos = []
+    for fundos in fundos:
+        list_fundos.append(convert_fundo_to_schema(fundos))
+
+    return list_fundos
+
+
+def get_fundos_imobiliarios_setor(db: Session, setor: str, skip: int = 0, limit: int = 100) -> \
+        list[FundosImobiliarioResponseSchema]:
+    fundos = db.query(FundosImobiliario).filter(FundosImobiliario.setor == setor).offset(skip).limit(limit).all()
 
     list_fundos = []
     for fundos in fundos:
@@ -114,7 +137,7 @@ def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str) -> FundosImobili
         db.query(FundosImobiliario).filter(FundosImobiliario.codigo_do_fundo == codigo).first())
 
 
-def create_acoes(db: Session, acao: AcaoRequestSchema):
+def upadate_acoes(db: Session, acao: AcaoRequestSchema):
     _acao = get_acoes_by_id(db, acao.acao_id)
     _acao.codigo = acao.codigo
     _acao.tipo = acao.tipo
@@ -148,36 +171,35 @@ def create_acoes(db: Session, acao: AcaoRequestSchema):
     db.refresh(_acao)
 
 
-def update_acoes(db: Session, acao: AcaoRequestSchema):
-    _acao = Acao()
-    _acao.codigo = acao.codigo
-    _acao.tipo = acao.tipo
-    _acao.nome = acao.nome
-    _acao.imagem = acao.imagem
-    _acao.lpa = acao.lpa
-    _acao.vpa = acao.vpa
-    _acao.setor = acao.setor
-    _acao.descricao = acao.descricao
-    _acao.cresc_rec_5a = acao.cresc_rec_5a
-    _acao.div_bruta_patrim = acao.div_bruta_patrim
-    _acao.ev_ebit = acao.ev_ebit
-    _acao.dividend_yield = acao.dividend_yield
-    _acao.liq_2meses = acao.liq_2meses
-    _acao.pl = acao.pl
-    _acao.pvp = acao.pvp
-    _acao.psr = acao.psr
-    _acao.p_ativo = acao.p_ativo
-    _acao.p_cap_giro = _acao.p_cap_giro
-    _acao.p_ebit = _acao.p_ebit
-    _acao.p_ativ_circ_liq = acao.p_ativ_circ_liq
-    _acao.ev_ebit = acao.ev_ebit
-    _acao.ev_ebitda = acao.ev_ebitda
-    _acao.margem_ebit = acao.margem_ebit
-    _acao.margem_liquida = acao.margem_liquida
-    _acao.liq_corrente = acao.liq_corrente
-    _acao.roic = acao.roic
-    _acao.roe = acao.roe
-    _acao.patrimonio_liquido = acao.patrimonio_liquido
+def create_acoes(db: Session, acao: AcaoRequestSchema):
+    _acao = Acao(
+        codigo=acao.codigo,
+        tipo=acao.tipo,
+        nome=acao.nome,
+        imagem=acao.imagem,
+        lpa=acao.lpa,
+        vpa=acao.vpa,
+        descricao=acao.descricao,
+        setor=acao.setor,
+        cresc_rec_5a=acao.cresc_rec_5a,
+        div_bruta_patrim=acao.div_bruta_patrim,
+        ev_ebit=acao.ev_ebit,
+        dividend_yield=acao.dividend_yield,
+        liq_2meses=acao.liq_2meses,
+        pl=acao.pl,
+        pvp=acao.pvp,
+        psr=acao.psr,
+        p_ativo=acao.p_ativo,
+        p_cap_giro=acao.p_cap_giro,
+        p_ebit=acao.p_ebit,
+        p_ativ_circ_liq=acao.p_ativ_circ_liq,
+        ev_ebitda=acao.ev_ebitda,
+        margem_ebit=acao.margem_ebit,
+        margem_liquida=acao.margem_liquida,
+        liq_corrente=acao.liq_corrente,
+        roic=acao.roic,
+        roe=acao.roe,
+        patrimonio_liquido=acao.patrimonio_liquido)
 
     db.add(_acao)
     db.commit()
@@ -185,42 +207,7 @@ def update_acoes(db: Session, acao: AcaoRequestSchema):
 
 
 def update_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
-    _fundo = FundosImobiliario()
-    _fundo.nome = fundo.nome
-    _fundo.descricao = fundo.descricao
-    _fundo.imagem = fundo.imagem
-    _fundo.administrador = fundo.administrador
-    _fundo.cnpj = fundo.cnpj
-    _fundo.taxa_administracao = fundo.taxa_administracao
-    _fundo.taxa_gestao = fundo.taxa_gestao
-    _fundo.taxa_performance = fundo.taxa_performance
-    _fundo.tipo_gestao = fundo.tipo_gestao
-    _fundo.setor = fundo.setor
-    _fundo.liquidez_diaria = fundo.liquidez_diaria
-    _fundo.dividendo = fundo.dividendo
-    _fundo.dividend_yield = fundo.dividend_yield
-    _fundo.dy_ano = fundo.dy_ano
-    _fundo.variacao_preco = fundo.variacao_preco
-    _fundo.rentab_periodo = fundo.rentab_periodo
-    _fundo.rentab_acumulada = fundo.rentab_acumulada
-    _fundo.patrimonio_liq = fundo.patrimonio_liq
-    _fundo.vpa = fundo.vpa
-    _fundo.p_vpa = fundo.p_vpa
-    _fundo.dy_patrimonial = fundo.dy_patrimonial
-    _fundo.variacao_patrimonial = fundo.variacao_patrimonial
-    _fundo.rentab_patr_no_período = fundo.rentab_patr_no_período
-    _fundo.rentab_patr_acumulada = fundo.rentab_patr_acumulada
-    _fundo.vacancia_fisica = fundo.vacancia_fisica
-    _fundo.vacancia_financeira = fundo.vacancia_financeira
-    _fundo.quantidade_ativos = fundo.quantidade_ativos
-
-    db.commit()
-    db.refresh(_fundo)
-
-
-def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
-    _fundo = FundosImobiliario()
-    _fundo.codigo_do_fundo = fundo.codigo_do_fundo
+    _fundo = get_fundos_imobiliarios_by_id(db, fundo.fundo_id)
     _fundo.nome = fundo.nome
     _fundo.descricao = fundo.descricao
     _fundo.imagem = fundo.imagem
@@ -249,13 +236,47 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     _fundo.vacancia_financeira = fundo.vacancia_financeira
     _fundo.quantidade_ativos = fundo.quantidade_ativos
 
+    db.commit()
+    db.refresh(_fundo)
+
+
+def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
+    _fundo = FundosImobiliario(
+        codigo_do_fundo=fundo.codigo_do_fundo,
+        nome=fundo.nome,
+        descricao=fundo.descricao,
+        imagem=fundo.imagem,
+        administrador=fundo.administrador,
+        cnpj=fundo.cnpj,
+        taxa_administracao=fundo.taxa_administracao,
+        taxa_gestao=fundo.taxa_gestao,
+        taxa_performance=fundo.taxa_performance,
+        tipo_gestao=fundo.tipo_gestao,
+        setor=fundo.setor,
+        liquidez_diaria=fundo.liquidez_diaria,
+        dividendo=fundo.dividendo,
+        dividend_yield=fundo.dividend_yield,
+        dy_ano=fundo.dy_ano,
+        variacao_preco=fundo.variacao_preco,
+        rentab_periodo=fundo.rentab_periodo,
+        rentab_acumulada=fundo.rentab_acumulada,
+        patrimonio_liq=fundo.patrimonio_liq,
+        vpa=fundo.vpa,
+        p_vpa=fundo.p_vpa,
+        dy_patrimonial=fundo.dy_patrimonial,
+        variacao_patrimonial=fundo.variacao_patrimonial,
+        rentab_patr_no_periodo=fundo.rentab_patr_no_periodo,
+        rentab_patr_acumulada=fundo.rentab_patr_acumulada,
+        vacancia_fisica=fundo.vacancia_fisica,
+        vacancia_financeira=fundo.vacancia_financeira,
+        quantidade_ativos=fundo.quantidade_ativos)
+
     db.add(_fundo)
     db.commit()
     db.refresh(_fundo)
 
 
 def import_fundos_imobiliarios(db: Session):
-    st = time.time()
     workbook = load_workbook("src/analise/rendavariavel.xlsx")
     sheet = workbook["FIIS"]
     row_count = sheet.max_row
@@ -325,3 +346,52 @@ def import_acoes(db: Session):
     if count == 0:
         db.add_all(list_acoes)
         db.commit()
+
+
+def remove_todas_acoes(db: Session):
+    acoes = db.query(Acao).all()
+
+    for acao in acoes:
+        db.delete(acao)
+
+    db.commit()
+
+
+def remove_todos_fundos(db: Session):
+    fundos = db.query(FundosImobiliario).all()
+
+    for fundo in fundos:
+        db.delete(fundo)
+
+    db.commit()
+
+#
+# def getByTicketCurrent(ticker):
+#     cotacao = web.DataReader(f"{ticker}.SA", data_source="yahoo")
+#     row = cotacao.iloc[-1]
+#     return row.to_json()
+#
+#
+# def getTicketByInterval(ticker, inicio, fim):
+#     start = convertDate(inicio)
+#     end = convertDate(fim)
+#     cotacao = web.DataReader(f"{ticker}.SA", data_source="yahoo", start=start, end=end)
+#     return cotacao.to_json()
+#
+#
+# def convertDate(datestr):
+#     day = int(datestr.split('-')[0])
+#     month = int(datestr.split('-')[1])
+#     year = int(datestr.split('-')[2])
+#     return f'{year}-{month}-{day}'
+#
+#
+# def getMoedaCotacao():
+#     request_url = requests.get("http://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,ETH-BRL")
+#     request_url_dic = request_url.json()
+#     return {
+#         "dolar": request_url_dic["USDBRL"]["bid"],
+#         "euro": request_url_dic["EURBRL"]["bid"],
+#         "btc": request_url_dic["BTCBRL"]["bid"],
+#         "ethereum": request_url_dic["ETHBRL"]["bid"],
+#     }

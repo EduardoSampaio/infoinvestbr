@@ -12,7 +12,7 @@ from config import settings
 
 router = APIRouter(
     prefix="/api/v1/usuarios",
-    tags=["Usuarios"],
+    tags=["Usuários"],
     dependencies=[],
     responses={404: {"descrição": "Usuario não encontrado"}},
 )
