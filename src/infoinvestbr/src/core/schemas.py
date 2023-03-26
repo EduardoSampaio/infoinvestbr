@@ -4,6 +4,7 @@ from typing import Optional, TypeVar
 
 from pydantic import BaseModel
 from pydantic.generics import GenericModel, Generic
+from src.core.tipos import TipoCategoria, TipoOperacao
 
 T = TypeVar('T')
 
@@ -40,7 +41,8 @@ class UsuarioResponseSchema:
     email: str
     imagem: Optional[str] = None
 
-    def __init__(self, usuario_id: int, nome: str, email: str, is_admin: bool, imagem: Optional[str] = None):
+    def __init__(self, usuario_id: int, nome: str, email: str, is_admin: bool,
+                 imagem: Optional[str] = None):
         self.usuario_id = usuario_id
         self.nome = nome
         self.email = email
@@ -49,7 +51,6 @@ class UsuarioResponseSchema:
 
 
 class TransacaoRequestSchema(BaseModel):
-    transacao_id: Optional[int]
     categoria: str
     codigo_ativo: str
     ordem: str
@@ -57,7 +58,6 @@ class TransacaoRequestSchema(BaseModel):
     data: datetime.date
     quantidade: int
     preco: float
-    total: float
     usuario_id: int
 
     class Config:
@@ -88,7 +88,6 @@ class TransacaoResponseSchema:
                  total: float,
                  usuario_id: int):
         self.transacao_id = transacao_id
-        self.usuario_id = usuario_id
         self.codigo_ativo = codigo_ativo
         self.ordem = ordem
         self.corretora = corretora
@@ -97,6 +96,7 @@ class TransacaoResponseSchema:
         self.preco = preco
         self.total = total
         self.categoria = categoria
+        self.usuario_id = usuario_id
 
 
 class ProventoRequestSchema(BaseModel):
@@ -427,3 +427,29 @@ class DividendoSchema:
         self.codigo = codigo
         self.data = data
         self.valor = valor
+
+
+@dataclass()
+class PatrimonioResponse:
+    patrimonio_id: int
+    codigo_ativo: str
+    preco_medio: float
+    quantidade: int
+    categoria: TipoCategoria
+    total: float
+    percentual_ativo: float
+    percentual_carteira: float
+    usuario_id: int
+    variacao_diaria: float
+    variacao_total: float
+    rentabilidade: float
+
+
+@dataclass()
+class CarteiraResponse:
+    total: float
+    usuario_id: int
+    variacao_diaria: float
+    variacao_total: float
+    patrimonio: list[PatrimonioResponse]
+    rentabilidade: float

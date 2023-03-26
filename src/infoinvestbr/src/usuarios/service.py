@@ -44,7 +44,7 @@ def create_usuario_google(db: Session, nome: str, email: str, imagem: str) -> Us
 
 
 def remove_usuario(db: Session, usuario_id: int):
-    _usuario = get_usuario_by_id(db, usuario_id)
+    _usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     db.delete(_usuario)
     db.commit()
 
