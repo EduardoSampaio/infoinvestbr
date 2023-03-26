@@ -1,8 +1,6 @@
-import datetime
-
 from fastapi import APIRouter, Depends, status
-from database import SessionLocal
-from schemas import Response, AcaoRequestSchema, FundosImobiliarioRequestSchema
+from src.core.database import SessionLocal
+from src.core.schemas import Response, AcaoRequestSchema, FundosImobiliarioRequestSchema
 from src.analise import service
 from sqlalchemy.orm import Session
 

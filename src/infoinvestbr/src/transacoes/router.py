@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
-from database import SessionLocal
-from schemas import TransacaoResponseSchema, TransacaoRequestSchema, Response
+from src.core.database import SessionLocal
+from src.core.schemas import TransacaoRequestSchema, Response
 from src.transacoes import service
 from sqlalchemy.orm import Session
 

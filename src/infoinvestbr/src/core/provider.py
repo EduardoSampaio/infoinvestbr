@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from fastapi_sso.sso.google import GoogleSSO
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.requests import Request as StarletteRequest
-from database import SessionLocal
-from config import settings
+from src.core.database import SessionLocal
+from src.core.config import settings
 from src.usuarios.utils import create_access_token, create_refresh_token
 from src.usuarios import service
 from datetime import timedelta

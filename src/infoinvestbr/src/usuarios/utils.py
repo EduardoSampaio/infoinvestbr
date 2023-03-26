@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, HTTPException, Request
 from datetime import datetime, timedelta
 from typing import Union, Any
-from config import settings
+from  src.core.config import settings
 from src.usuarios.exceptions import get_user_exception
 from jose import JWTError, jwt
 

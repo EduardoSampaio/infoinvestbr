@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 def get_user_exception():
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Acesso Negado!",
         headers={"WWW-Authenticate": "Bearer"}
     )
 
@@ -12,6 +12,6 @@ def get_user_exception():
 def token_exception():
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
+        detail="Usuário ou Senha incorretos!",
         headers={"WWW-Authenticate": "Bearer"}
     )

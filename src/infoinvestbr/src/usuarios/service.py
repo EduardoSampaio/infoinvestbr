@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models import Usuario
-from schemas import UsuarioResponseSchema, UsuarioRequestSchema
+from src.core.models import Usuario
+from src.core.schemas import UsuarioResponseSchema, UsuarioRequestSchema
 from passlib.context import CryptContext
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

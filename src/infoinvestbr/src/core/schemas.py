@@ -413,3 +413,17 @@ class CotacaoSchema:
         self.fechamento = fechamento
         self.baixa = baixa
         self.alta = alta
+
+
+@dataclass()
+class DividendoSchema:
+    codigo: str
+    data: datetime.date
+    valor: float
+
+    def __int__(self, codigo: str,
+                data: datetime.date,
+                valor: float):
+        self.codigo = codigo
+        self.data = data
+        self.valor = valor

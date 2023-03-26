@@ -1,8 +1,6 @@
-import datetime
-
 from sqlalchemy.orm import Session
-from models import Transacao
-from schemas import TransacaoResponseSchema, TransacaoRequestSchema
+from src.core.models import Transacao
+from src.core.schemas import TransacaoResponseSchema, TransacaoRequestSchema
 
 
 def convert_schema(model: TransacaoResponseSchema) -> TransacaoResponseSchema:

@@ -1,26 +1,51 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi_sso.sso.google import GoogleSSO
 from starlette.middleware.sessions import SessionMiddleware
-from config import settings
+from src.core.config import settings
 from functools import lru_cache
-from database import engine, SessionLocal
+from src.core.database import engine, SessionLocal
 from src.usuarios import router as routerUsuario
-from provider import router as routerProvider
+from src.core.provider import router as routerProvider
 from src.proventos import router as routerProvento
 from src.transacoes import router as routerTransacao
 from src.analise import router as routerAnalise
 from src.cotacoes import router as routerCotacao
-import models
-
+from src.core import models
+from src.core.exceptions import CodigoAtivoException
+from pathlib import Path
+from src.core.custom_logging import CustomizeLogger
+import uvicorn
+import logging
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+logger = logging.getLogger(__name__)
 
-google_sso = GoogleSSO(settings.GOOGLE_CLIENT_ID, settings.GOOGLE_CLIENT_SECRET,
-                       "http://localhost:8000/google/callback")
+config_path = Path(__file__).with_name("logging_config.json")
+
+
+def create_app() -> FastAPI:
+    _app = FastAPI(title='INFO INVEST BR', debug=False)
+    _logger = CustomizeLogger.make_logger(config_path)
+    _app.logger = _logger
+
+    return _app
+
+
+app = create_app()
+
+
+# Exceptions
+@app.exception_handler(CodigoAtivoException)
+async def handle_http_exception(request: Request, exc: CodigoAtivoException):
+    return JSONResponse(
+        status_code=400,
+        content={
+            "mensagem": f"Erro de solicitação para o código: {exc.name}, o código do ativo é formado de {exc.name}.SA"}
+    )
 
 # Routers
 app.include_router(routerUsuario.router)
@@ -55,3 +80,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if __name__ == '__main__':
+    uvicorn.run(app, port=8000)

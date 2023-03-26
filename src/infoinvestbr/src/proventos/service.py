@@ -1,8 +1,8 @@
 import datetime
 
 from sqlalchemy.orm import Session
-from models import Provento
-from schemas import ProventoRequestSchema, ProventoResponseSchema
+from src.core.models import Provento
+from src.core.schemas import ProventoRequestSchema, ProventoResponseSchema
 
 
 def convert_to_schema(model: ProventoResponseSchema) -> ProventoResponseSchema:

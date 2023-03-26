@@ -1,12 +1,10 @@
-import time
-import models
+from src.core import models
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
-from models import Acao, FundosImobiliario
-from schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
+from src.core.models import Acao, FundosImobiliario
+from src.core.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
     FundosImobiliarioResponseSchema
-
-import requests
+import logging as logger
 
 
 def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
@@ -277,6 +275,7 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
 
 
 def import_fundos_imobiliarios(db: Session):
+    logger.info("Inicio da Importação de fundos Imobiliários")
     workbook = load_workbook("src/analise/rendavariavel.xlsx")
     sheet = workbook["FIIS"]
     row_count = sheet.max_row
@@ -309,6 +308,7 @@ def import_fundos_imobiliarios(db: Session):
     if count == 0:
         db.add_all(list_fii)
         db.commit()
+    logger.info("Fim da Importação de fundos Imobiliários")
 
 
 def import_acoes(db: Session):
@@ -364,34 +364,3 @@ def remove_todos_fundos(db: Session):
         db.delete(fundo)
 
     db.commit()
-
-#
-# def getByTicketCurrent(ticker):
-#     cotacao = web.DataReader(f"{ticker}.SA", data_source="yahoo")
-#     row = cotacao.iloc[-1]
-#     return row.to_json()
-#
-#
-# def getTicketByInterval(ticker, inicio, fim):
-#     start = convertDate(inicio)
-#     end = convertDate(fim)
-#     cotacao = web.DataReader(f"{ticker}.SA", data_source="yahoo", start=start, end=end)
-#     return cotacao.to_json()
-#
-#
-# def convertDate(datestr):
-#     day = int(datestr.split('-')[0])
-#     month = int(datestr.split('-')[1])
-#     year = int(datestr.split('-')[2])
-#     return f'{year}-{month}-{day}'
-#
-#
-# def getMoedaCotacao():
-#     request_url = requests.get("http://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,ETH-BRL")
-#     request_url_dic = request_url.json()
-#     return {
-#         "dolar": request_url_dic["USDBRL"]["bid"],
-#         "euro": request_url_dic["EURBRL"]["bid"],
-#         "btc": request_url_dic["BTCBRL"]["bid"],
-#         "ethereum": request_url_dic["ETHBRL"]["bid"],
-#     }

@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, Integer, String, Numeric, Text, DateTime, CheckConstraint
-from database import Base
+from src.core.database import Base
 from datetime import datetime
 
 
@@ -134,7 +134,7 @@ class FundosImobiliario(Base):
                  imagem="",
                  administrador="",
                  cnpj="",
-                 taxa_administracao="",
+                 taxa_administracao=0,
                  taxa_gestao=0,
                  taxa_performance=0,
                  tipo_gestao="",
@@ -165,7 +165,7 @@ class FundosImobiliario(Base):
         self.cnpj = cnpj
         self.taxa_administracao = taxa_administracao
         self.taxa_gestao = taxa_gestao
-        self.taxa_performance = taxa_gestao
+        self.taxa_performance = taxa_performance
         self.tipo_gestao = tipo_gestao
 
 
