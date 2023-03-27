@@ -16,11 +16,17 @@ from src.proventos import router as routerProvento
 from src.transacoes import router as routerTransacao
 from src.analise import router as routerAnalise
 from src.cotacoes import router as routerCotacao
-from src.core import models
+from src.core import models as core
+from src.analise import models as analise
+from src.transacoes import models as transacao
+from src.proventos import models as proventos
 from src.core.exceptions import CodigoAtivoException
 from src.core.custom_logging import CustomizeLogger
 
-models.Base.metadata.create_all(bind=engine)
+core.Base.metadata.create_all(bind=engine)
+analise.Base.metadata.create_all(bind=engine)
+transacao.Base.metadata.create_all(bind=engine)
+proventos.Base.metadata.create_all(bind=engine)
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +46,7 @@ app = create_app()
 
 # Exceptions
 @app.exception_handler(CodigoAtivoException)
-async def handle_http_exception(request: Request, exc: CodigoAtivoException):
+async def handle_http_exception(exc: CodigoAtivoException):
     return JSONResponse(
         status_code=400,
         content={

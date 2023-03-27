@@ -30,6 +30,12 @@ async def get_moeda_cotacao():
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
+@router.get("/ibovespa")
+async def get_by_codigo_ibovespa(periodo: str, intervalo: str = "1d"):
+    valor = service.get_by_codigo_ibovespa(periodo, intervalo)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
 @router.get("/codigo-ativo/{codigo_ativo}")
 async def get_by_codigo(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
     valor = service.get_by_codigo(codigo_ativo, periodo, intervalo)
@@ -67,5 +73,3 @@ async def deletar_dados_historicos(codigo: str, db: Session = Depends(get_db)):
 async def get_historico_dividendo(codigo: str):
     valor = service.get_historico_dividendo(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
-
-

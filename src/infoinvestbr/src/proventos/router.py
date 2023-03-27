@@ -2,7 +2,8 @@ import datetime
 
 from fastapi import APIRouter, Depends, status
 from src.core.database import SessionLocal
-from src.core.schemas import ProventoRequestSchema, Response
+from src.proventos.schemas import ProventoRequestSchema
+from src.core.schemas import Response
 from src.proventos import service
 from sqlalchemy.orm import Session
 

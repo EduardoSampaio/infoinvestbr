@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from src.core.database import SessionLocal
-from src.core.schemas import TransacaoRequestSchema, Response
+from src.transacoes.schemas import TransacaoRequestSchema
 from src.transacoes import service
+from src.core.schemas import Response
 from sqlalchemy.orm import Session
 
 router = APIRouter(
@@ -50,3 +51,9 @@ async def get_transacao_by_usuario_id(usuario_id: int, db: Session = Depends(get
 async def get_transacao_by_codigo(codigo_ativo: str, db: Session = Depends(get_db)):
     transacoes = service.get_transacao_by_codigo(db, codigo_ativo)
     return Response(code=status.HTTP_200_OK, status="OK", result=transacoes)
+
+
+@router.get("/patrimonio/{usuarios_id}")
+async def get_transacao_by_codigo(usuario_id: str, db: Session = Depends(get_db)):
+    patrimonios = service.get_patrimonio_by_usuario(db, usuario_id)
+    return Response(code=status.HTTP_200_OK, status="OK", result=patrimonios)

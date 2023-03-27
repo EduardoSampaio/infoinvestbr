@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
-from src.core.models import Transacao, Patrimonio, PatrimonioTransacao, Acao, FundosImobiliario
-from src.core.schemas import TransacaoResponseSchema, TransacaoRequestSchema
+from src.transacoes.models import Transacao, Patrimonio, PatrimonioTransacao
+from src.analise.models import Acao, FundosImobiliario
+from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestSchema, PatrimonioSchemaResponse
 from fastapi import HTTPException, status
 from src.core.tipos import TipoCategoria
+from src.cotacoes import service as cotacao
 
 
 def convert_schema(model: TransacaoResponseSchema) -> TransacaoResponseSchema:
@@ -21,13 +23,14 @@ def convert_schema(model: TransacaoResponseSchema) -> TransacaoResponseSchema:
 
 
 def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transacao:
+    #validar_codigo(db, transacao.codigo_ativo, transacao.categoria)
     _trasacao = Transacao(
-        categoria=transacao.categoria,
+        categoria=transacao.categoria.name,
         codigo_ativo=transacao.codigo_ativo,
         quantidade=transacao.quantidade,
         corretora=transacao.corretora,
         preco=transacao.preco,
-        ordem=transacao.ordem,
+        ordem=transacao.ordem.name,
         data=transacao.data,
         usuario_id=transacao.usuario_id
     )
@@ -101,7 +104,7 @@ def zerar_posicao_ativo(db, patrimonio_exists):
 def create_patrimonio(transacao: Transacao):
     return Patrimonio(
         codigo_ativo=transacao.codigo_ativo,
-        categoria=transacao.categoria,
+        categoria=transacao.categoria.name,
         usuario_id=transacao.usuario_id,
         quantidade=transacao.quantidade,
         preco_medio=transacao.preco
@@ -149,7 +152,7 @@ def validar_codigo(db: Session, codigo: str, categoria: TipoCategoria):
         if exist is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Código da ação é inesistente"
+                detail="Código da ação é inexistente"
             )
     else:
         exist = db.query(FundosImobiliario).filter(Acao.codigo == codigo).first()
@@ -158,3 +161,60 @@ def validar_codigo(db: Session, codigo: str, categoria: TipoCategoria):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Código do fundo imobiliário é inesistente"
             )
+
+
+def get_patrimonio_by_usuario(db: Session, usuario_id: str) -> list[PatrimonioSchemaResponse]:
+    valores = db.query(Patrimonio).filter(Patrimonio.usuario_id == usuario_id).all()
+
+    list_valores = []
+    for valor in valores:
+        list_valores.append(convert_patrimonio_schema(valor))
+
+    return list_valores
+
+
+def convert_patrimonio_schema(model: Patrimonio) -> PatrimonioSchemaResponse:
+    variacao_total = calcular_variacao_total(model.codigo_ativo, model.preco_medio, model.quantidade)
+    variacao_diaria = calcular_variacao_diaria(model.codigo_ativo, model.total)
+    rentabilidade = calcular_rentabilidade(model.codigo_ativo, model.preco_medio)
+    return PatrimonioSchemaResponse(
+        patrimonio_id=model.patrimonio_id,
+        usuario_id=model.usuario_id,
+        quantidade=model.quantidade,
+        codigo_ativo=model.codigo_ativo,
+        preco_medio=model.preco_medio,
+        categoria=TipoCategoria[model.categoria].name,
+        total=model.total,
+        rentabilidade=rentabilidade,
+        variacao_total=variacao_total,
+        percentual_ativo=0,
+        variacao_diaria=variacao_diaria,
+        percentual_carteira=0
+    )
+
+
+def calcular_rentabilidade(codigo_ativo: str, preco_medio: float) -> float:
+    """
+    ROI = [(Preço atual da ação - Preço de compra da ação) / Preço de compra da ação] x 100
+    :param codigo_ativo:
+    :param preco_medio:
+    :return: rentabilidade
+    """
+    preco_atual = cotacao.get_by_codigo_atual(f"{codigo_ativo}.SA")
+    return ((float(preco_atual) - float(preco_medio)) / float(preco_medio)) * 100
+
+
+def calcular_variacao_diaria(codigo_ativo: str, total: float) -> float:
+    preco = cotacao.get_by_codigo_varicao_diaria(f"{codigo_ativo}.SA")
+    preco_fechamento_dia_anterior = float(preco[1])
+    preco_fechamento_atual = float(preco[0])
+    porcentagem = ((float(preco_fechamento_atual) - float(preco_fechamento_dia_anterior)) / float(
+        preco_fechamento_dia_anterior)) * 100
+    variacao = (float(total / 100)) * porcentagem
+    return variacao, porcentagem
+
+
+def calcular_variacao_total(codigo_ativo: str, preco_inicial: float, quantidade: int) :
+    preco_atual = cotacao.get_by_codigo_atual(f"{codigo_ativo}.SA")
+    variacao_total = (float(preco_atual) - float(preco_inicial)) * quantidade
+    return variacao_total

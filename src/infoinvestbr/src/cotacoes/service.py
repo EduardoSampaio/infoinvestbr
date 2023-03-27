@@ -34,6 +34,30 @@ def get_by_codigo(codigo: str, periodo: str, intervalo: str):
     return list_cotacao
 
 
+def get_by_codigo_ibovespa(periodo: str, intervalo: str):
+    """
+     [IFiX.SA]
+     periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
+     intevalo= [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
+    """
+    cotacao = yf.Ticker("^BVSP")
+    cotacao = cotacao.history(period=periodo, interval=intervalo)
+
+    list_cotacao = []
+    for data in cotacao['Close'].keys():
+        _cotacao = CotacaoSchema(
+            codigo="^BVSP",
+            data=data,
+            abertura=cotacao['Open'].get(data),
+            fechamento=cotacao['Close'].get(data),
+            alta=cotacao['High'].get(data),
+            baixa=cotacao['Low'].get(data),
+        )
+        list_cotacao.append(_cotacao)
+
+    return list_cotacao
+
+
 def get_by_codigo_by_intervalo(codigo, inicio: datetime.date, fim: datetime.date):
     """
      codigo  = [CODIGO.SA]
@@ -58,6 +82,20 @@ def get_by_codigo_by_intervalo(codigo, inicio: datetime.date, fim: datetime.date
         list_cotacao.append(_cotacao)
 
     return list_cotacao
+
+
+def get_by_codigo_atual(codigo: str) -> float:
+    codigo_exception(codigo)
+    cotacao = yf.Ticker(codigo)
+    cotacao = cotacao.history(period="1d")['Close'][0]
+    return cotacao
+
+
+def get_by_codigo_varicao_diaria(codigo: str):
+    cotacao = yf.Ticker(codigo)
+    fechamento_anterior = cotacao.history(period="2d")['Close'][-2]
+    fechamento_atual = cotacao.history(period="1d")['Close'][0]
+    return fechamento_atual, fechamento_anterior
 
 
 def get_moeda_cotacao():

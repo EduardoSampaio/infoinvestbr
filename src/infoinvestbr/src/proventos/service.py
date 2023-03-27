@@ -1,8 +1,8 @@
 import datetime
 
 from sqlalchemy.orm import Session
-from src.core.models import Provento
-from src.core.schemas import ProventoRequestSchema, ProventoResponseSchema
+from src.proventos.models import Provento
+from src.proventos.schemas import ProventoRequestSchema, ProventoResponseSchema
 
 
 def convert_to_schema(model: ProventoResponseSchema) -> ProventoResponseSchema:
@@ -67,7 +67,7 @@ def create_provento(db: Session, provento: ProventoRequestSchema) -> Provento:
         data_com=provento.data_com,
         data_pagamento=provento.data_pagamento,
         valor=provento.valor,
-        tipo=provento.tipo
+        tipo=provento.tipo_pagamento
     )
 
     db.add(_provento)
@@ -84,7 +84,7 @@ def remover_provento(db: Session, provendo_id: int):
 
 def update_provento(db: Session, provento: ProventoRequestSchema):
     _provento = get_provento_by_id(db, provento_id=provento.provendo_id)
-    _provento.tipo = provento.tipo
+    _provento.tipo = provento.tipo_pagamento
     _provento.valor = provento.valor
     _provento.data_com = provento.data_com
     _provento.data_pagamento = provento.data_pagamento

@@ -1,8 +1,8 @@
 from src.core import models
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
-from src.core.models import Acao, FundosImobiliario
-from src.core.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
+from src.analise.models import Acao, FundosImobiliario
+from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
     FundosImobiliarioResponseSchema
 import logging as logger
 
@@ -304,7 +304,7 @@ def import_fundos_imobiliarios(db: Session):
         )
         list_fii.append(fii)
 
-    count = db.query(models.FundosImobiliario).count()
+    count = db.query(FundosImobiliario).count()
     if count == 0:
         db.add_all(list_fii)
         db.commit()
@@ -342,7 +342,7 @@ def import_acoes(db: Session):
         )
         list_acoes.append(acoes)
 
-    count = db.query(models.Acao).count()
+    count = db.query(Acao).count()
     if count == 0:
         db.add_all(list_acoes)
         db.commit()
