@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from pydantic import BaseModel
-from src.core.tipos import TipoPagamento
+from src.core.tipos import EnumTipoPagamento
 
 
 class ProventoRequestSchema(BaseModel):
@@ -12,7 +12,7 @@ class ProventoRequestSchema(BaseModel):
     data_com: datetime.date
     data_pagamento: datetime.date
     valor: float
-    tipo_pagamento: TipoPagamento
+    tipo_pagamento: EnumTipoPagamento
 
     class Config:
         orm_mode = True

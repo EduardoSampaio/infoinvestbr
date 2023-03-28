@@ -54,6 +54,6 @@ async def get_transacao_by_codigo(codigo_ativo: str, db: Session = Depends(get_d
 
 
 @router.get("/patrimonio/{usuarios_id}")
-async def get_transacao_by_codigo(usuario_id: str, db: Session = Depends(get_db)):
+async def get_patrimonio_by_usuario(usuario_id: str, db: Session = Depends(get_db)):
     patrimonios = service.get_patrimonio_by_usuario(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="OK", result=patrimonios)

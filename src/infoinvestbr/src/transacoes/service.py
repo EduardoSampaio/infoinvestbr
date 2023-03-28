@@ -3,7 +3,7 @@ from src.transacoes.models import Transacao, Patrimonio, PatrimonioTransacao
 from src.analise.models import Acao, FundosImobiliario
 from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestSchema, PatrimonioSchemaResponse
 from fastapi import HTTPException, status
-from src.core.tipos import TipoCategoria
+from src.core.tipos import EnumTipoCategoria
 from src.cotacoes import service as cotacao
 
 
@@ -23,7 +23,7 @@ def convert_schema(model: TransacaoResponseSchema) -> TransacaoResponseSchema:
 
 
 def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transacao:
-    #validar_codigo(db, transacao.codigo_ativo, transacao.categoria)
+    validar_codigo(db, transacao.codigo_ativo, transacao.categoria)
     _trasacao = Transacao(
         categoria=transacao.categoria.name,
         codigo_ativo=transacao.codigo_ativo,
@@ -73,8 +73,13 @@ def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transaca
 def atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, transacao):
     verificar_quantidade_ativo(patrimonio_exists, transacao)
     patrimonio_exists.quantidade = patrimonio_exists.quantidade - transacao.quantidade
-    _trasacao.resultado = (_trasacao.preco - float(patrimonio_exists.preco_medio)) * transacao.quantidade
-    zerar_posicao_ativo(db, patrimonio_exists)
+    _trasacao.lucro_prejuizo = (_trasacao.preco - float(patrimonio_exists.preco_medio)) * transacao.quantidade
+    if patrimonio_exists.quantidade == 0:
+        _trasacao.posicao_zerada = True
+        patrimonio_transacao = db.query(PatrimonioTransacao).filter(
+            PatrimonioTransacao.patrimonio_id == patrimonio_exists.patrimonio_id).first()
+        db.delete(patrimonio_transacao)
+        db.delete(patrimonio_exists)
 
 
 def atualizar_patrimonio_compra(patrimonio_exists, transacao):
@@ -93,15 +98,7 @@ def verificar_quantidade_ativo(patrimonio_exists, transacao):
         )
 
 
-def zerar_posicao_ativo(db, patrimonio_exists):
-    if patrimonio_exists.quantidade == 0:
-        patrimonio_transacao = db.query(PatrimonioTransacao).filter(
-            PatrimonioTransacao.patrimonio_id == patrimonio_exists.patrimonio_id).first()
-        db.delete(patrimonio_transacao)
-        db.delete(patrimonio_exists)
-
-
-def create_patrimonio(transacao: Transacao):
+def create_patrimonio(transacao: TransacaoRequestSchema):
     return Patrimonio(
         codigo_ativo=transacao.codigo_ativo,
         categoria=transacao.categoria.name,
@@ -146,8 +143,8 @@ def remover_transacao(db: Session, usuario_id: int):
     db.commit()
 
 
-def validar_codigo(db: Session, codigo: str, categoria: TipoCategoria):
-    if categoria.name == TipoCategoria.ACAO.name:
+def validar_codigo(db: Session, codigo: str, categoria: EnumTipoCategoria):
+    if categoria.name == EnumTipoCategoria.ACAO.name:
         exist = db.query(Acao).filter(Acao.codigo == codigo).first()
         if exist is None:
             raise HTTPException(
@@ -168,28 +165,30 @@ def get_patrimonio_by_usuario(db: Session, usuario_id: str) -> list[PatrimonioSc
 
     list_valores = []
     for valor in valores:
-        list_valores.append(convert_patrimonio_schema(valor))
+        list_valores.append(convert_patrimonio_schema(valor, valores))
 
     return list_valores
 
 
-def convert_patrimonio_schema(model: Patrimonio) -> PatrimonioSchemaResponse:
+def convert_patrimonio_schema(model: Patrimonio, list_model: list[Patrimonio]) -> PatrimonioSchemaResponse:
     variacao_total = calcular_variacao_total(model.codigo_ativo, model.preco_medio, model.quantidade)
     variacao_diaria = calcular_variacao_diaria(model.codigo_ativo, model.total)
     rentabilidade = calcular_rentabilidade(model.codigo_ativo, model.preco_medio)
+    percentual_ativo = calcular_percentual_ativo(model, list_model)
+    percentual_carteira = calcular_percentual_carteira(model, list_model)
     return PatrimonioSchemaResponse(
         patrimonio_id=model.patrimonio_id,
         usuario_id=model.usuario_id,
         quantidade=model.quantidade,
         codigo_ativo=model.codigo_ativo,
         preco_medio=model.preco_medio,
-        categoria=TipoCategoria[model.categoria].name,
+        categoria=EnumTipoCategoria[model.categoria].name,
         total=model.total,
         rentabilidade=rentabilidade,
         variacao_total=variacao_total,
-        percentual_ativo=0,
+        percentual_ativo=percentual_ativo,
         variacao_diaria=variacao_diaria,
-        percentual_carteira=0
+        percentual_carteira=percentual_carteira
     )
 
 
@@ -205,6 +204,13 @@ def calcular_rentabilidade(codigo_ativo: str, preco_medio: float) -> float:
 
 
 def calcular_variacao_diaria(codigo_ativo: str, total: float) -> float:
+    """
+    porcentagem = ((preco_fechamento_atual - preco_fechamento_dia_anterior) / preco_fechamento_dia_anterior) * 100
+    variacao = (total / 100) * porcentagem
+    :param codigo_ativo:
+    :param total:
+    :return:
+    """
     preco = cotacao.get_by_codigo_varicao_diaria(f"{codigo_ativo}.SA")
     preco_fechamento_dia_anterior = float(preco[1])
     preco_fechamento_atual = float(preco[0])
@@ -214,7 +220,45 @@ def calcular_variacao_diaria(codigo_ativo: str, total: float) -> float:
     return variacao, porcentagem
 
 
-def calcular_variacao_total(codigo_ativo: str, preco_inicial: float, quantidade: int) :
+def calcular_variacao_total(codigo_ativo: str, preco_inicial: float, quantidade: int):
+    """
+    variacao_total =  (preco_atual - preco_inicial) * quantidade
+    :param codigo_ativo:
+    :param preco_inicial:
+    :param quantidade:
+    :return:
+    """
     preco_atual = cotacao.get_by_codigo_atual(f"{codigo_ativo}.SA")
     variacao_total = (float(preco_atual) - float(preco_inicial)) * quantidade
     return variacao_total
+
+
+def calcular_percentual_ativo(current_model: Patrimonio, list_model: list[Patrimonio]):
+    """
+     percentual_ativo = (total_ativo / soma(list_model) mesma categoria) * 100
+    :param current_model:
+    :param list_model:
+    :return:
+    """
+    soma_ativos = 0
+    for model in list_model:
+        if model.categoria == current_model.categoria:
+            soma_ativos += model.total
+
+    percentual = current_model.total / soma_ativos * 100
+    return percentual
+
+
+def calcular_percentual_carteira(current_model: Patrimonio, list_model: list[Patrimonio]):
+    """
+     percentual_carteira = (total_ativo / soma(list_model)) * 100
+    :param current_model:
+    :param list_model:
+    :return:
+    """
+    soma_ativos = 0
+    for model in list_model:
+        soma_ativos += model.total
+
+    percentual = current_model.total / soma_ativos * 100
+    return percentual

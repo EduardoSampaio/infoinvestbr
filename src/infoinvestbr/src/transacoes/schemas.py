@@ -1,13 +1,13 @@
 import datetime
 from dataclasses import dataclass
 from pydantic import BaseModel
-from src.core.tipos import TipoCategoria, OrdemOperacao
+from src.core.tipos import EnumTipoCategoria, EnumOrdemOperacao
 
 
 class TransacaoRequestSchema(BaseModel):
-    categoria: TipoCategoria
+    categoria: EnumTipoCategoria
     codigo_ativo: str
-    ordem: OrdemOperacao
+    ordem: EnumOrdemOperacao
     corretora: str
     data: datetime.date
     quantidade: int
@@ -59,7 +59,7 @@ class PatrimonioSchemaResponse:
     codigo_ativo: str
     preco_medio: float
     quantidade: int
-    categoria: TipoCategoria
+    categoria: EnumTipoCategoria
     total: float
     percentual_ativo: float
     percentual_carteira: float
@@ -73,7 +73,7 @@ class PatrimonioSchemaResponse:
                 codigo_ativo: str,
                 preco_medio: float,
                 quantidade: int,
-                categoria: TipoCategoria,
+                categoria: EnumTipoCategoria,
                 total: float,
                 percentual_ativo: float,
                 percentual_carteira: float,

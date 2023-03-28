@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class OrdemOperacao(Enum):
+class EnumOrdemOperacao(Enum):
     """
      COMPRA = 1
      VENDA = 2
@@ -10,7 +10,7 @@ class OrdemOperacao(Enum):
     VENDA = 2
 
 
-class TipoCategoria(Enum):
+class EnumTipoCategoria(Enum):
     """
     ACAO = 1
     FUNDO_IMOBILIARIO = 2
@@ -19,7 +19,7 @@ class TipoCategoria(Enum):
     FUNDO_IMOBILIARIO = 2
 
 
-class TipoPagamento(Enum):
+class EnumTipoPagamento(Enum):
     """
     JCP = 1
     DIVIDENDO = 2
