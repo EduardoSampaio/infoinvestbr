@@ -1,4 +1,3 @@
-from src.core import models
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
 from src.analise.models import Acao, FundosImobiliario
@@ -82,7 +81,6 @@ def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponse
 
     for acao in acoes:
         list_acoes.append(convert_acao_to_schema(acao))
-
     return list_acoes
 
 

@@ -101,14 +101,14 @@ async def importar_acoes(db: Session = Depends(get_db)):
 
 
 @router.delete("/fundos-imobiliarios/importacao", tags=["Importação"])
-async def importar_fundos(db: Session = Depends(get_db)):
+async def remove_todos_fundos(db: Session = Depends(get_db)):
     service.remove_todos_fundos(db)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
                     message="Todos os Fundos Imobiliário foram removidos com sucesso!").dict(exclude_none=True)
 
 
 @router.delete("/acoes/importacao", tags=["Importação"])
-async def importar_acoes(db: Session = Depends(get_db)):
+async def remove_todas_acoes(db: Session = Depends(get_db)):
     service.remove_todas_acoes(db)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
                     message="Todas as Ações foram removidas com sucesso!").dict(exclude_none=True)

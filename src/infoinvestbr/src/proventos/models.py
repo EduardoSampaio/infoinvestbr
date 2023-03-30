@@ -11,7 +11,7 @@ class Provento(Base):
     data_com = Column("DATA_COM", DateTime, nullable=False)
     data_pagamento = Column("DATA_PAGAMENTO", DateTime, nullable=False)
     valor = Column("VALOR", Numeric, nullable=False)
-    tipo_pagamento = Column("TIPO", String(30), nullable=False)
+    tipo_pagamento = Column("TIPO_PAGAMENTO", String(30), nullable=False)
 
     __table_args__ = (
         CheckConstraint(tipo_pagamento.in_(['JCP', 'DIVIDENDO'])),

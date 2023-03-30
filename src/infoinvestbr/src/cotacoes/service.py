@@ -2,11 +2,13 @@ import requests
 import yfinance as yf
 from datetime import datetime
 from sqlalchemy.orm import Session
-
-from src.core.schemas import CotacaoSchema, DividendoSchema
+import math
+from src.cotacoes.schemas import CotacaoSchema, CotacaoAltaOuBaixaSchema
+from src.core.schemas import DividendoSchema
 from src.core import models
 from src.core.models import HistoricoCotacao
 from src.core.exceptions import CodigoAtivoException
+from src.cotacoes.constantes import ACAO_TICKER, FUNDOS_TICKER
 
 
 def get_by_codigo(codigo: str, periodo: str, intervalo: str):
@@ -186,3 +188,33 @@ def get_historico_dividendo(codigo: str):
 def codigo_exception(codigo: str):
     if codigo.find(".SA") == -1:
         raise CodigoAtivoException(name=codigo)
+
+
+def get_maiores_altas_dia_acoes() -> CotacaoAltaOuBaixaSchema:
+    return get_cotacao_comparacao(True, ACAO_TICKER)
+
+
+def get_maiores_altas_dia_fundos() -> CotacaoAltaOuBaixaSchema:
+    return get_cotacao_comparacao(True, FUNDOS_TICKER)
+
+
+def get_maiores_baixa_dia_acoes() -> CotacaoAltaOuBaixaSchema:
+    return get_cotacao_comparacao(False, ACAO_TICKER)
+
+
+def get_maiores_baixa_dia_fundos() -> CotacaoAltaOuBaixaSchema:
+    return get_cotacao_comparacao(False, FUNDOS_TICKER)
+
+
+def get_cotacao_comparacao(alta: bool, tickers: []) -> CotacaoAltaOuBaixaSchema:
+    ativo = yf.download(tickers, period="1d")
+    variacao = ((ativo['Close'] - ativo['Open']) / ativo['Open']) * 100
+
+    list_ativo = []
+    for k in variacao.keys():
+        for item in variacao.get(key=k):
+            if not math.isnan(item) and not math.isinf(item):
+                list_ativo.append(CotacaoAltaOuBaixaSchema(codigo=k, valor=item))
+
+    list_ativo.sort(key=lambda x: x.valor, reverse=alta)
+    return list_ativo[0:20]

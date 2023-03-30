@@ -7,7 +7,6 @@ from src.core.tipos import EnumTipoPagamento
 
 
 class ProventoRequestSchema(BaseModel):
-    provendo_id: Optional[int]
     codigo_ativo: str
     data_com: datetime.date
     data_pagamento: datetime.date

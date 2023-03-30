@@ -40,7 +40,8 @@ async def google_callback(request: StarletteRequest, db: Session = Depends(get_d
     usuario = await google_sso.verify_and_process(request)
     request.session["usuario"] = dict(usuario)
 
-    if usuario is None:
+    exist_usuario = service.get_usuario_by_email(db, usuario.email)
+    if exist_usuario is None:
         service.create_usuario_google(db, nome=usuario.display_name, email=usuario.email, imagem=usuario.picture)
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)

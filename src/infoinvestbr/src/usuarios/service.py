@@ -18,11 +18,15 @@ def get_usuarios(db: Session, skip: int = 0, limit: int = 100) -> list[UsuarioRe
 
 def get_usuario_by_id(db: Session, usuario_id: int) -> UsuarioResponseSchema:
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
+    if usuario is None:
+        return None
     return convert_model_to_schema(usuario)
 
 
 def get_usuario_by_email(db: Session, email: str) -> UsuarioResponseSchema:
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    if usuario is None:
+        return None
     return convert_model_to_schema(usuario)
 
 

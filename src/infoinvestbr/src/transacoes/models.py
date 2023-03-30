@@ -2,6 +2,7 @@ from sqlalchemy import Boolean, Column, Integer, String, Numeric, DateTime, Chec
 from sqlalchemy.orm import relationship
 from src.core.database import Base
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class Transacao(Base):
@@ -16,9 +17,9 @@ class Transacao(Base):
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
     preco = Column("PRECO", Numeric, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
-    lucro_prejuizo = Column("LUCRO_PREJUIZO", Numeric, nullable=True)
+    ganho = Column("GANHO", Numeric, nullable=True)
     posicao_zerada = Column("POSICAO_ZERADA", Boolean, nullable=True, default=False)
-    usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.USUARIO_ID"), index=True)
+    usuario_id = Column("USUARIO_ID", UUID, ForeignKey("usuarios.USUARIO_ID"), index=True)
     usuario = relationship("Usuario", back_populates="transacoes")
     patrimonios = relationship("Patrimonio", secondary="patrimonio_transacao", back_populates="transacoes")
 
@@ -67,7 +68,7 @@ class Patrimonio(Base):
     quantidade = Column("QUANTIDADE", Integer, nullable=False)
     categoria = Column("CATEGORIA", String, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
-    usuario_id = Column("USUARIO_ID", Integer, ForeignKey("usuarios.USUARIO_ID"), index=True)
+    usuario_id = Column("USUARIO_ID", UUID, ForeignKey("usuarios.USUARIO_ID"), index=True)
     transacoes = relationship("Transacao", secondary="patrimonio_transacao", back_populates="patrimonios")
 
     __table_args__ = (

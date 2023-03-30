@@ -1,9 +1,11 @@
 import datetime
 from dataclasses import dataclass
 from typing import Optional, TypeVar
-
-from pydantic import BaseModel
+from uuid import UUID
+from pydantic import BaseModel, Field, validator
 from pydantic.generics import GenericModel, Generic
+from src.core import validators
+from src.core.database import SessionLocal
 
 T = TypeVar('T')
 
@@ -27,49 +29,48 @@ class UsuarioBaseSchema(BaseModel):
     email: str
     imagem: Optional[str] = None
 
+    @validator('nome', always=True, pre=True)
+    def validar_nome(cls, v):
+        validators.required(v, "Nome")
+        validators.max_length(30, v, "Nome")
+        validators.min_length(4, v, "Nome")
+        return v
+
+    @validator('email', always=True, pre=True)
+    def validar_email(cls, v):
+        validators.required(v, "Email")
+        validators.validar_email(v)
+        validators.validar_email_existente(v)
+        return v
+
 
 class UsuarioRequestSchema(UsuarioBaseSchema):
-    senha: str
+    senha: str = Field(min_length=6, max_length=30)
+    confirmar_senha: str = Field(min_length=6, max_length=30)
+
+    @validator('confirmar_senha', always=True, pre=True)
+    def confirmacao_senha(cls, v, values):
+        validators.min_length(4, v, "Nome")
+        if 'senha' in values and v != values['senha']:
+            raise ValueError('Por favor confirme sua senha!')
+        return v
 
 
 @dataclass
 class UsuarioResponseSchema:
-    usuario_id: int
+    usuario_id: UUID
     is_admin: bool
     nome: str
     email: str
     imagem: Optional[str] = None
 
-    def __init__(self, usuario_id: int, nome: str, email: str, is_admin: bool,
+    def __init__(self, usuario_id: UUID, nome: str, email: str, is_admin: bool,
                  imagem: Optional[str] = None):
         self.usuario_id = usuario_id
         self.nome = nome
         self.email = email
         self.imagem = imagem
         self.is_admin = is_admin
-
-
-@dataclass()
-class CotacaoSchema:
-    codigo: str
-    data: datetime.date
-    abertura: float
-    fechamento: float
-    baixa: float
-    alta: float
-
-    def __int__(self, codigo: str,
-                data: datetime.date,
-                abertura: float,
-                fechamento: float,
-                baixa: float,
-                alta: float):
-        self.codigo = codigo
-        self.data = data
-        self.abertura = abertura
-        self.fechamento = fechamento
-        self.baixa = baixa
-        self.alta = alta
 
 
 @dataclass()

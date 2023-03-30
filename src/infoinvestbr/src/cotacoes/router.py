@@ -73,3 +73,27 @@ async def deletar_dados_historicos(codigo: str, db: Session = Depends(get_db)):
 async def get_historico_dividendo(codigo: str):
     valor = service.get_historico_dividendo(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
+@router.get("/codigo-fundo/{fundo}/maiores-altas")
+async def get_by_codigo():
+    valor = service.get_maiores_altas_dia_fundos()
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
+@router.get("/codigo-fundo/{fundo}/maiores-baixa")
+async def get_by_codigo():
+    valor = service.get_maiores_baixa_dia_fundos()
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
+@router.get("/codigo-acao/{fundo}/maiores-altas")
+async def get_by_codigo():
+    valor = service.get_maiores_altas_dia_acoes()
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
+@router.get("/codigo-acao/{fundo}/maiores-baixa")
+async def get_by_codigo():
+    valor = service.get_maiores_baixa_dia_acoes()
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)

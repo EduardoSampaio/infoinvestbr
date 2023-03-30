@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -7,6 +7,7 @@ from pathlib import Path
 from functools import lru_cache
 import uvicorn
 import logging
+from datetime import datetime
 
 from src.core.config import settings
 from src.core.database import engine
@@ -66,6 +67,13 @@ app.include_router(routerCotacao.router)
 @lru_cache()
 def get_settings():
     return settings
+
+
+@app.get("/health-check")
+async def healh_check():
+    return {
+        "mensagem": f"Funcionando: {datetime.now()}"
+    }
 
 
 # Middleware
