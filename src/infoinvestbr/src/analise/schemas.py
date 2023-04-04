@@ -1,38 +1,36 @@
 from dataclasses import dataclass
-from typing import Optional
-
 from pydantic import BaseModel
 
 
 class FundosImobiliarioRequestSchema(BaseModel):
-    fundo_id: Optional[int] = None
-    codigo_do_fundo: Optional[str] = None
-    nome: Optional[str] = None
-    descricao: Optional[str] = None
-    administrador: Optional[str] = None
-    cnpj: Optional[str] = None
-    taxa_administracao: Optional[str] = None
-    taxa_gestao: Optional[str] = None
-    taxa_performance: Optional[str] = None
-    tipo_gestao: Optional[str] = None
-    setor: Optional[str] = None
-    liquidez_diaria: Optional[float] = None
-    dividendo: Optional[float] = None
-    dividend_yield: Optional[float] = None
-    dy_ano: Optional[float] = None
-    variacao_preco: Optional[float] = None
-    rentab_periodo: Optional[float] = None
-    rentab_acumulada: Optional[float] = None
-    patrimonio_liq: Optional[float] = None
-    vpa: Optional[float] = None
-    p_vpa: Optional[float] = None
-    dy_patrimonial: Optional[float] = None
-    variacao_patrimonial: Optional[float] = None
-    rentab_patr_no_periodo: Optional[float] = None
-    rentab_patr_acumulada: Optional[float] = None
-    vacancia_fisica: Optional[float] = None
-    vacancia_financeira: Optional[float] = None
-    quantidade_ativos: Optional[int] = None
+    fundo_id: int
+    codigo_do_fundo: str
+    nome: str
+    descricao: str
+    administrador: str
+    cnpj: str
+    taxa_administracao: str
+    taxa_gestao: str
+    taxa_performance: str
+    tipo_gestao: str
+    setor: str
+    liquidez_diaria: float
+    dividendo: float
+    dividend_yield: float
+    dy_ano: float
+    variacao_preco: float
+    rentab_periodo: float
+    rentab_acumulada: float
+    patrimonio_liq: float
+    vpa: float
+    p_vpa: float
+    dy_patrimonial: float
+    variacao_patrimonial: float
+    rentab_patr_no_periodo: float
+    rentab_patr_acumulada: float
+    vacancia_fisica: float
+    vacancia_financeira: float
+    quantidade_ativos: int
 
     class Config:
         orm_mode = True
@@ -40,34 +38,34 @@ class FundosImobiliarioRequestSchema(BaseModel):
 
 @dataclass()
 class FundosImobiliarioResponseSchema:
-    fundo_id: Optional[int] = None
-    codigo_do_fundo: Optional[str] = None
-    nome: Optional[str] = None
-    descricao: Optional[str] = None
-    administrador: Optional[str] = None
-    cnpj: Optional[str] = None
-    taxa_administracao: Optional[str] = None
-    taxa_gestao: Optional[str] = None
-    taxa_performance: Optional[str] = None
-    tipo_gestao: Optional[str] = None
-    setor: Optional[str] = None
-    liquidez_diaria: Optional[float] = None
-    dividendo: Optional[float] = None
-    dividend_yield: Optional[float] = None
-    dy_ano: Optional[float] = None
-    variacao_preco: Optional[float] = None
-    rentab_periodo: Optional[float] = None
-    rentab_acumulada: Optional[float] = None
-    patrimonio_liq: Optional[float] = None
-    vpa: Optional[float] = None
-    p_vpa: Optional[float] = None
-    dy_patrimonial: Optional[float] = None
-    variacao_patrimonial: Optional[float] = None
-    rentab_patr_no_periodo: Optional[float] = None
-    rentab_patr_acumulada: Optional[float] = None
-    vacancia_fisica: Optional[float] = None
-    vacancia_financeira: Optional[float] = None
-    quantidade_ativos: Optional[int] = None
+    fundo_id: int
+    codigo_do_fundo: str
+    nome: str
+    descricao: str
+    administrador: str
+    cnpj: str
+    taxa_administracao: str
+    taxa_gestao: str
+    taxa_performance: str
+    tipo_gestao: str
+    setor: str
+    liquidez_diaria: float
+    dividendo: float
+    dividend_yield: float
+    dy_ano: float
+    variacao_preco: float
+    rentab_periodo: float
+    rentab_acumulada: float
+    patrimonio_liq: float
+    vpa: float
+    p_vpa: float
+    dy_patrimonial: float
+    variacao_patrimonial: float
+    rentab_patr_no_periodo: float
+    rentab_patr_acumulada: float
+    vacancia_fisica: float
+    vacancia_financeira: float
+    quantidade_ativos: int
 
     def __init__(self,
                  fundo_id,
@@ -129,35 +127,36 @@ class FundosImobiliarioResponseSchema:
 
 
 class AcaoRequestSchema(BaseModel):
-    acao_id: Optional[int] = None
-    codigo: Optional[str] = None
-    nome: Optional[str] = None
-    descricao: Optional[str] = None
-    imagem: Optional[str] = None
-    pl: Optional[float] = None
-    pvp: Optional[float] = None
-    psr: Optional[float] = None
-    dividend_yield: Optional[float] = None
-    p_ativo: Optional[float] = None
-    p_cap_giro: Optional[float] = None
-    p_ebit: Optional[float] = None
-    p_ativ_circ_liq: Optional[float] = None
-    ev_ebit: Optional[float] = None
-    ev_ebitda: Optional[float] = None
-    margem_ebit: Optional[float] = None
-    margem_liquida: Optional[float] = None
-    liq_corrente: Optional[float] = None
-    roic: Optional[float] = None
-    roe: Optional[float] = None
-    liq_2meses: Optional[float] = None
-    patrimonio_liquido: Optional[float] = None
-    div_bruta_patrim: Optional[float] = None
-    cresc_rec_5a: Optional[float] = None
-    setor: Optional[str] = None
-    lpa: Optional[float] = None
-    vpa: Optional[float] = None
-    cnpj: Optional[str] = None
-    tipo: Optional[str] = None
+    acao_id: int
+    codigo: str
+    nome: str
+    descricao: str
+    imagem: str
+    pl: float
+    pvp: float
+    psr: float
+    dividend_yield: float
+    p_ativo: float
+    p_cap_giro: float
+    p_ebit: float
+    p_ativ_circ_liq: float
+    ev_ebit: float
+    ev_ebitda: float
+    margem_ebit: float
+    margem_liquida: float
+    liq_corrente: float
+    roic: float
+    roe: float
+    liq_2meses: float
+    patrimonio_liquido: float
+    div_bruta_patrim: float
+    cresc_rec_5a: float
+    setor: str
+    lpa: float
+    vpa: float
+    cnpj: str
+    tipo: str
+    sub_setor:str
 
     class Config:
         orm_mode = True
@@ -165,36 +164,36 @@ class AcaoRequestSchema(BaseModel):
 
 @dataclass()
 class AcaoResponseSchema:
-    acao_id: Optional[int] = None
-    codigo: Optional[str] = None
-    nome: Optional[str] = None
-    descricao: Optional[str] = None
-    imagem: Optional[str] = None
-    pl: Optional[float] = None
-    pvp: Optional[float] = None
-    psr: Optional[float] = None
-    dividend_yield: Optional[float] = None
-    p_ativo: Optional[float] = None
-    p_cap_giro: Optional[float] = None
-    p_ebit: Optional[float] = None
-    p_ativ_circ_liq: Optional[float] = None
-    ev_ebit: Optional[float] = None
-    ev_ebitda: Optional[float] = None
-    margem_ebit: Optional[float] = None
-    margem_liquida: Optional[float] = None
-    liq_corrente: Optional[float] = None
-    roic: Optional[float] = None
-    roe: Optional[float] = None
-    liq_2meses: Optional[float] = None
-    patrimonio_liquido: Optional[float] = None
-    div_bruta_patrim: Optional[float] = None
-    cresc_rec_5a: Optional[float] = None
-    setor: Optional[str] = None
-    lpa: Optional[float] = None
-    vpa: Optional[float] = None
-    cnpj: Optional[str] = None
-    tipo: Optional[str] = None
-    sub_setor: Optional[str] = None
+    acao_id: int
+    codigo: str
+    nome: str
+    descricao: str
+    imagem: str
+    pl: float
+    pvp: float
+    psr: float
+    dividend_yield: float
+    p_ativo: float
+    p_cap_giro: float
+    p_ebit: float
+    p_ativ_circ_liq: float
+    ev_ebit: float
+    ev_ebitda: float
+    margem_ebit: float
+    margem_liquida: float
+    liq_corrente: float
+    roic: float
+    roe: float
+    liq_2meses: float
+    patrimonio_liquido: float
+    div_bruta_patrim: float
+    cresc_rec_5a: float
+    setor: str
+    lpa: float
+    vpa: float
+    cnpj: str
+    tipo: str
+    sub_setor: str
 
     def __init__(self,
                  acao_id,

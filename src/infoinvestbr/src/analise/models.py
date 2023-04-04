@@ -1,23 +1,21 @@
-from sqlalchemy import Boolean, Column, Integer, String, Numeric, Text, DateTime, CheckConstraint, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Numeric, Text
 from src.core.database import Base
-from datetime import datetime
 
 
 class FundosImobiliario(Base):
     __tablename__ = "fundos_imobiliarios"
 
     id = Column("FUNDO_ID", Integer, index=True, primary_key=True)
-    codigo_do_fundo = Column("CODIGO_DO_FUNDO", String, index=True, unique=True, nullable=False)
-    nome = Column("NOME", String, nullable=True)
+    codigo_do_fundo = Column("CODIGO_DO_FUNDO", String(30), index=True, unique=True, nullable=False)
+    nome = Column("NOME", String(200), nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
-    administrador = Column("ADMINISTRADOR", String, nullable=True)
-    cnpj = Column("CNPJ", String, nullable=True)
+    administrador = Column("ADMINISTRADOR", String(200), nullable=True)
+    cnpj = Column("CNPJ", String(100), nullable=True)
     taxa_administracao = Column("TAXA_ADMINISTRACAO", Numeric, nullable=True)
     taxa_gestao = Column("TAXA_GESTAO", Numeric, nullable=True)
     taxa_performance = Column("TAXA_PERFORMANCE", Numeric, nullable=True)
-    tipo_gestao = Column("TIPO_GESTAO", String, nullable=True)
-    setor = Column("SETOR", String)
+    tipo_gestao = Column("TIPO_GESTAO", String(200), nullable=True)
+    setor = Column("SETOR", String(100))
     liquidez_diaria = Column("LIQUIDEZ_DIARIA", Numeric, nullable=True)
     dividendo = Column("DIVIDENDO", Numeric, nullable=True)
     dividend_yield = Column("DIVIDEND_YIELD", Numeric, nullable=True)
@@ -56,15 +54,9 @@ class FundosImobiliario(Base):
                  vacancia_fisica,
                  vacancia_financeira,
                  quantidade_ativos,
-                 nome="",
-                 descricao="",
-                 imagem="",
-                 administrador="",
-                 cnpj="",
-                 taxa_administracao=0,
-                 taxa_gestao=0,
-                 taxa_performance=0,
-                 tipo_gestao="",
+                 nome,
+                 administrador,
+                 cnpj,
                  ):
         self.codigo_do_fundo = codigo_do_fundo
         self.setor = setor
@@ -86,22 +78,16 @@ class FundosImobiliario(Base):
         self.vacancia_financeira = vacancia_financeira
         self.quantidade_ativos = quantidade_ativos
         self.nome = nome
-        self.descricao = descricao
-        self.imagem = imagem
         self.administrador = administrador
         self.cnpj = cnpj
-        self.taxa_administracao = taxa_administracao
-        self.taxa_gestao = taxa_gestao
-        self.taxa_performance = taxa_performance
-        self.tipo_gestao = tipo_gestao
 
 
 class Acao(Base):
     __tablename__ = "acoes"
 
     id = Column("ACAO_ID", Integer, index=True, primary_key=True)
-    codigo = Column("CODIGO", String, index=True, unique=True, nullable=False)
-    nome = Column("NOME", String, nullable=True)
+    codigo = Column("CODIGO", String(6), index=True, unique=True, nullable=False)
+    nome = Column("NOME", String(100), nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
     imagem = Column("IMAGEM", String(200), nullable=True)
     pl = Column("PL", Numeric, nullable=True)
@@ -123,12 +109,12 @@ class Acao(Base):
     patrimonio_liquido = Column("PATRIMONIO_LIQUIDO", Numeric, nullable=True)
     div_bruta_patrim = Column("DIV_BRUTA_PATRIM", Numeric, nullable=True)
     cresc_rec_5a = Column("CRESC_REC_5A", Numeric, nullable=True)
-    setor = Column("SETOR", String, nullable=False)
-    sub_setor = Column("SUB_SETOR", String, nullable=False)
+    setor = Column("SETOR", String(100), nullable=False)
+    sub_setor = Column("SUB_SETOR", String(100), nullable=False)
     lpa = Column("LPA", Numeric, nullable=True)
     vpa = Column("VPA", Numeric, nullable=True)
-    cnpj = Column("CNPJ", String, nullable=True)
-    tipo = Column("TIPO", String, nullable=True)
+    cnpj = Column("CNPJ", String(100), nullable=True)
+    tipo = Column("TIPO", String(100), nullable=True)
 
     def __init__(self,
                  codigo,
@@ -152,14 +138,10 @@ class Acao(Base):
                  div_bruta_patrim,
                  cresc_rec_5a,
                  setor,
-                 tipo="",
-                 nome="",
-                 imagem="",
-                 lpa=0,
-                 vpa=0,
-                 descricao="",
-                 sub_setor="",
-                 cnpj=""
+                 nome,
+                 imagem,
+                 sub_setor,
+                 cnpj
                  ):
         self.codigo = codigo
         self.pl = pl
@@ -182,11 +164,7 @@ class Acao(Base):
         self.div_bruta_patrim = div_bruta_patrim
         self.cresc_rec_5a = cresc_rec_5a
         self.setor = setor
-        self.tipo = tipo,
         self.nome = nome,
         self.imagem = imagem,
-        self.lpa = lpa,
-        self.vpa = vpa,
-        self.descricao = descricao
         self.sub_setor = sub_setor
         self.cnpj = cnpj

@@ -1,139 +1,47 @@
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
 from src.analise.models import Acao, FundosImobiliario
-from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema, \
-    FundosImobiliarioResponseSchema
+from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema
 import logging as logger
 
 
-def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
-    return AcaoResponseSchema(
-        acao_id=model.id,
-        codigo=model.codigo,
-        tipo=model.tipo,
-        nome=model.nome,
-        imagem=model.imagem,
-        lpa=model.lpa,
-        vpa=model.vpa,
-        descricao=model.descricao,
-        setor=model.setor,
-        cresc_rec_5a=model.cresc_rec_5a,
-        div_bruta_patrim=model.div_bruta_patrim,
-        ev_ebit=model.ev_ebit,
-        dividend_yield=model.dividend_yield,
-        liq_2meses=model.liq_2meses,
-        pl=model.pl,
-        pvp=model.pvp,
-        psr=model.psr,
-        p_ativo=model.p_ativo,
-        p_cap_giro=model.p_cap_giro,
-        p_ebit=model.p_ebit,
-        p_ativ_circ_liq=model.p_ativ_circ_liq,
-        ev_ebitda=model.ev_ebitda,
-        margem_ebit=model.margem_ebit,
-        margem_liquida=model.margem_liquida,
-        liq_corrente=model.liq_corrente,
-        roic=model.roic,
-        roe=model.roe,
-        patrimonio_liquido=model.patrimonio_liquido,
-        cnpj=model.cnpj,
-        sub_setor=model.sub_setor
-    )
-
-
-def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioResponseSchema:
-    return FundosImobiliarioResponseSchema(
-        fundo_id=model.id,
-        codigo_do_fundo=model.codigo_do_fundo,
-        nome=model.nome,
-        descricao=model.descricao,
-        administrador=model.administrador,
-        cnpj=model.cnpj,
-        taxa_administracao=model.taxa_administracao,
-        taxa_gestao=model.taxa_gestao,
-        taxa_performance=model.taxa_performance,
-        tipo_gestao=model.tipo_gestao,
-        setor=model.setor,
-        liquidez_diaria=model.liquidez_diaria,
-        dividendo=model.dividendo,
-        dividend_yield=model.dividend_yield,
-        dy_ano=model.dy_ano,
-        variacao_preco=model.variacao_preco,
-        rentab_periodo=model.rentab_periodo,
-        rentab_acumulada=model.rentab_acumulada,
-        patrimonio_liq=model.patrimonio_liq,
-        vpa=model.vpa,
-        p_vpa=model.p_vpa,
-        dy_patrimonial=model.dy_patrimonial,
-        variacao_patrimonial=model.variacao_patrimonial,
-        rentab_patr_no_periodo=model.rentab_patr_no_periodo,
-        rentab_patr_acumulada=model.rentab_patr_acumulada,
-        vacancia_fisica=model.vacancia_fisica,
-        vacancia_financeira=model.vacancia_financeira,
-        quantidade_ativos=model.quantidade_ativos
-    )
-
-
-def get_acoes(db: Session, skip: int = 0, limit: int = 100) -> list[AcaoResponseSchema]:
+def get_acoes(db: Session, skip: int = 0, limit: int = 100):
     acoes = db.query(Acao).offset(skip).limit(limit).all()
-
-    list_acoes = []
-
-    for acao in acoes:
-        list_acoes.append(convert_acao_to_schema(acao))
-    return list_acoes
+    return acoes
 
 
-def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100) -> list[AcaoResponseSchema]:
+def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):
     acoes = db.query(Acao).filter(Acao.setor == setor).offset(skip).limit(limit).all()
-
-    list_acoes = []
-
-    for acao in acoes:
-        list_acoes.append(convert_acao_to_schema(acao))
-
-    return list_acoes
+    return acoes
 
 
-def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100) -> list[FundosImobiliarioResponseSchema]:
+def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100):
     fundos = db.query(FundosImobiliario).offset(skip).limit(limit).all()
-
-    list_fundos = []
-    for fundos in fundos:
-        list_fundos.append(convert_fundo_to_schema(fundos))
-
-    return list_fundos
+    return fundos
 
 
-def get_fundos_imobiliarios_setor(db: Session, setor: str, skip: int = 0, limit: int = 100) -> \
-        list[FundosImobiliarioResponseSchema]:
+def get_fundos_imobiliarios_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):
     fundos = db.query(FundosImobiliario).filter(FundosImobiliario.setor == setor).offset(skip).limit(limit).all()
-
-    list_fundos = []
-    for fundos in fundos:
-        list_fundos.append(convert_fundo_to_schema(fundos))
-
-    return list_fundos
+    return fundos
 
 
-def get_acoes_by_id(db: Session, acao_id: int) -> AcaoResponseSchema:
-    return convert_acao_to_schema(db.query(Acao).filter(Acao.id == acao_id).first())
+def get_acoes_by_id(db: Session, acao_id: int):
+    return db.query(Acao).filter(Acao.id == acao_id).first()
 
 
-def get_fundos_imobiliarios_by_id(db: Session, fundos_id: int) -> FundosImobiliarioResponseSchema:
-    return convert_fundo_to_schema(db.query(FundosImobiliario).filter(FundosImobiliario.id == fundos_id).first())
+def get_fundos_imobiliarios_by_id(db: Session, fundos_id: int):
+    return db.query(FundosImobiliario).filter(FundosImobiliario.id == fundos_id).first()
 
 
-def get_acoes_by_codigo(db: Session, codigo: str) -> AcaoResponseSchema:
-    return convert_acao_to_schema(db.query(Acao).filter(Acao.codigo == codigo).first())
+def get_acoes_by_codigo(db: Session, codigo: str):
+    return db.query(Acao).filter(Acao.codigo == codigo).first()
 
 
-def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str) -> FundosImobiliarioResponseSchema:
-    return convert_fundo_to_schema(
-        db.query(FundosImobiliario).filter(FundosImobiliario.codigo_do_fundo == codigo).first())
+def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str):
+    return db.query(FundosImobiliario).filter(FundosImobiliario.codigo_do_fundo == codigo).first()
 
 
-def upadate_acoes(db: Session, acao: AcaoRequestSchema):
+def update_acoes(db: Session, acao: AcaoRequestSchema):
     _acao = get_acoes_by_id(db, acao.acao_id)
     _acao.codigo = acao.codigo
     _acao.tipo = acao.tipo
@@ -170,12 +78,8 @@ def upadate_acoes(db: Session, acao: AcaoRequestSchema):
 def create_acoes(db: Session, acao: AcaoRequestSchema):
     _acao = Acao(
         codigo=acao.codigo,
-        tipo=acao.tipo,
         nome=acao.nome,
         imagem=acao.imagem,
-        lpa=acao.lpa,
-        vpa=acao.vpa,
-        descricao=acao.descricao,
         setor=acao.setor,
         cresc_rec_5a=acao.cresc_rec_5a,
         div_bruta_patrim=acao.div_bruta_patrim,
@@ -195,7 +99,9 @@ def create_acoes(db: Session, acao: AcaoRequestSchema):
         liq_corrente=acao.liq_corrente,
         roic=acao.roic,
         roe=acao.roe,
-        patrimonio_liquido=acao.patrimonio_liquido)
+        patrimonio_liquido=acao.patrimonio_liquido,
+        cnpj=acao.cnpj,
+        sub_setor=acao.sub_setor)
 
     db.add(_acao)
     db.commit()
@@ -239,13 +145,8 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     _fundo = FundosImobiliario(
         codigo_do_fundo=fundo.codigo_do_fundo,
         nome=fundo.nome,
-        descricao=fundo.descricao,
         administrador=fundo.administrador,
         cnpj=fundo.cnpj,
-        taxa_administracao=fundo.taxa_administracao,
-        taxa_gestao=fundo.taxa_gestao,
-        taxa_performance=fundo.taxa_performance,
-        tipo_gestao=fundo.tipo_gestao,
         setor=fundo.setor,
         liquidez_diaria=fundo.liquidez_diaria,
         dividendo=fundo.dividendo,
