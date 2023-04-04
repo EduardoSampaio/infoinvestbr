@@ -5,7 +5,6 @@ from uuid import UUID
 from pydantic import BaseModel, Field, validator
 from pydantic.generics import GenericModel, Generic
 from src.core import validators
-from src.core.database import SessionLocal
 
 T = TypeVar('T')
 

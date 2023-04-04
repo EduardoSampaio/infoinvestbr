@@ -9,7 +9,6 @@ class FundosImobiliarioRequestSchema(BaseModel):
     codigo_do_fundo: Optional[str] = None
     nome: Optional[str] = None
     descricao: Optional[str] = None
-    imagem: Optional[str] = None
     administrador: Optional[str] = None
     cnpj: Optional[str] = None
     taxa_administracao: Optional[str] = None
@@ -45,7 +44,6 @@ class FundosImobiliarioResponseSchema:
     codigo_do_fundo: Optional[str] = None
     nome: Optional[str] = None
     descricao: Optional[str] = None
-    imagem: Optional[str] = None
     administrador: Optional[str] = None
     cnpj: Optional[str] = None
     taxa_administracao: Optional[str] = None
@@ -93,7 +91,6 @@ class FundosImobiliarioResponseSchema:
                  quantidade_ativos,
                  nome,
                  descricao,
-                 imagem,
                  administrador,
                  cnpj,
                  taxa_administracao,
@@ -122,7 +119,6 @@ class FundosImobiliarioResponseSchema:
         self.quantidade_ativos = quantidade_ativos
         self.nome = nome,
         self.descricao = descricao,
-        self.imagem = imagem,
         self.administrador = administrador,
         self.cnpj = cnpj,
         self.taxa_administracao = taxa_administracao,

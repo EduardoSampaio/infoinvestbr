@@ -1,7 +1,9 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
 from functools import lru_cache
@@ -23,6 +25,7 @@ from src.transacoes import models as transacao
 from src.proventos import models as proventos
 from src.core.exceptions import CodigoAtivoException
 from src.core.custom_logging import CustomizeLogger
+from redis import asyncio as aioredis
 
 core.Base.metadata.create_all(bind=engine)
 analise.Base.metadata.create_all(bind=engine)
@@ -43,6 +46,12 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.on_event("startup")
+def startup():
+    redis = aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="info-invest")
 
 
 # Exceptions

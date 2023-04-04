@@ -11,7 +11,6 @@ class FundosImobiliario(Base):
     codigo_do_fundo = Column("CODIGO_DO_FUNDO", String, index=True, unique=True, nullable=False)
     nome = Column("NOME", String, nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
-    imagem = Column("IMAGEM", String(200), nullable=True)
     administrador = Column("ADMINISTRADOR", String, nullable=True)
     cnpj = Column("CNPJ", String, nullable=True)
     taxa_administracao = Column("TAXA_ADMINISTRACAO", Numeric, nullable=True)

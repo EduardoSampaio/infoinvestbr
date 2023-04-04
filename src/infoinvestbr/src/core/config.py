@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM")
     GOOGLE_CLIENT_ID: str = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET")
+    REDIS_URL: str = os.environ.get("REDIS_URL")
 
     class Config:
         env_file = '../../Projeto TCC/src/infoinvestbr/.env'

@@ -46,7 +46,6 @@ def convert_fundo_to_schema(model: FundosImobiliario) -> FundosImobiliarioRespon
         codigo_do_fundo=model.codigo_do_fundo,
         nome=model.nome,
         descricao=model.descricao,
-        imagem=model.imagem,
         administrador=model.administrador,
         cnpj=model.cnpj,
         taxa_administracao=model.taxa_administracao,
@@ -298,7 +297,10 @@ def import_fundos_imobiliarios(db: Session):
             rentab_patr_acumulada=sheet.cell(row=row, column=16).value,
             vacancia_fisica=sheet.cell(row=row, column=17).value,
             vacancia_financeira=sheet.cell(row=row, column=18).value,
-            quantidade_ativos=sheet.cell(row=row, column=19).value
+            quantidade_ativos=sheet.cell(row=row, column=19).value,
+            nome=sheet.cell(row=row, column=20).value,
+            cnpj=sheet.cell(row=row, column=21).value,
+            administrador=sheet.cell(row=row, column=22).value,
         )
         list_fii.append(fii)
 
