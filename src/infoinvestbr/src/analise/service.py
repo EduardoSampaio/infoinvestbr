@@ -36,7 +36,8 @@ def convert_acao_to_schema(model: Acao) -> AcaoResponseSchema:
         roic=model.roic,
         roe=model.roe,
         patrimonio_liquido=model.patrimonio_liquido,
-        cnpj=model.cnpj
+        cnpj=model.cnpj,
+        sub_setor=model.sub_setor
     )
 
 
@@ -205,7 +206,6 @@ def update_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     _fundo = get_fundos_imobiliarios_by_id(db, fundo.fundo_id)
     _fundo.nome = fundo.nome
     _fundo.descricao = fundo.descricao
-    _fundo.imagem = fundo.imagem
     _fundo.administrador = fundo.administrador
     _fundo.cnpj = fundo.cnpj
     _fundo.taxa_administracao = fundo.taxa_administracao
@@ -240,7 +240,6 @@ def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
         codigo_do_fundo=fundo.codigo_do_fundo,
         nome=fundo.nome,
         descricao=fundo.descricao,
-        imagem=fundo.imagem,
         administrador=fundo.administrador,
         cnpj=fundo.cnpj,
         taxa_administracao=fundo.taxa_administracao,
@@ -318,27 +317,31 @@ def import_acoes(db: Session):
     list_acoes = []
     for row in range(2, row_count + 1):
         acoes = Acao(
-            sheet.cell(row=row, column=1).value,
-            sheet.cell(row=row, column=2).value,
-            sheet.cell(row=row, column=3).value,
-            sheet.cell(row=row, column=4).value,
-            sheet.cell(row=row, column=5).value,
-            sheet.cell(row=row, column=6).value,
-            sheet.cell(row=row, column=7).value,
-            sheet.cell(row=row, column=8).value,
-            sheet.cell(row=row, column=9).value,
-            sheet.cell(row=row, column=10).value,
-            sheet.cell(row=row, column=11).value,
-            sheet.cell(row=row, column=12).value,
-            sheet.cell(row=row, column=13).value,
-            sheet.cell(row=row, column=14).value,
-            sheet.cell(row=row, column=15).value,
-            sheet.cell(row=row, column=16).value,
-            sheet.cell(row=row, column=17).value,
-            sheet.cell(row=row, column=18).value,
-            sheet.cell(row=row, column=19).value,
-            sheet.cell(row=row, column=20).value,
-            sheet.cell(row=row, column=21).value
+            codigo=sheet.cell(row=row, column=1).value,
+            pl=sheet.cell(row=row, column=2).value,
+            pvp=sheet.cell(row=row, column=3).value,
+            psr=sheet.cell(row=row, column=4).value,
+            dividend_yield=sheet.cell(row=row, column=5).value,
+            p_ativo=sheet.cell(row=row, column=6).value,
+            p_cap_giro=sheet.cell(row=row, column=7).value,
+            p_ebit=sheet.cell(row=row, column=8).value,
+            p_ativ_circ_liq=sheet.cell(row=row, column=9).value,
+            ev_ebit=sheet.cell(row=row, column=10).value,
+            ev_ebitda=sheet.cell(row=row, column=11).value,
+            margem_ebit=sheet.cell(row=row, column=12).value,
+            margem_liquida=sheet.cell(row=row, column=13).value,
+            liq_corrente=sheet.cell(row=row, column=14).value,
+            roic=sheet.cell(row=row, column=15).value,
+            roe=sheet.cell(row=row, column=16).value,
+            liq_2meses=sheet.cell(row=row, column=17).value,
+            patrimonio_liquido=sheet.cell(row=row, column=18).value,
+            div_bruta_patrim=sheet.cell(row=row, column=19).value,
+            cresc_rec_5a=sheet.cell(row=row, column=20).value,
+            setor=sheet.cell(row=row, column=21).value,
+            sub_setor=sheet.cell(row=row, column=22).value,
+            nome=sheet.cell(row=row, column=23).value,
+            cnpj=sheet.cell(row=row, column=24).value,
+            imagem=sheet.cell(row=row, column=25).value
         )
         list_acoes.append(acoes)
 

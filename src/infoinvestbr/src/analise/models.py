@@ -124,6 +124,7 @@ class Acao(Base):
     div_bruta_patrim = Column("DIV_BRUTA_PATRIM", Numeric, nullable=True)
     cresc_rec_5a = Column("CRESC_REC_5A", Numeric, nullable=True)
     setor = Column("SETOR", String, nullable=False)
+    sub_setor = Column("SUB_SETOR", String, nullable=False)
     lpa = Column("LPA", Numeric, nullable=True)
     vpa = Column("VPA", Numeric, nullable=True)
     cnpj = Column("CNPJ", String, nullable=True)
@@ -157,6 +158,8 @@ class Acao(Base):
                  lpa=0,
                  vpa=0,
                  descricao="",
+                 sub_setor="",
+                 cnpj=""
                  ):
         self.codigo = codigo
         self.pl = pl
@@ -185,3 +188,5 @@ class Acao(Base):
         self.lpa = lpa,
         self.vpa = vpa,
         self.descricao = descricao
+        self.sub_setor = sub_setor
+        self.cnpj = cnpj

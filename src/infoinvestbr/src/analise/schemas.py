@@ -194,6 +194,7 @@ class AcaoResponseSchema:
     vpa: Optional[float] = None
     cnpj: Optional[str] = None
     tipo: Optional[str] = None
+    sub_setor: Optional[str] = None
 
     def __init__(self,
                  acao_id,
@@ -224,7 +225,8 @@ class AcaoResponseSchema:
                  lpa,
                  vpa,
                  descricao,
-                 cnpj
+                 cnpj,
+                 sub_setor,
                  ):
         self.acao_id = acao_id
         self.codigo = codigo
@@ -255,3 +257,4 @@ class AcaoResponseSchema:
         self.vpa = vpa,
         self.descricao = descricao,
         self.cnpj = cnpj
+        self.sub_setor = sub_setor
