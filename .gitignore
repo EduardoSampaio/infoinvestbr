@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 /src/infoinvestbr/logs.txt
+src/infoinvestbr/logs.txt
