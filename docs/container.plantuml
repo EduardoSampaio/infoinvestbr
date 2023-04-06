@@ -31,6 +31,6 @@ Rel(usuario, frontend, "Acessa", "Análise de Ativo, carteira de investimento , 
 Rel(backend, yahoo, "Obter Cotação de Ativo", "")
 Rel(backend, banco, "Leitura/Escrita", "")
 Rel(backend, redis, "Cache de dados", "")
-Rel(backend, google, "Autorização de Acesso", "")
+Rel(backend, google, "Autenticação de Acesso", "")
 
 @enduml

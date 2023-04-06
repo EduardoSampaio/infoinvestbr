@@ -44,9 +44,9 @@ Container_Boundary(c1, "API REST com FASTAPI com python") {
 
 Container(frontend, "Aplicação SPA NextJS", "NextJS,typescript e tailwindcss", $sprite="nextjs_original_wordmark")
 System_Ext(yahoo, "API Yahoo Finance", "Cotação de ativos", $sprite="yahoo")
-System_Ext(google, "API Google", "API Autorização", $sprite="google")
+System_Ext(google, "API Google", "API Autenticação", $sprite="google")
 
-Rel(google, auth, "Autorização de acesso")
+Rel(google, auth, "Autenticação de acesso")
 Rel(cotacao, yahoo , "Cotação de tempo real")
 
 Rel(frontend, auth, "JSON / REST / HTTP", "Verificar Autorização utilizando token JWT para acesso")
