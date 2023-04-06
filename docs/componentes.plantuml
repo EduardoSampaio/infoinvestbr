@@ -1,6 +1,6 @@
 @startuml DiagramaContainer
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 !define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
 !define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
 !define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
@@ -11,23 +11,52 @@
 !include DEVICONS2/google.puml
 !include DEVICONS2/nextjs_original_wordmark.puml
 
-Container(frontend, "Aplicação SPA NextJS", "NextJS,typescript e tailwindcss", $sprite="nextjs_original_wordmark")
-Container_Boundary(c1, "") {
-    Container(auth, "Autorização e Autenticação", "Camada de segurança verifica se usuário possui acesso")
-    Container(controller, "Controllers", "Camada disponibiliza os endpoints através de rotas")
-    Container(service, "Service", "Camada contém as regras de negócio")
-    Container(repositorio, "Repositório", "Camada responsável pela comunicação com banco de dados")
-    Container(model, "Model", "Camada responsável geração de tabelas no banco de dados através do orm sql alchemy")
+Container_Boundary(c1, "API REST com FASTAPI com python") {
+    Component(auth, "Camada de segurança", "Autorização através do token JWT")
+    Component(usuario, "Usuário Controller", "Endpoints autenticação e criação de usuários")
+    Component(cotacao, "Cotação Controller", "Endpoints cotações de ações e fundos imobiliarios")
+    Component(analise, "Análise Controller", "Endpoints detalhes de indicadores de ações e fundo imobiliários")
+    Component(transacao, "Transação Controller", "Endpoints transações de compra e venda de ativos")
+    Component(patrimonio, "Patrimônio Controller", "Endpoints dados de todo patrimônio do usuário e rentabilidade , variação e todos os ativos da carteira de investimento")
+    Component(importacao, "Importacao Controller", "Endpoints de importação de panilhas com dados sobre os ativos")
+    Component(service, "Serviço", "Camada de regra de negócios")
+    Component(repositorio, "Repositório", "Camada de Acesso a dados com sql alchemy")
+    Component(modelo, "Modelo", "Modelo de banco de dados para uso com orm sql alchemy")
+
+    Rel(auth, cotacao, "")
+    Rel(auth, analise, "")
+    Rel(auth, transacao, "")
+    Rel(auth, patrimonio, "")
+    Rel(auth, importacao, "")
+
+    
+    Rel(cotacao, service,"")
+    Rel(analise, service,"")
+    Rel(transacao, service,"")
+    Rel(patrimonio, service,"")
+    Rel(importacao, service,"")
+
+    Rel(service,repositorio , "")
+    Rel(service, modelo, "")
+    Rel(repositorio, modelo, "")
 }
+
+
+Container(frontend, "Aplicação SPA NextJS", "NextJS,typescript e tailwindcss", $sprite="nextjs_original_wordmark")
+System_Ext(yahoo, "API Yahoo Finance", "Cotação de ativos", $sprite="yahoo")
+System_Ext(google, "API Google", "API Autorização", $sprite="google")
+
+Rel(google, auth, "Autorização de acesso")
+Rel(cotacao, yahoo , "Cotação de tempo real")
+
+Rel(frontend, auth, "JSON / REST / HTTP", "Verificar Autorização utilizando token JWT para acesso")
+Rel(frontend, usuario, "Acesso para autenticação")
 
 ContainerDb(banco,  "Banco de Dados Relacional", "PostgreSQL para persistência de dados",$sprite="postgresql")
 ContainerDb(redis, "Banco de Dados Não Relacional", "Redis para cache", $sprite="redis")
-Rel(frontend, auth, "JSON / REST / HTTP", "Verificar Autorização utilizando token JWT para acesso")
-Rel(auth, controller, "Acesso Permitido")
-Rel(controller, service, "Acessando Camada de serviço", "")
-Rel(service, repositorio, "Acessando Camada o Repositório", "")
-Rel(repositorio, model, "Acessando Modelo", "")
-Rel(service, model, "Acessando Modelo", "")
-Rel(repositorio, banco, "Acessando Banco de dados", "")
-Rel(service, redis, "Acessando o Cache", "")
+
+Rel(repositorio, banco, "Acessando Banco de dados", "Leitura e Escrita")
+Rel(service, redis, "Acessando o Cache", "Leitura e Escrita")
+
+
 @enduml

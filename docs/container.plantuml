@@ -17,16 +17,16 @@ Person(usuario, "Usuário", "Acessa o sistema com conta pessoal")
 
 
 Container_Boundary(c1, "Sistema de Gerenciamento de Renda Variável", "") {
-Container(frontend, "Aplicação SPA NextJS", "acessa aplicação e todas sua funcionalidades via web", $sprite="nextjs_original_wordmark")
+Container(frontend, "Aplicação SPA NextJS", "acessa aplicação e todas suas funcionalidades via web", $sprite="nextjs_original_wordmark")
 Container(backend, "API REST", "Python, Fastapi", $sprite="python")
 ContainerDb(banco,  "Banco de Dados Relacional", "PostgreSQL para persistência de dados",$sprite="postgresql")
 ContainerDb(redis, "Banco de Dados Não Relacional", "Redis para cache", $sprite="redis")
 }
 
-Container(yahoo, "API Yahoo Finance", "Cotação de ativos", $sprite="yahoo")
-Container(google, "API Google", "API Autorização", $sprite="google")
+System_Ext(yahoo, "API Yahoo Finance", "Cotação de ativos", $sprite="yahoo")
+System_Ext(google, "API Google", "API Autorização", $sprite="google")
 
-Rel(frontend, backend, "HTTP ou HTTPS", "")
+Rel(frontend, backend, "JSON / HTTP ou HTTPS", "")
 Rel(usuario, frontend, "Acessa", "Análise de Ativo, carteira de investimento , transaçoes, patrimônio")
 Rel(backend, yahoo, "Obter Cotação de Ativo", "")
 Rel(backend, banco, "Leitura/Escrita", "")
