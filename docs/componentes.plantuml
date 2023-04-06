@@ -1,0 +1,33 @@
+@startuml DiagramaContainer
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/python.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+!include DEVICONS/yahoo.puml
+!include DEVICONS2/google.puml
+!include DEVICONS2/nextjs_original_wordmark.puml
+
+Container(frontend, "Aplicação SPA NextJS", "NextJS,typescript e tailwindcss", $sprite="nextjs_original_wordmark")
+Container_Boundary(c1, "") {
+    Container(auth, "Autorização e Autenticação", "Camada de segurança verifica se usuário possui acesso")
+    Container(controller, "Controllers", "Camada disponibiliza os endpoints através de rotas")
+    Container(service, "Service", "Camada contém as regras de negócio")
+    Container(repositorio, "Repositório", "Camada responsável pela comunicação com banco de dados")
+    Container(model, "Model", "Camada responsável geração de tabelas no banco de dados através do orm sql alchemy")
+}
+
+ContainerDb(banco,  "Banco de Dados Relacional", "PostgreSQL para persistência de dados",$sprite="postgresql")
+ContainerDb(redis, "Banco de Dados Não Relacional", "Redis para cache", $sprite="redis")
+Rel(frontend, auth, "JSON / REST / HTTP", "Verificar Autorização utilizando token JWT para acesso")
+Rel(auth, controller, "Acesso Permitido")
+Rel(controller, service, "Acessando Camada de serviço", "")
+Rel(service, repositorio, "Acessando Camada o Repositório", "")
+Rel(repositorio, model, "Acessando Modelo", "")
+Rel(service, model, "Acessando Modelo", "")
+Rel(repositorio, banco, "Acessando Banco de dados", "")
+Rel(service, redis, "Acessando o Cache", "")
+@enduml

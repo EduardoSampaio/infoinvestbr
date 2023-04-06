@@ -1,0 +1,14 @@
+@startuml DiagramaContexto
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(personAlias, "Usuário", "Acessa o sistema")
+Container(applicacao, "InfoInvestBr", "Sistema Gerenciador de Renda Variável","Análise de ativos e gerenciamento de investimentos de renda Variável'")
+Container(autoricaoGoogle, "Google", "Acesso de Autorização de Usuário")
+Container(yahooFinance, "Yahoo Finance", "Acessa o Yahoo Finance para obter cotações em tempo real")
+Person(admin, "Administrador" , "Gerencia e atualiza os dados do sistema")
+Rel(personAlias, applicacao, "Acessa", "Visualiza os ativos e sua carteira de investimento")
+Rel(autoricaoGoogle,personAlias, "Autoriza ou Nega", "acesso por uma conta Google")
+Rel(applicacao,autoricaoGoogle, "Verificar", "Verifica se usuário possui uma conta no Google")
+Rel(applicacao,yahooFinance, "Busca", "Busca cotação de ações e fundos imobiliários em tempo real")
+Rel(admin, applicacao, "Gerencia", "Gerencia dados")
+@endumls

@@ -1,0 +1,36 @@
+@startuml DiagramaContainer
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/python.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/redis.puml
+!include DEVICONS/yahoo.puml
+!include DEVICONS2/google.puml
+!include DEVICONS2/nextjs_original_wordmark.puml
+
+
+Person(usuario, "Usuário", "Acessa o sistema com conta pessoal")
+
+
+
+Container_Boundary(c1, "Sistema de Gerenciamento de Renda Variável", "") {
+Container(frontend, "Aplicação SPA NextJS", "acessa aplicação e todas sua funcionalidades via web", $sprite="nextjs_original_wordmark")
+Container(backend, "API REST", "Python, Fastapi", $sprite="python")
+ContainerDb(banco,  "Banco de Dados Relacional", "PostgreSQL para persistência de dados",$sprite="postgresql")
+ContainerDb(redis, "Banco de Dados Não Relacional", "Redis para cache", $sprite="redis")
+}
+
+Container(yahoo, "API Yahoo Finance", "Cotação de ativos", $sprite="yahoo")
+Container(google, "API Google", "API Autorização", $sprite="google")
+
+Rel(frontend, backend, "HTTP ou HTTPS", "")
+Rel(usuario, frontend, "Acessa", "Análise de Ativo, carteira de investimento , transaçoes, patrimônio")
+Rel(backend, yahoo, "Obter Cotação de Ativo", "")
+Rel(backend, banco, "Leitura/Escrita", "")
+Rel(backend, redis, "Cache de dados", "")
+Rel(backend, google, "Autorização de Acesso", "")
+
+@enduml
