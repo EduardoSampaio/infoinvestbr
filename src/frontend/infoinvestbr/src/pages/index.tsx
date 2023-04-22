@@ -1,7 +1,11 @@
+import Card from "@/components/template/Card";
+import Layout from "@/components/template/Layout";
+import Titulo from "@/components/template/Titulo";
+
 export default function Home() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  )
+    <Layout>
+        <Card className="w-full h-screen" titulo="Home" />
+    </Layout>
+  );
 }

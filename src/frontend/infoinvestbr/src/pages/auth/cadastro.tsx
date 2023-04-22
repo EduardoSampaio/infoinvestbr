@@ -9,7 +9,7 @@ export default function CadastroPage() {
         <div className="flex flex-row justify-center">
           <Image
             priority
-            src="/img/logo.png"
+            src="/img/logo-light.png"
             height="200"
             width="200"
             alt="Logo"

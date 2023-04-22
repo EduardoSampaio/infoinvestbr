@@ -65,7 +65,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 2,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -74,7 +74,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 3,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -83,7 +83,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 4,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -92,7 +92,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 5,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -101,7 +101,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 6,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -110,7 +110,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 7,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -119,7 +119,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 8,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -128,7 +128,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 9,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -137,7 +137,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 10,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -146,7 +146,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 11,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -155,7 +155,7 @@ const rows = [
     roe: 25.1,
   },
   {
-    id: 1,
+    id: 12,
     codigo: "BBAS3",
     imagem: "/img/acoes/331.jpg",
     pl: 10.5,
@@ -165,22 +165,25 @@ const rows = [
   },
 ];
 
+
 export default function AcoesListar() {
   return (
-    <Box sx={{ height: 700, width: "100%" }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
+    <div className="flex my-28 overflow-y-scroll h-screen">
+      <Box sx={{ height: 700, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              },
             },
-          },
-        }}
-        pageSizeOptions={[10]}
-        disableRowSelectionOnClick
-      />
-    </Box>
-  );
+          }}
+          pageSizeOptions={[10]}
+          disableRowSelectionOnClick
+        />
+      </Box>
+    </div>
+    );
 }
