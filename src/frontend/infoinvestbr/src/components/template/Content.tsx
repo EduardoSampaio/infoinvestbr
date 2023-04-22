@@ -4,7 +4,7 @@ export default function Content(props: any) {
   return (
     <div className={`flex`}>
       <MenuLateral />
-      <section className="flex h-screen w-full bg-gray-200 dark:bg-black">
+      <section className="flex h-screen w-full">
         {props.children}
       </section>
     </div>

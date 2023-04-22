@@ -4,8 +4,7 @@ import {
   HiOutlineDocument,
 } from "react-icons/hi";
 import MenuItem from "./MenuItem";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Typography from "@mui/material/Typography";
+import { HiOutlineBuildingLibrary } from "react-icons/hi2";
 
 export default function NavMenu() {
   function getMenuId(menuId: any) {
@@ -18,7 +17,7 @@ export default function NavMenu() {
         <MenuItem key={1} icon={HiOutlineHome} titulo="Início" url="/" />
         <MenuItem
           key={2}
-          icon={HiOutlineDocument}
+          icon={HiOutlineBuildingLibrary}
           titulo="Ações"
           url="/acoes/listar"
         />
