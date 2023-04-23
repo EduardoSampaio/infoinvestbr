@@ -1,21 +1,387 @@
+import AltasEBaixas from "@/components/dashboard/AltasEBaixas";
+import TaxasEmoedas from "@/components/dashboard/TaxasEMoedas";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
-import Titulo from "@/components/template/Titulo";
+import { ITicker } from "@/models/ticker";
+
+const tickersAlta: ITicker[] = [
+  {
+    codigo: "BBAS3",
+    tipo: "Alta",
+    valor: 43.75,
+    total: "1.55%",
+    imagem: "/img/acoes/331.jpg",
+  },
+  {
+    codigo: "TAEE11",
+    tipo: "Alta",
+    valor: 34.75,
+    total: "3.55%",
+    imagem: "/img/acoes/480.jpg",
+  },
+  {
+    codigo: "TASA4",
+    tipo: "Alta",
+    valor: 14.74,
+    total: "3.55%",
+    imagem: "/img/acoes/177.jpg",
+  },
+  {
+    codigo: "ITSA4",
+    tipo: "Alta",
+    valor: 8.75,
+    total: "0.55%",
+    imagem: "/img/acoes/345.jpg",
+  },
+  {
+    codigo: "BBDC4",
+    tipo: "Alta",
+    valor: 13.75,
+    total: "3.55%",
+    imagem: "/img/acoes/330.jpg",
+  },
+  {
+    codigo: "ALUP11",
+    tipo: "Alta",
+    valor: 26.75,
+    total: "3.55%",
+    imagem: "/img/acoes/446.jpg",
+  },
+  {
+    codigo: "CMIG4",
+    tipo: "Alta",
+    valor: 12.74,
+    total: "2.55%",
+    imagem: "/img/acoes/455.jpg",
+  },
+  {
+    codigo: "CPLE6",
+    tipo: "Alta",
+    valor: 7.75,
+    total: "1.50%",
+    imagem: "/img/acoes/462.jpg",
+  },
+  {
+    codigo: "SAPR4",
+    tipo: "Alta",
+    valor: 3.74,
+    total: "11.55%",
+    imagem: "/img/acoes/443.jpg",
+  },
+  {
+    codigo: "MOVI3",
+    tipo: "Alta",
+    valor: 8.75,
+    total: "3.55%",
+    imagem: "/img/acoes/247.jpg",
+  },
+];
+
+const tickersBaixa: ITicker[] = [
+  {
+    codigo: "BBAS3",
+    tipo: "Baixa",
+    valor: 43.75,
+    total: "1.55%",
+    imagem: "/img/acoes/331.jpg",
+  },
+  {
+    codigo: "TAEE11",
+    tipo: "Baixa",
+    valor: 34.75,
+    total: "3.55%",
+    imagem: "/img/acoes/480.jpg",
+  },
+  {
+    codigo: "TASA4",
+    tipo: "Baixa",
+    valor: 14.74,
+    total: "3.55%",
+    imagem: "/img/acoes/177.jpg",
+  },
+  {
+    codigo: "ITSA4",
+    tipo: "Baixa",
+    valor: 8.75,
+    total: "0.55%",
+    imagem: "/img/acoes/345.jpg",
+  },
+  {
+    codigo: "BBDC4",
+    tipo: "Baixa",
+    valor: 13.75,
+    total: "3.55%",
+    imagem: "/img/acoes/330.jpg",
+  },
+  {
+    codigo: "ALUP11",
+    tipo: "Baixa",
+    valor: 26.75,
+    total: "3.55%",
+    imagem: "/img/acoes/446.jpg",
+  },
+  {
+    codigo: "CMIG4",
+    tipo: "Baixa",
+    valor: 12.74,
+    total: "2.55%",
+    imagem: "/img/acoes/455.jpg",
+  },
+  {
+    codigo: "CPLE6",
+    tipo: "Baixa",
+    valor: 7.75,
+    total: "1.50%",
+    imagem: "/img/acoes/462.jpg",
+  },
+  {
+    codigo: "SAPR4",
+    tipo: "Baixa",
+    valor: 3.74,
+    total: "11.55%",
+    imagem: "/img/acoes/443.jpg",
+  },
+  {
+    codigo: "MOVI3",
+    tipo: "Baixa",
+    valor: 8.75,
+    total: "3.55%",
+    imagem: "/img/acoes/247.jpg",
+  },
+];
+
+const tickersFiisAlta: ITicker[] = [
+  {
+    codigo: "HGLG11",
+    tipo: "Alta",
+    valor: 43.75,
+    total: "1.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "XPML11",
+    tipo: "Alta",
+    valor: 34.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "MXFR11",
+    tipo: "Alta",
+    valor: 14.74,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "XPLG11",
+    tipo: "Alta",
+    valor: 8.75,
+    total: "0.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "HFOF11",
+    tipo: "Alta",
+    valor: 13.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "BCFF11",
+    tipo: "Alta",
+    valor: 26.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VILG11",
+    tipo: "Alta",
+    valor: 12.74,
+    total: "2.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VISC11",
+    tipo: "Alta",
+    valor: 7.75,
+    total: "1.50%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VINO11",
+    tipo: "Alta",
+    valor: 3.74,
+    total: "11.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "HCTR11",
+    tipo: "Alta",
+    valor: 8.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+];
+
+const tickersFiisBaixa: ITicker[] = [
+  {
+    codigo: "HGLG11",
+    tipo: "Baixa",
+    valor: 43.75,
+    total: "1.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "XPML11",
+    tipo: "Baixa",
+    valor: 34.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "MXFR11",
+    tipo: "Baixa",
+    valor: 14.74,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "XPLG11",
+    tipo: "Baixa",
+    valor: 8.75,
+    total: "0.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "HFOF11",
+    tipo: "Baixa",
+    valor: 13.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "BCFF11",
+    tipo: "Baixa",
+    valor: 26.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VILG11",
+    tipo: "Baixa",
+    valor: 12.74,
+    total: "2.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VISC11",
+    tipo: "Baixa",
+    valor: 7.75,
+    total: "1.50%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "VINO11",
+    tipo: "Baixa",
+    valor: 3.74,
+    total: "11.55%",
+    imagem: "/img/fiis.svg",
+  },
+  {
+    codigo: "HCTR11",
+    tipo: "Baixa",
+    valor: 8.75,
+    total: "3.55%",
+    imagem: "/img/fiis.svg",
+  },
+];
+
+const options = {
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      type: "cross",
+    },
+  },
+  grid: {
+    top: 10,
+    bottom: 30,
+    show: true,
+  },
+  xAxis: {
+    type: "category",
+    data: ["11-2022", "12-2022", "01-2023", "02-2023", "03-2023", "04-2023"],
+    splitLine: {
+      lineStyle: {
+        type: "solid",
+      },
+      show: true,
+    },
+  },
+  yAxis: [
+    {
+      type: "value",
+      position: "left",
+      splitLine: {
+        lineStyle: {
+          type: "solid",
+        },
+        show: true,
+      },
+      min: 0,
+      max: "150.000",
+    },
+  ],
+  series: [
+    {
+      data: [112.486, 110.031, 113.532, 113.43, 101.882, 104.366],
+      type: "line",
+    },
+  ],
+};
 
 export default function Home() {
   return (
     <Layout>
-      <div className="flex flex-col w-full h-screen">
-        <div className="flex">
-          <Card className="basis-1/2 h-[250px]" titulo="Ibovespa" sizeText="text-xs"></Card>
-          <Card className="basis-1/2 h-[250px]" titulo="IFIX" sizeText="text-xs"></Card>
-          <Card className="basis-1/2 h-[250px]" titulo="Taxas e Moedas" sizeText="text-xs"></Card>
+      <div className="flex flex-col w-full">
+        <div className="flex max-sm:flex-wrap sm:flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap">
+          <Card
+            className="basis-full py-1 min-h-[150px]"
+            titulo="Mercado Financeiro"
+            sizeText="text-xs"
+          >
+            <TaxasEmoedas />
+          </Card>
         </div>
-        <div className="flex sm:flex-wrap md:flex-nowrap lg:flex-nowrap xl:flex-nowrap">
-          <Card className="basis-full h-[250px]" titulo="Altas Ações" sizeText="text-xs"></Card>
-          <Card className="basis-full h-[250px]" titulo="Baixas Ações" sizeText="text-xs"></Card>
-          <Card className="basis-full h-[250px]" titulo="Altas Fundos Imobiliários" sizeText="text-xs"></Card>
-          <Card className="basis-full h-[250px]" titulo="Baixas Fundos Imobiliários" sizeText="text-xs"></Card>
+        <div className="flex max-sm:flex-wrap sm:flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap">
+          <Card
+            className="basis-full h-[320px]"
+            titulo="Ações Maiores Altas"
+            sizeText="text-xs"
+          >
+            <AltasEBaixas ticker={tickersAlta} />
+          </Card>
+          <Card
+            className="basis-full h-[320px]"
+            titulo="Ações Maiores Baixas"
+            sizeText="text-xs"
+          >
+            <AltasEBaixas ticker={tickersBaixa} />
+          </Card>
+          <Card
+            className="basis-full h-[320px]"
+            titulo="Fundos Imobiliários Maiores Alta"
+            sizeText="text-xs"
+          >
+            <AltasEBaixas ticker={tickersFiisAlta} />
+          </Card>
+          <Card
+            className="basis-full h-[320px]"
+            titulo="Fundos Imobiliários Maiores Baixas"
+            sizeText="text-xs"
+          >
+            <AltasEBaixas ticker={tickersFiisBaixa} />
+          </Card>
         </div>
       </div>
     </Layout>

@@ -1,19 +1,18 @@
 import { useEffect } from "react";
-import Content from "./Content";
 import Header from "./Header";
 import useAppData from "@/hooks/useAppData";
+import MenuLateral from "./MenuLateral";
 
 export default function Layout(props: any) {
   const { tema } = useAppData();
 
   useEffect(() => {
-    document.body.style.height = "100%"
-    if(tema === 'dark') {
-      document.body.style.backgroundColor = 'black'
-    }else{
-      document.body.style.backgroundColor = '#E5E7EB'
+    document.body.style.height = "100%";
+    if (tema === "dark") {
+      document.body.style.backgroundColor = "black";
+    } else {
+      document.body.style.backgroundColor = "#E5E7EB";
     }
- 
   }, [tema]);
 
   return (
@@ -22,7 +21,10 @@ export default function Layout(props: any) {
       `}
     >
       <Header />
-      <Content>{props.children}</Content>
+      <section className={`flex`}>
+        <MenuLateral />
+        {props.children}
+      </section>
     </div>
   );
 }

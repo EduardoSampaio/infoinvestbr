@@ -10,7 +10,7 @@ interface CardProps {
 export default function Card(props: CardProps) {
   return (
     <div
-      className={`${props.className} bg-white m-2.5 rounded-lg box-shadow
+      className={`${props.className} bg-white m-2.5 h-auto rounded-lg box-shadow
             dark:bg-primary-gray
             `}
     >

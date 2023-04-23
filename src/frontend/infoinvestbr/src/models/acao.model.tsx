@@ -5,4 +5,6 @@ export interface IAcao {
     pvp:number;
     pl: number;
     roe: number;
+    setor: string;
+    subsetor: string;
 }

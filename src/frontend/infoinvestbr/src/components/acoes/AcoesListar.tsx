@@ -6,36 +6,45 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 import { IAcao } from "@/models/acao.model";
+import useAppData from "@/hooks/useAppData";
+import { useEffect, useState } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { CssBaseline, PaletteMode } from "@mui/material";
 
 const columns: GridColDef[] = [
   {
     field: "imagem",
     headerName: "",
-    width: 90,
+    width: 50,
     editable: false,
-    renderCell: (params) => <img src={params.value} />,
+    renderCell: (params) => (
+      <img src={params.value} width="20px" height="20px" />
+    ),
   },
-  { field: "codigo", headerName: "CÓDIGO", width: 150, editable: false },
+  { field: "codigo", headerName: "CÓDIGO", width: 80, editable: false },
   {
     field: "pl",
     headerName: "P/L",
     type: "number",
-    width: 90,
+    minWidth: 100,
     editable: false,
+    resizable: true,
   },
   {
     field: "pvp",
     headerName: "P/VP",
     type: "number",
-    width: 90,
+    minWidth: 100,
     editable: false,
+    resizable: true,
   },
   {
     field: "dividend_yield",
     headerName: "Div.Yield",
     type: "number",
-    width: 90,
+    minWidth: 100,
     editable: false,
+    resizable: true,
     valueFormatter: (params: GridValueFormatterParams<number>) => {
       if (params.value == null) {
         return "";
@@ -48,9 +57,26 @@ const columns: GridColDef[] = [
   {
     field: "roe",
     headerName: "ROE",
-    type: "number",
-    width: 90,
+    type: "string",
+    minWidth: 100,
     editable: false,
+    resizable: true,
+  },
+  {
+    field: "setor",
+    headerName: "SETOR",
+    type: "string",
+    minWidth: 100,
+    editable: false,
+    resizable: true,
+  },
+  {
+    field: "subsetor",
+    headerName: "SUBSETOR",
+    type: "string",
+    minWidth: 100,
+    editable: false,
+    resizable: true,
   },
 ];
 
@@ -63,6 +89,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 2,
@@ -72,6 +100,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 3,
@@ -81,6 +111,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 4,
@@ -90,6 +122,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 5,
@@ -99,6 +133,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 6,
@@ -108,6 +144,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 7,
@@ -117,6 +155,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 8,
@@ -126,6 +166,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 9,
@@ -135,6 +177,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 10,
@@ -144,6 +188,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 11,
@@ -153,6 +199,8 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
   {
     id: 12,
@@ -162,28 +210,43 @@ const rows = [
     pvp: 1.8,
     dividend_yield: 10.5,
     roe: 25.1,
+    setor: "Financeiro",
+    subsetor: "Financeiro",
   },
 ];
 
-
 export default function AcoesListar() {
+  const { tema } = useAppData();
+  const [color, setColor] = useState<"white" | "black">("white");
+
+  useEffect(() => {
+    if (tema === "dark") {
+      setColor("white");
+    } else {
+      setColor("black");
+    }
+  }, [tema]);
+
   return (
-    <div className="flex my-28 overflow-y-scroll h-screen">
-      <Box sx={{ height: 700, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
+    <div className="flex w-full">
+      <div className="flex w-full my-20">
+        <div style={{ height: 370, width: "95%" }}>
+          <DataGrid
+            sx={{ color: `${color}` }}
+            rows={rows}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
               },
-            },
-          }}
-          pageSizeOptions={[10]}
-          disableRowSelectionOnClick
-        />
-      </Box>
+            }}
+            pageSizeOptions={[5]}
+            disableRowSelectionOnClick
+          />
+        </div>
+      </div>
     </div>
-    );
+  );
 }

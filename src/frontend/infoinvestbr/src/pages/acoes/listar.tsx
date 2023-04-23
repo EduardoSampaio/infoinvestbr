@@ -1,12 +1,14 @@
 import AcoesListar from "@/components/acoes/AcoesListar";
+import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
 
 export default function ListarPage() {
     return (
         <Layout>
-            {/* <AcoesListar /> */}
-            <h2>Ações</h2>
+            <Card sizeText="text-xs" titulo="Ações" className="flex w-full">
+                <AcoesListar />
+            </Card>
         </Layout>
     )
 }
