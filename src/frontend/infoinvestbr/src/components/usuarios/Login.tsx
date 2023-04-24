@@ -1,22 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Login(props: any) {
+interface LoginProps {
+  changeMode?: () => void
+}
+
+export default function Login(props: LoginProps) {
   return (
     <>
       <div className="flex flex-col h-full justify-center">
         <button
           type="button"
-          className="flex px-8 py-2.5 active:ring-2 border-2 mb-5 justify-center"
+          className="flex py-2.5 active:ring-2 border-2 mb-5 justify-center"
         >
           <Image
+            className="-mb-2"
             priority
             src="/img/google.svg"
-            height="24"
-            width="24"
+            height="18"
+            width="18"
             alt="Google Login"
           />
-          <p className="pl-5">ENTRAR COM O GOOGLE</p>
+          <p className="pl-2 text-gray-700 text-xs">ENTRAR COM O GOOGLE</p>
         </button>
         <div className="mb-6">
           <label
@@ -59,13 +64,11 @@ export default function Login(props: any) {
           </button>
         </div>
         <div className="flex mt-5">
-          <Link href={"/auth/cadastro"}>
-            <button
+            <button onClick={props.changeMode}
               className="text-blue-500 active:text-blue-800"
             >
               Não tem conta ? Criar uma nova conta
             </button>
-          </Link>
         </div>
       </div>
     </>

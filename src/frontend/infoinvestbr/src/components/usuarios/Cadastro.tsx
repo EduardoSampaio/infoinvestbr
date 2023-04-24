@@ -1,7 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Cadastro(props: any) {
+interface CadastroProps {
+  changeMode?: () => void
+}
+
+export default function Cadastro(props: CadastroProps) {
   return (
     <div className="flex flex-col h-full justify-center">
       <div className="mb-6">
@@ -77,9 +81,7 @@ export default function Cadastro(props: any) {
         </button>
       </div>
       <div className="flex mt-5">
-        <Link href={"/auth/login"}>
-          <button className="text-blue-500 active:text-blue-800">Voltar</button>
-        </Link>
+        <button className="text-blue-500 active:text-blue-800" onClick={props.changeMode}>Voltar</button>
       </div>
     </div>
   );

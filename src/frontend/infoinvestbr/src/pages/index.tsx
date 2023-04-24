@@ -346,7 +346,7 @@ export default function Home() {
       <div className="flex flex-col w-full">
         <div className="flex max-sm:flex-wrap sm:flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap">
           <Card
-            className="basis-full py-1 min-h-[150px]"
+            className="basis-full h-[150px]"
             titulo="Mercado Financeiro"
             sizeText="text-xs"
           >

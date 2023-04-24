@@ -4,13 +4,15 @@ import { Perfil } from "./Perfil";
 import MenuLateralItem from "./MenuLateralItem";
 import { Button } from "@mui/material";
 
-interface MenuLateralProps {}
+interface MenuLateralProps {
+  className?: string;
+}
 
 export default function MenuLateral(props: MenuLateralProps) {
   return (
-      <Card className={`h-[250px] w-[180px]`} sizeText="text-xs">
+      <Card className={`w-[180px] h-[280px] m-2.5`} sizeText="text-xs">
         <Perfil />
-        <ul className="flex h-full flex-col ml-10 text-sm">
+        <ul className="flex flex-col ml-10 text-sm">
           <MenuLateralItem texto="Carteira" url="/carteira" />
           <MenuLateralItem texto="Patrimônio" url="/patrimonio" />
           <MenuLateralItem texto="Transações" url="/transacao" />

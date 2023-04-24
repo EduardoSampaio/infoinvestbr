@@ -1,30 +1,28 @@
 import { useEffect } from "react";
 import Header from "./Header";
-import useAppData from "@/hooks/useAppData";
 import MenuLateral from "./MenuLateral";
+import { useTheme } from "@mui/material";
 
 export default function Layout(props: any) {
-  const { tema } = useAppData();
+  const theme = useTheme();
+  const dark = theme.palette.mode === "dark" ? "dark" : "";
 
   useEffect(() => {
     document.body.style.height = "100%";
-    if (tema === "dark") {
+    if (dark === "dark") {
       document.body.style.backgroundColor = "black";
     } else {
       document.body.style.backgroundColor = "#E5E7EB";
     }
-  }, [tema]);
+  }, [dark]);
 
   return (
-    <div
-      className={`flex flex-col w-full h-full ${tema}
-      `}
-    >
+    <div className={`flex flex-col w-full min-w-full ${dark}`}>
       <Header />
-      <section className={`flex`}>
+      <div className="flex w-full">
         <MenuLateral />
-        {props.children}
-      </section>
+        <div className="w-full">{props.children}</div>
+      </div>
     </div>
   );
 }
