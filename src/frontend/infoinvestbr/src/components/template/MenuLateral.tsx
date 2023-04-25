@@ -10,7 +10,7 @@ interface MenuLateralProps {
 
 export default function MenuLateral(props: MenuLateralProps) {
   return (
-      <Card className={`w-[180px] h-[280px] m-2.5`} sizeText="text-xs">
+      <Card className={`min-w-[180px] h-[280px] m-2.5`} sizeText="text-xs">
         <Perfil />
         <ul className="flex flex-col ml-10 text-sm">
           <MenuLateralItem texto="Carteira" url="/carteira" />

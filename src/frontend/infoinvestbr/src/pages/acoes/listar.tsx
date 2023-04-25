@@ -2,7 +2,8 @@ import AcoesListar from "@/components/acoes/AcoesListar";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
-export default function ListarPage() {
+
+export default function ListarAcoes() {
   return (
     <Layout>
       <Card

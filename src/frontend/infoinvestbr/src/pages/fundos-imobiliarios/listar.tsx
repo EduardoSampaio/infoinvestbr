@@ -1,11 +1,20 @@
 
+import FundosImoboliariosListar from "@/components/fundos-imobiliarios/FundosImoboliariosListar";
+import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
 
-export default function ListarPage() {
+
+export default function ListarFundosImobiliarios() {
     return (
         <Layout>
-            <h2>Fundos Imobiliarios</h2>
+          <Card
+            sizeText="text-xl"
+            titulo="Fundos Imobiliários"
+            className="flex"
+          > 
+            <FundosImoboliariosListar />
+          </Card>
         </Layout>
-    )
+      );
 }
