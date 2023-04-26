@@ -1,13 +1,55 @@
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
 from src.analise.models import Acao, FundosImobiliario
-from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema
+from src.analise.schemas import AcaoRequestSchema, AcaoResponseSchema, FundosImobiliarioRequestSchema
 import logging as logger
+import yfinance as yf
+
+
+def convert_to_schema(model: Acao) -> AcaoResponseSchema:
+    return AcaoResponseSchema(
+        model.id,
+        model.codigo,
+        model.pl,
+        model.pvp,
+        model.psr,
+        model.dividend_yield,
+        model.p_ativo,
+        model.p_cap_giro,
+        model.p_ebit,
+        model.p_ativ_circ_liq,
+        model.ev_ebit,
+        model.ev_ebitda,
+        model.margem_ebit,
+        model.margem_liquida,
+        model.liq_corrente,
+        model.roic,
+        model.roe,
+        model.liq_2meses,
+        model.patrimonio_liquido,
+        model.div_bruta_patrim,
+        model.cresc_rec_5a,
+        model.setor,
+        model.tipo,
+        model.nome,
+        model.imagem,
+        model.lpa,
+        model.vpa,
+        model.descricao,
+        model.cnpj,
+        model.sub_setor,
+        0
+    )
 
 
 def get_acoes(db: Session, skip: int = 0, limit: int = 100):
     acoes = db.query(Acao).offset(skip).limit(limit).all()
-    return acoes
+    acoes_schemas = []
+    for acao in acoes:
+        acao_schema = convert_to_schema(acao)
+        acoes_schemas.append(acao_schema)
+
+    return acoes_schemas
 
 
 def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):

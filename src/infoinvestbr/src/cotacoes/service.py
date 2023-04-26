@@ -9,6 +9,7 @@ from src.core import models
 from src.core.models import HistoricoCotacao
 from src.core.exceptions import CodigoAtivoException
 from src.cotacoes.constantes import ACAO_TICKER, FUNDOS_TICKER
+from openpyxl import load_workbook
 
 
 def get_by_codigo(codigo: str, periodo: str, intervalo: str):
@@ -218,3 +219,18 @@ def get_cotacao_comparacao(alta: bool, tickers: []) -> CotacaoAltaOuBaixaSchema:
 
     list_ativo.sort(key=lambda x: x.valor, reverse=alta)
     return list_ativo[0:20]
+
+
+def get_preco_abertura_acoes():
+    workbook = load_workbook("src/analise/rendavariavel.xlsx")
+    sheet = workbook["Ações"]
+    row_count = sheet.max_row
+    tickers = []
+    for row in range(2, row_count + 1):
+        ticker = sheet.cell(row=row, column=1).value
+        tickers.append(f'{ticker}.SA')
+
+    dowload_tickers = yf.download(tickers, period='1d')['Close']
+
+    for ticker in tickers:
+        print(dowload_tickers[ticker][0])

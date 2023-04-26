@@ -10,7 +10,6 @@ from functools import lru_cache
 import uvicorn
 import logging
 from datetime import datetime
-
 from src.core.config import settings
 from src.core.database import engine
 from src.usuarios import router as routerUsuario
@@ -38,7 +37,7 @@ config_path = Path(__file__).with_name("logging_config.json")
 
 
 def create_app() -> FastAPI:
-    _app = FastAPI(title='INFO INVEST BR', debug=False)
+    _app = FastAPI(title='INFO INVEST', debug=False)
     _logger = CustomizeLogger.make_logger(config_path)
     _app.logger = _logger
 
@@ -49,8 +48,8 @@ app = create_app()
 
 
 @app.on_event("startup")
-def startup():
-    redis = aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
+async def startup():
+    redis = await aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="info-invest")
 
 

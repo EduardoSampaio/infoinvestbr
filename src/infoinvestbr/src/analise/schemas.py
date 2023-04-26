@@ -127,7 +127,7 @@ class FundosImobiliarioResponseSchema:
 
 
 class AcaoRequestSchema(BaseModel):
-    acao_id: int
+    id: int
     codigo: str
     nome: str
     descricao: str
@@ -164,7 +164,7 @@ class AcaoRequestSchema(BaseModel):
 
 @dataclass()
 class AcaoResponseSchema:
-    acao_id: int
+    id: int
     codigo: str
     nome: str
     descricao: str
@@ -194,9 +194,10 @@ class AcaoResponseSchema:
     cnpj: str
     tipo: str
     sub_setor: str
+    preco: float
 
     def __init__(self,
-                 acao_id,
+                 id,
                  codigo,
                  pl,
                  pvp,
@@ -226,8 +227,9 @@ class AcaoResponseSchema:
                  descricao,
                  cnpj,
                  sub_setor,
+                 preco
                  ):
-        self.acao_id = acao_id
+        self.id = id
         self.codigo = codigo
         self.pl = pl
         self.pvp = pvp
@@ -257,3 +259,4 @@ class AcaoResponseSchema:
         self.descricao = descricao,
         self.cnpj = cnpj
         self.sub_setor = sub_setor
+        self.preco = preco

@@ -26,7 +26,7 @@ def get_db():
 
 
 @router.get("/acao")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=1440, coder=JsonCoder)
 async def get_acoes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes(db, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
