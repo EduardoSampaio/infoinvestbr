@@ -12,7 +12,7 @@ export default function AltasEBaixas(props: AltasEBaixasProps) {
       return (
         <li key={index} className="my-1.5">
           <div className={`flex mx-4 justify-center`}>
-            <div className="font-semibold dark:text-white w-1/2">{index+1} </div>
+            <div className="font-semibold  w-1/2">{index+1} </div>
             <Image
               alt="ativo imagem"
               src={value.imagem}
@@ -20,7 +20,7 @@ export default function AltasEBaixas(props: AltasEBaixasProps) {
               height="20"
               className="mr-2"
             /> 
-            <div className="font-semibold dark:text-white  w-full">{value.codigo} </div>
+            <div className="font-semibold  w-full">{value.codigo} </div>
             <div className={`flex  w-full font-semibold ${value?.tipo === 'Alta' ? 'text-green-400' : 'text-red-500'} ml-2`}>{value.total} 
                 {value?.tipo === 'Alta' ? <MdArrowUpward /> :  <MdArrowDownward />}
             </div>

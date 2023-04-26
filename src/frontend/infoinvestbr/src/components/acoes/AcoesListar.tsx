@@ -16,7 +16,7 @@ const columns: GridColDef[] = [
     editable: false,
     sortable: false,
     renderCell: (params) => (
-      <img src={params.value === '/img/acoes/None.jpg' ? '/img/acao.svg' : params.value } width="40px" height="40px" />
+      <img src={params.value == '/img/acoes/None.jpg' ? '/img/acao.svg' : params.value } width="40px" height="40px" />
     ),
   },
   { field: "codigo", headerName: "CÓDIGO", minWidth: 75, editable: false },

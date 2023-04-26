@@ -296,51 +296,11 @@ const tickersFiisBaixa: ITicker[] = [
   },
 ];
 
-const options = {
-  tooltip: {
-    trigger: "axis",
-    axisPointer: {
-      type: "cross",
-    },
-  },
-  grid: {
-    top: 10,
-    bottom: 30,
-    show: true,
-  },
-  xAxis: {
-    type: "category",
-    data: ["11-2022", "12-2022", "01-2023", "02-2023", "03-2023", "04-2023"],
-    splitLine: {
-      lineStyle: {
-        type: "solid",
-      },
-      show: true,
-    },
-  },
-  yAxis: [
-    {
-      type: "value",
-      position: "left",
-      splitLine: {
-        lineStyle: {
-          type: "solid",
-        },
-        show: true,
-      },
-      min: 0,
-      max: "150.000",
-    },
-  ],
-  series: [
-    {
-      data: [112.486, 110.031, 113.532, 113.43, 101.882, 104.366],
-      type: "line",
-    },
-  ],
-};
+
 
 export default function Home() {
+  const breadcrumbs: LinkModel = {titulo: 'Home', link: '/'}
+
   return (
     <Layout>
       <div className="flex flex-col w-full">
@@ -349,6 +309,7 @@ export default function Home() {
             className="basis-full h-[150px]"
             titulo="Mercado Financeiro"
             sizeText="text-xs"
+            current={breadcrumbs}
           >
             <TaxasEmoedas />
           </Card>

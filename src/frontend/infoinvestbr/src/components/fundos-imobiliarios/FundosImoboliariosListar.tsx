@@ -21,19 +21,26 @@ const columns: GridColDef[] = [
       <img src={'/img/fiis.svg'} width="40px" height="40px" />
     ),
   },
-  { field: "codigo_do_fundo", headerName: "CÓDIGO", width: 140, editable: false },
+  { field: "codigo_do_fundo", headerName: "CÓDIGO", width: 80, editable: false },
+  {
+    field: "setor",
+    headerName: "Setor",
+    type: "string",
+    minWidth: 150,
+    editable: false,
+  },
   {
     field: "p_vpa",
     headerName: "P/VPA",
     type: "number",
-    minWidth: 120,
+    minWidth: 100,
     editable: false,
   },
   {
     field: "dividend_yield",
     headerName: "Div.Yield",
     type: "number",
-    minWidth: 130,
+    minWidth: 100,
     editable: false,
     valueFormatter: (params: GridValueFormatterParams<number>) => {
       if (params.value == null) {
@@ -45,17 +52,24 @@ const columns: GridColDef[] = [
     },
   },
   {
-    field: "setor",
-    headerName: "Setor",
+    field: "dividendo",
+    headerName: "Dividendo",
     type: "string",
-    minWidth: 200,
+    minWidth: 100,
     editable: false,
   },
   {
-    field: "dividendo",
-    headerName: "Ultimo Dividendo",
-    type: "string",
-    minWidth: 180,
+    field: "liquidez_diaria",
+    headerName: "Liquidez",
+    type: "number",
+    minWidth: 100,
+    editable: false,
+  },
+  {
+    field: "patrimonio_liq",
+    headerName: "Patrimônio",
+    type: "number",
+    minWidth: 150,
     editable: false,
   },
 ];

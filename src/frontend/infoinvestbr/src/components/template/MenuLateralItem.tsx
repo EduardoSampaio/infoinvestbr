@@ -22,7 +22,7 @@ export default function MenuLateralItem(props: MenuLateralItemProps) {
           <div className="flex items-center">
             {active ? <HiTag /> : <HiOutlineTag />}
 
-            <h4 className="ml-0.5">{props.texto}</h4>
+            <h4 className="ml-1 text-sm">{props.texto}</h4>
           </div>
         </li>
       </Link>

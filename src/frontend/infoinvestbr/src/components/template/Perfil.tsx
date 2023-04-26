@@ -4,7 +4,7 @@ import { HiOutlineLogout } from "react-icons/hi";
 
 export function Perfil() {
   return (
-    <div className="flex flex-col items-center border-b-2">
+    <div className="flex flex-col items-center border-b-2 mt-2.5">
       <Image
         alt="perfil"
         src="/img/eduardo.jpg"
