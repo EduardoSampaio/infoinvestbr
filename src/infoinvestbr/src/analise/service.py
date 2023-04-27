@@ -6,50 +6,55 @@ import logging as logger
 import yfinance as yf
 
 
-def convert_to_schema(model: Acao) -> AcaoResponseSchema:
-    return AcaoResponseSchema(
-        model.id,
-        model.codigo,
-        model.pl,
-        model.pvp,
-        model.psr,
-        model.dividend_yield,
-        model.p_ativo,
-        model.p_cap_giro,
-        model.p_ebit,
-        model.p_ativ_circ_liq,
-        model.ev_ebit,
-        model.ev_ebitda,
-        model.margem_ebit,
-        model.margem_liquida,
-        model.liq_corrente,
-        model.roic,
-        model.roe,
-        model.liq_2meses,
-        model.patrimonio_liquido,
-        model.div_bruta_patrim,
-        model.cresc_rec_5a,
-        model.setor,
-        model.tipo,
-        model.nome,
-        model.imagem,
-        model.lpa,
-        model.vpa,
-        model.descricao,
-        model.cnpj,
-        model.sub_setor,
-        0
-    )
+def convert_to_schema(model: Acao):
+    if model is None:
+        return {}
+
+    preco = 0
+    current_ticker = yf.Ticker(f'{model.codigo}.SA')
+    history = current_ticker.history(period='1d')['Close']
+    if not history.empty:
+        preco = history[0]
+
+    response = AcaoResponseSchema()
+    response.id = model.id
+    response.codigo = model.codigo
+    response.pl = model.pl
+    response.pvp = model.pvp
+    response.psr = model.psr
+    response.dividend_yield = model.dividend_yield * 100
+    response.p_ativo = model.p_ativo
+    response.p_cap_giro = model.p_cap_giro
+    response.p_ebit = model.p_ebit
+    response.p_ativ_circ_liq = model.p_ativ_circ_liq
+    response.ev_ebit = model.ev_ebit
+    response.ev_ebitda = model.ev_ebitda
+    response.margem_ebit = model.margem_ebit * 100
+    response.margem_liquida = model.margem_liquida * 100
+    response.liq_corrente = model.liq_corrente
+    response.roic = model.roic * 100
+    response.roe = model.roe * 100
+    response.liq_2meses = model.liq_2meses
+    response.patrimonio_liquido = model.patrimonio_liquido
+    response.div_bruta_patrim = model.div_bruta_patrim
+    response.cresc_rec_5a = model.cresc_rec_5a * 100
+    response.setor = model.setor
+    response.tipo = model.tipo
+    response.nome = model.nome
+    response.imagem = model.imagem
+    response.lpa = model.lpa
+    response.vpa = model.vpa
+    response.descricao = model.descricao
+    response.cnpj = model.cnpj
+    response.sub_setor = model.sub_setor
+    response.preco = round(preco, 2)
+
+    return response
 
 
 def get_acoes(db: Session, skip: int = 0, limit: int = 100):
     acoes = db.query(Acao).offset(skip).limit(limit).all()
-    acoes_schemas = []
-    for acao in acoes:
-        acao_schema = convert_to_schema(acao)
-        acoes_schemas.append(acao_schema)
-
-    return acoes_schemas
+    return acoes
 
 
 def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):
@@ -76,7 +81,7 @@ def get_fundos_imobiliarios_by_id(db: Session, fundos_id: int):
 
 
 def get_acoes_by_codigo(db: Session, codigo: str):
-    return db.query(Acao).filter(Acao.codigo == codigo).first()
+    return convert_to_schema(db.query(Acao).filter(Acao.codigo == codigo).first())
 
 
 def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str):
@@ -84,7 +89,7 @@ def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str):
 
 
 def update_acoes(db: Session, acao: AcaoRequestSchema):
-    _acao = get_acoes_by_id(db, acao.acao_id)
+    _acao = get_acoes_by_id(db, acao.id)
     _acao.codigo = acao.codigo
     _acao.tipo = acao.tipo
     _acao.nome = acao.nome

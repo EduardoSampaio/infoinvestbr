@@ -18,8 +18,7 @@ def get_by_codigo(codigo: str, periodo: str, intervalo: str):
      periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
      intevalo= [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
     """
-    codigo_exception(codigo)
-    cotacao = yf.Ticker(codigo)
+    cotacao = yf.Ticker(f'{codigo}.SA')
     cotacao = cotacao.history(period=periodo, interval=intervalo)
 
     list_cotacao = []
@@ -35,6 +34,27 @@ def get_by_codigo(codigo: str, periodo: str, intervalo: str):
         list_cotacao.append(_cotacao)
 
     return list_cotacao
+
+
+def get_by_codigo_chart(codigo: str, periodo: str, intervalo: str):
+    """
+     codigo  = [CODIGO.SA]
+     periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
+     intevalo= [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
+    """
+    cotacao = yf.Ticker(f'{codigo}.SA')
+    cotacao = cotacao.history(period=periodo, interval=intervalo)
+
+    list_data = []
+    list_close = []
+    for data in cotacao['Close'].keys():
+        list_close.append(cotacao['Close'].get(data))
+        list_data.append("{:%d/%m/%Y}".format(data))
+
+    return {
+        "datas": list_data,
+        "fechamento": list_close
+    }
 
 
 def get_by_codigo_ibovespa(periodo: str, intervalo: str):
@@ -67,8 +87,7 @@ def get_by_codigo_by_intervalo(codigo, inicio: datetime.date, fim: datetime.date
      periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
      intevalo= [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
     """
-    codigo_exception(codigo)
-    cotacao = yf.Ticker(codigo)
+    cotacao = yf.Ticker(f'{codigo}.SA')
     start = inicio.strftime('%Y-%m-%d')
     end = fim.strftime('%Y-%m-%d')
     cotacao = cotacao.history(start=start, end=end)
@@ -88,14 +107,13 @@ def get_by_codigo_by_intervalo(codigo, inicio: datetime.date, fim: datetime.date
 
 
 def get_by_codigo_atual(codigo: str) -> float:
-    codigo_exception(codigo)
-    cotacao = yf.Ticker(codigo)
+    cotacao = yf.Ticker(f'{codigo}.SA')
     cotacao = cotacao.history(period="1d")['Close'][0]
     return cotacao
 
 
 def get_by_codigo_varicao_diaria(codigo: str):
-    cotacao = yf.Ticker(codigo)
+    cotacao = yf.Ticker(f'{codigo}.SA')
     fechamento_anterior = cotacao.history(period="2d")['Close'][-2]
     fechamento_atual = cotacao.history(period="1d")['Close'][0]
     return fechamento_atual, fechamento_anterior
@@ -117,7 +135,6 @@ def gerar_dados_historicos(db: Session, codigo: str, periodo: str = "1d", update
          codigo  = [CODIGO.SA]
          periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
     """
-    codigo_exception(codigo)
     ativo = db.query(models.HistoricoCotacao).filter(models.HistoricoCotacao.codigo == codigo).first()
 
     if ativo is None:
@@ -174,16 +191,31 @@ def create_historico(db: Session, codigo: str, periodo: str = "1d"):
 
 
 def get_historico_dividendo(codigo: str):
-    codigo_exception(codigo)
-    current_ticker = yf.Ticker(codigo)
+    current_ticker = yf.Ticker(f'{codigo}.SA')
     valores = current_ticker.dividends
     list_dividendos = []
 
+    my_dict = {}
     for data in current_ticker.dividends.keys():
-        ativo = DividendoSchema(codigo, data, valores.get(data))
-        list_dividendos.append(ativo)
+        # ativo = DividendoSchema(codigo, data, valores.get(data))
+        # list_dividendos.append(ativo)
+        ano = "{:%d/%m/%Y}".format(data).split('/')[2]
+        my_dict.setdefault(ano, []).append(valores.get(data))
 
-    return list_dividendos
+    list_data = []
+    lista_valores = []
+    for k in my_dict.keys():
+        valores = my_dict.get(k)
+        total = 0
+        for valor in valores:
+            total += valor
+        list_data.append(k)
+        lista_valores.append(round(total, 2))
+
+    return {
+        "datas": list_data,
+        "valores": lista_valores
+    }
 
 
 def codigo_exception(codigo: str):

@@ -42,6 +42,12 @@ async def get_by_codigo(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
+@router.get("/codigo-ativo/{codigo_ativo}/chart")
+async def get_by_codigo_chart(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
+    valor = service.get_by_codigo_chart(codigo_ativo, periodo, intervalo)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
 @router.get("/codigo-ativo/{codigo_ativo}/data-inicio/{inicio}/data-fim/{fim}")
 async def get_by_codigo_by_intervalo(codigo_ativo: str, inicio: datetime.date, fim: datetime.date):
     valor = service.get_by_codigo_by_intervalo(codigo_ativo, inicio, fim)
@@ -69,7 +75,7 @@ async def deletar_dados_historicos(codigo: str, db: Session = Depends(get_db)):
                     message="Dados Históricos removidos com sucesso!").dict(exclude_none=True)
 
 
-@router.post("/historico/dividendos/{codigo}")
+@router.get("/historico/dividendos/{codigo}")
 async def get_historico_dividendo(codigo: str):
     valor = service.get_historico_dividendo(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)

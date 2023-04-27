@@ -3,7 +3,7 @@ import { HiQuestionMarkCircle } from "react-icons/hi";
 
 interface BoxIndicadorProps {
   indicador: string;
-  valor: string;
+  valor: any;
   tooltip?: string;
 }
 

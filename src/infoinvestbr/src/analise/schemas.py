@@ -34,6 +34,7 @@ class FundosImobiliarioRequestSchema(BaseModel):
 
     class Config:
         orm_mode = True
+        uselist=False
 
 
 @dataclass()
@@ -162,7 +163,6 @@ class AcaoRequestSchema(BaseModel):
         orm_mode = True
 
 
-@dataclass()
 class AcaoResponseSchema:
     id: int
     codigo: str
@@ -196,67 +196,68 @@ class AcaoResponseSchema:
     sub_setor: str
     preco: float
 
-    def __init__(self,
-                 id,
-                 codigo,
-                 pl,
-                 pvp,
-                 psr,
-                 dividend_yield,
-                 p_ativo,
-                 p_cap_giro,
-                 p_ebit,
-                 p_ativ_circ_liq,
-                 ev_ebit,
-                 ev_ebitda,
-                 margem_ebit,
-                 margem_liquida,
-                 liq_corrente,
-                 roic,
-                 roe,
-                 liq_2meses,
-                 patrimonio_liquido,
-                 div_bruta_patrim,
-                 cresc_rec_5a,
-                 setor,
-                 tipo,
-                 nome,
-                 imagem,
-                 lpa,
-                 vpa,
-                 descricao,
-                 cnpj,
-                 sub_setor,
-                 preco
-                 ):
-        self.id = id
-        self.codigo = codigo
-        self.pl = pl
-        self.pvp = pvp
-        self.psr = psr
-        self.dividend_yield = dividend_yield
-        self.p_ativo = p_ativo
-        self.p_cap_giro = p_cap_giro
-        self.p_ebit = p_ebit
-        self.p_ativ_circ_liq = p_ativ_circ_liq
-        self.ev_ebit = ev_ebit
-        self.ev_ebitda = ev_ebitda
-        self.margem_ebit = margem_ebit
-        self.margem_liquida = margem_liquida
-        self.liq_corrente = liq_corrente
-        self.roic = roic
-        self.roe = roe
-        self.liq_2meses = liq_2meses
-        self.patrimonio_liquido = patrimonio_liquido
-        self.div_bruta_patrim = div_bruta_patrim
-        self.cresc_rec_5a = cresc_rec_5a
-        self.setor = setor
-        self.tipo = tipo,
-        self.nome = nome,
-        self.imagem = imagem,
-        self.lpa = lpa,
-        self.vpa = vpa,
-        self.descricao = descricao,
-        self.cnpj = cnpj
-        self.sub_setor = sub_setor
-        self.preco = preco
+    #
+    # def __init__(self,
+    #              id,
+    #              codigo,
+    #              pl,
+    #              pvp,
+    #              psr,
+    #              dividend_yield,
+    #              p_ativo,
+    #              p_cap_giro,
+    #              p_ebit,
+    #              p_ativ_circ_liq,
+    #              ev_ebit,
+    #              ev_ebitda,
+    #              margem_ebit,
+    #              margem_liquida,
+    #              liq_corrente,
+    #              roic,
+    #              roe,
+    #              liq_2meses,
+    #              patrimonio_liquido,
+    #              div_bruta_patrim,
+    #              cresc_rec_5a,
+    #              setor,
+    #              tipo,
+    #              nome,
+    #              imagem,
+    #              lpa,
+    #              vpa,
+    #              descricao,
+    #              cnpj,
+    #              sub_setor,
+    #              preco
+    #              ):
+    #     self.id = id
+    #     self.codigo = codigo
+    #     self.pl = pl
+    #     self.pvp = pvp
+    #     self.psr = psr
+    #     self.dividend_yield = dividend_yield
+    #     self.p_ativo = p_ativo
+    #     self.p_cap_giro = p_cap_giro
+    #     self.p_ebit = p_ebit
+    #     self.p_ativ_circ_liq = p_ativ_circ_liq
+    #     self.ev_ebit = ev_ebit
+    #     self.ev_ebitda = ev_ebitda
+    #     self.margem_ebit = margem_ebit
+    #     self.margem_liquida = margem_liquida
+    #     self.liq_corrente = liq_corrente
+    #     self.roic = roic
+    #     self.roe = roe
+    #     self.liq_2meses = liq_2meses
+    #     self.patrimonio_liquido = patrimonio_liquido
+    #     self.div_bruta_patrim = div_bruta_patrim
+    #     self.cresc_rec_5a = cresc_rec_5a
+    #     self.setor = setor
+    #     self.tipo = tipo,
+    #     self.nome = nome,
+    #     self.imagem = imagem,
+    #     self.lpa = lpa,
+    #     self.vpa = vpa,
+    #     self.descricao = descricao,
+    #     self.cnpj = cnpj
+    #     self.sub_setor = sub_setor
+    #     self.preco = preco

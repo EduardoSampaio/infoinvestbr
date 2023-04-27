@@ -25,15 +25,14 @@ function renderCellHeader(values: any[]) {
 function renderCellRow(props: BasicTableProps) {
   return props.rows.map((row, index) => {
     const value: any = [];
-    props.columns.forEach((column, indexC) => {
-      value.push(<TableCell align="center">{row[column]}</TableCell>);
+    props.columns.forEach((column, indexc) => {
+      value.push(<TableCell key={indexc} align="center">{row[column]}</TableCell>);
     });
     return <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>{value}</TableRow>;
   });
 }
 
 export default function BasicTable(props: BasicTableProps) {
-  console.log(renderCellRow(props));
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: props?.minWidth ? props.minWidth : 650}} aria-label={props?.description}>

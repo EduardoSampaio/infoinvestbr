@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi_cache import JsonCoder
 
 from src.core.database import SessionLocal
-from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema
+from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema
 from src.core.schemas import Response
 from src.analise import service
 from sqlalchemy.orm import Session
@@ -54,9 +54,9 @@ async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session =
 
 
 @router.get("/acao/{codigo}")
-@cache(expire=60, coder=JsonCoder)
-async def get_acoes_by_codigo(codigo_id: int, db: Session = Depends(get_db)):
-    acao = service.get_acoes_by_codigo(db, codigo_id)
+# @cache(expire=60, coder=JsonCoder)
+async def get_acoes_by_codigo(codigo: str, db: Session = Depends(get_db)):
+    acao = service.get_acoes_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acao).dict(exclude_none=True)
 
 
