@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/router";
 import GridCustom from "../shared/GridCustom";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 const columns: GridColDef[] = [
   {
     field: "imagem",
@@ -18,7 +19,7 @@ const columns: GridColDef[] = [
     editable: false,
     sortable: false,
     renderCell: (params) => (
-      <img src={'/img/fiis.svg'} width="40px" height="40px" />
+      <Image src={'/img/fiis.svg'} alt="imagem fiis" width={"40"} height={"40"} />
     ),
   },
   { field: "codigo", headerName: "CÓDIGO", width: 80, editable: false },
@@ -75,7 +76,6 @@ const columns: GridColDef[] = [
 ];
 
 export default function FundosImoboliariosListar() {
-  const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
   const router =useRouter();
   const handleEvent: GridEventListener<'rowClick'> = (
     params, // GridRowParams
@@ -87,12 +87,14 @@ export default function FundosImoboliariosListar() {
 
   const [rows, setRows] = useState<any[]>([])
 
+ 
+  useEffect(() => { 
   const fetchData = async () => {
+    const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
     const data = await fetch(`${API_HOST}/analises/fundos-imobiliarios?skip=0&limit=500`);
     return await data.json();
   }
- 
-  useEffect(() => { 
+  
     fetchData()
     .then((json) => setRows(json.result))
     .catch();

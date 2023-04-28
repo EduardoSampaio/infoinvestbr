@@ -9,6 +9,9 @@ import { useRouter } from "next/router";
 import GridCustom from "../shared/GridCustom";
 import { useEffect, useState } from "react";
 import { IAcao } from "@/models/acao.model";
+import Image from "next/image";
+
+
 const columns: GridColDef[] = [
   {
     field: "imagem",
@@ -16,7 +19,16 @@ const columns: GridColDef[] = [
     editable: false,
     sortable: false,
     renderCell: (params) => (
-      <img src={params.value == '/img/acoes/None.jpg' ? '/img/acao.svg' : params.value } width="40px" height="40px" />
+      <Image
+        alt="imagem ações"
+        src={
+          params.value === null
+          ? "/img/acao.svg"
+          : `/img/acoes/${params?.value}.jpg`
+        }
+        width={"40"}
+        height={"40"}
+      />
     ),
   },
   { field: "codigo", headerName: "CÓDIGO", minWidth: 75, editable: false },
@@ -73,31 +85,27 @@ const columns: GridColDef[] = [
 ];
 
 export default function AcoesListar() {
-  const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-  const router =useRouter();
-  const handleEvent: GridEventListener<'rowClick'> = (
+  const router = useRouter();
+  const handleEvent: GridEventListener<"rowClick"> = (
     params, // GridRowParams
     event, // MuiEvent<React.MouseEvent<HTMLElement>>
-    details, // GridCallbackDetails
+    details // GridCallbackDetails
   ) => {
-    router.push(`/acoes/${params.row.codigo}/detalhes`)
+    router.push(`/acoes/${params.row.codigo}/detalhes`);
   };
-  const [rows, setRows] = useState<IAcao[]>([])
+  const [rows, setRows] = useState<IAcao[]>([]);
 
-  const fetchData = async () => {
-    const data = await fetch(`${API_HOST}/analises/acao?skip=0&limit=500`);
-    return await data.json();
-  }
- 
-  useEffect(() => { 
-    fetchData()
-    .then((json) => setRows(json.result))
-    .catch();
-  },[])
+  
+  useEffect(() => {
+    const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+    fetch(`${API_HOST}/analises/acao?skip=0&limit=500`)
+    .then(response => response.json())
+    .then(data => setRows(data.result));
+  }, []);
 
   return (
     <div className="w-full flex">
-        <GridCustom columns={columns} rows={rows} handleEvent={handleEvent}/>
+      <GridCustom columns={columns} rows={rows} handleEvent={handleEvent} />
     </div>
-    );
+  );
 }

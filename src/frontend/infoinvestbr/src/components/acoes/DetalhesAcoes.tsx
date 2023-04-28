@@ -19,7 +19,7 @@ function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
         return [pt[0], "10%"];
       },
       axisPointer: {
-          type: "line",
+        type: "line",
       },
     },
     title: {
@@ -35,8 +35,8 @@ function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
       type: "value",
       boundaryGap: [0, "100%"],
       axisLabel: {
-        formatter: "R$ {value},00"
-      }
+        formatter: "R$ {value},00",
+      },
     },
     dataZoom: [
       {
@@ -89,7 +89,7 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
       },
       axisPointer: {
         type: "shadow",
-    },
+      },
     },
     xAxis: {
       type: "category",
@@ -98,8 +98,8 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
     yAxis: {
       type: "value",
       axisLabel: {
-        formatter: "R$ {value}"
-      }
+        formatter: "R$ {value}",
+      },
     },
     series: [
       {
@@ -279,11 +279,15 @@ const dataDividendo = {
   ],
 };
 
+function getImage(imagem?: string) {
+  return imagem === undefined || imagem === "None"
+    ? "/img/acao.svg"
+    : `/img/acoes/${imagem}.jpg`;
+}
+
 export default function DetalhesAcoes() {
-  const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
   const router = useRouter();
   const codigo = router.query.codigo?.toString();
-
   const [acao, setAcao] = useState<IAcao>({});
   const [chartLine, setChartLine] = useState<any>({
     datas: "",
@@ -291,35 +295,36 @@ export default function DetalhesAcoes() {
   });
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
 
-  const fetchDataIndicadores = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(`${API_HOST}/analises/acao/${codigo}`);
-    return await data.json();
-  };
-
-  const fetchDataGrafico = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(
-      `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
-    );
-    return await data.json();
-  };
-
-  const fetchDataBarGrafico = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(
-      `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`
-    );
-    return await data.json();
-  };
-
   useEffect(() => {
+    const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+    const fetchDataIndicadores = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(`${API_HOST}/analises/acao/${codigo}`);
+      return await data.json();
+    };
+
+    const fetchDataGrafico = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
+      );
+      return await data.json();
+    };
+
+    const fetchDataBarGrafico = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(
+        `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`
+      );
+      return await data.json();
+    };
+
     fetchDataIndicadores()
       .then((json) => setAcao(json.result))
       .catch();
@@ -331,21 +336,12 @@ export default function DetalhesAcoes() {
     fetchDataBarGrafico()
       .then((json) => setChartBar(json.result))
       .catch();
-  }, [router]);
+  }, [router, codigo]);
 
   return (
     <div className="flex flex-wrap m-5">
       <div className="flex flex-row w-full">
-        <Image
-          alt={`detalhes ${codigo}`}
-          src={
-            acao?.imagem === undefined || acao?.imagem === "/img/acoes/None.jpg"
-              ? "/img/acao.svg"
-              : acao.imagem
-          }
-          width={"50"}
-          height={"50"}
-        />
+        <Image alt={`detalhes ${codigo}`} src={getImage(acao?.imagem)} width={"50"} height={"50"} />
         <div className="w-[500px]">
           <h2 className="text-xl font-semibold ml-2.5">{codigo}</h2>
           <h4 className="text-xs font-semibold ml-2.5">{acao?.nome}</h4>

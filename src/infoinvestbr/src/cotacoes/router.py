@@ -4,8 +4,8 @@ from fastapi import APIRouter, status
 from src.cotacoes import service
 from src.core.schemas import Response
 from src.core.database import SessionLocal
-from fastapi_cache.decorator import cache
-from fastapi_cache import JsonCoder
+# from fastapi_cache.decorator import cache
+# from fastapi_cache import JsonCoder
 
 
 # Dependency
@@ -44,7 +44,7 @@ async def get_by_codigo(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
 
 
 @router.get("/codigo-ativo/{codigo_ativo}/chart")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_by_codigo_chart(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
     valor = service.get_by_codigo_chart(codigo_ativo, periodo, intervalo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
@@ -57,7 +57,7 @@ async def get_by_codigo_by_intervalo(codigo_ativo: str, inicio: datetime.date, f
 
 
 @router.get("/historico/dividendos-anual/{codigo}")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_historico_dividendo(codigo: str):
     valor = service.get_historico_dividendo_anual(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)

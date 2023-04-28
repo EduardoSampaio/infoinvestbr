@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, status
-from fastapi_cache import JsonCoder
+# from fastapi_cache import JsonCoder
 
 from src.core.database import SessionLocal
 from src.analise.schemas import AcaoRequestSchema, FundosImobiliarioRequestSchema, AcaoResponseSchema
 from src.core.schemas import Response
 from src.analise import service
 from sqlalchemy.orm import Session
-from fastapi_cache.decorator import cache
+# from fastapi_cache.decorator import cache
 
 router = APIRouter(
     prefix="/api/v1/analises",
@@ -33,28 +33,28 @@ async def get_acoes(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
 
 
 @router.get("/fundos-imobiliarios/setor/{setor}")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_fundos_imobiliarios(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios_setor(db, setor, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
 
 
 @router.get("/acao/setor/{setor}")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_acoes_by_setor(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes_by_setor(db, setor, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios(db, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
 
 
 @router.get("/acao/{codigo}")
-@cache(expire=60, coder=JsonCoder)
+# @cache(expire=60, coder=JsonCoder)
 async def get_acoes_by_codigo(codigo: str, db: Session = Depends(get_db)):
     acao = service.get_acoes_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acao).dict(exclude_none=True)

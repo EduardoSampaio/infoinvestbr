@@ -46,7 +46,7 @@ export function ReactECharts({
       option.backgroundColor = dark === 'dark' ? '#1D2226' : 'white';
       chart?.setOption(option, settings);
     }
-  }, [option, settings, theme]); 
+  }, [option, settings, theme, dark]); 
 
   useEffect(() => {
     if (chartRef.current !== null) {

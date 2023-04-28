@@ -165,6 +165,6 @@ class Acao(Base):
         self.cresc_rec_5a = cresc_rec_5a
         self.setor = setor
         self.nome = nome,
-        self.imagem = f'/img/acoes/{imagem}.jpg',
+        self.imagem = imagem,
         self.sub_setor = sub_setor
         self.cnpj = cnpj

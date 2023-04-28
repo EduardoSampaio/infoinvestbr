@@ -9,7 +9,7 @@ import BasicTable from "../shared/BasicTable";
 import { IAcao } from "@/models/acao.model";
 import { IFundoImobiliario } from "@/models/fundos.model";
 import Indicadores from "../shared/Indicadores";
-import { TOOLTIP_MSG } from "../acoes/tooltip";
+import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -135,76 +135,77 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
       />
       <BoxIndicador
         valor={`${fundo?.dividend_yield}%`}
-        indicador="D.Y"
+        indicador="DY"
         tooltip={TOOLTIP_MSG.DY}
       />
 
       <BoxIndicador
-        valor={`${fundo?.liquidez_diaria}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        valor={`R$ ${fundo?.dividendo}`}
+        indicador="Ultimo Dividendo"
+        tooltip={TOOLTIP_MSG.ULTIMO_DY}
       />
 
       <BoxIndicador
-        valor={`${fundo?.p_vpa}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        valor={`${fundo?.p_vpa}`}
+        indicador="P/VPA"
+        tooltip={TOOLTIP_MSG.P_VPA}
       />
 
+      <BoxIndicador
+        valor={`R$ ${fundo?.vpa}`}
+        indicador="VPA"
+        tooltip={TOOLTIP_MSG.VPA}
+      />
+
+      <BoxIndicador
+        valor={`${fundo?.liquidez_diaria?.toLocaleString('pt-br',{minimumFractionDigits: 0})}`}
+        indicador="Liquidez Diária"
+        tooltip={TOOLTIP_MSG.LIQUIDEZ_DIARIA}
+      />
+
+      <BoxIndicador
+        valor={`R$ ${(fundo?.patrimonio_liq)?.toLocaleString('pt-br',{minimumFractionDigits: 2})}`}
+        indicador="Patrimônio Líquido"
+        tooltip={TOOLTIP_MSG.PATRIMONIO_LIQ}
+      />
       <BoxIndicador
         valor={`${fundo?.dy_ano}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        indicador="DY no Ano"
+        tooltip={TOOLTIP_MSG.DY_ANO}
       />
 
       <BoxIndicador
-        valor={`${fundo?.quantidade_ativos}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
-      />
-
-      <BoxIndicador
-        valor={`${fundo?.vacancia_financeira}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
-      />
-
-      <BoxIndicador
-        valor={`${fundo?.vpa}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        valor={`${fundo?.variacao_preco}%`}
+        indicador="Variação do Preço"
+        tooltip={TOOLTIP_MSG.VARIACAO_PRECO}
       />
 
       <BoxIndicador
         valor={`${fundo?.rentab_periodo}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        indicador="Rent. Período"
+        tooltip={TOOLTIP_MSG.RENTAB_PERIODO}
       />
 
       <BoxIndicador
-        valor={`${fundo?.rentab_acumulada}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        valor={`${fundo?.vacancia_financeira}%`}
+        indicador="Vacância Financeira"
+        tooltip={TOOLTIP_MSG.VACANCIA_FIANCEIRA}
       />
-
-     <BoxIndicador
-        valor={`${fundo?.variacao_patrimonial}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        <BoxIndicador
+        valor={`${fundo?.vacancia_fisica}%`}
+        indicador="Vacância Física"
+        tooltip={TOOLTIP_MSG.VACANCIA_FISICA}
       />
-
-    <BoxIndicador
-        valor={`${fundo?.variacao_patrimonial}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
+        <BoxIndicador
+        valor={`${fundo?.quantidade_ativos}`}
+        indicador="Quantidade de Ativos"
+        tooltip={TOOLTIP_MSG.QTD_ATIVOS}
       />
-
     </Indicadores>
   );
 }
 
 export default function DetalhesFundosImobiliario() {
-  const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
   const router = useRouter();
   const codigo = router.query.codigo?.toString();
 
@@ -215,37 +216,39 @@ export default function DetalhesFundosImobiliario() {
   });
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
 
-  const fetchDataIndicadores = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(
-      `${API_HOST}/analises/fundos-imobiliarios/${codigo}`
-    );
-    return await data.json();
-  };
-
-  const fetchDataGrafico = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(
-      `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
-    );
-    return await data.json();
-  };
-
-  const fetchDataBarGrafico = async () => {
-    if (codigo === undefined) {
-      return false;
-    }
-    const data = await fetch(
-      `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`
-    );
-    return await data.json();
-  };
-
   useEffect(() => {
+    const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+
+    const fetchDataIndicadores = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(
+        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`
+      );
+      return await data.json();
+    };
+
+    const fetchDataGrafico = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
+      );
+      return await data.json();
+    };
+
+    const fetchDataBarGrafico = async () => {
+      if (codigo === undefined) {
+        return false;
+      }
+      const data = await fetch(
+        `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`
+      );
+      return await data.json();
+    };
+
     fetchDataIndicadores()
       .then((json) => setFundo(json.result))
       .catch();
@@ -257,7 +260,7 @@ export default function DetalhesFundosImobiliario() {
     fetchDataBarGrafico()
       .then((json) => setChartBar(json.result))
       .catch();
-  }, [router]);
+  }, [router, codigo]);
 
   return (
     <div className="flex flex-wrap m-5">

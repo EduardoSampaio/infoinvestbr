@@ -99,7 +99,7 @@ def convert_to_schema_fundos(model: FundosImobiliario):
 
 
 def get_acoes(db: Session, skip: int = 0, limit: int = 100):
-    acoes = db.query(Acao).offset(skip).limit(limit).all()
+    acoes = db.query(Acao).order_by(Acao.codigo).offset(skip).limit(limit).all()
     return acoes
 
 
@@ -109,7 +109,7 @@ def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100)
 
 
 def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100):
-    fundos = db.query(FundosImobiliario).offset(skip).limit(limit).all()
+    fundos = db.query(FundosImobiliario).order_by(FundosImobiliario.codigo).offset(skip).limit(limit).all()
     return fundos
 
 
