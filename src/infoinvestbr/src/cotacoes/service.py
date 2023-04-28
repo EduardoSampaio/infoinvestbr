@@ -1,15 +1,11 @@
 import requests
 import yfinance as yf
-from datetime import datetime
-from sqlalchemy.orm import Session
 import math
+from datetime import datetime
+
 from src.cotacoes.schemas import CotacaoSchema, CotacaoAltaOuBaixaSchema
-from src.core.schemas import DividendoSchema
-from src.core import models
-from src.core.models import HistoricoCotacao
 from src.core.exceptions import CodigoAtivoException
 from src.cotacoes.constantes import ACAO_TICKER, FUNDOS_TICKER
-from openpyxl import load_workbook
 
 
 def get_by_codigo(codigo: str, periodo: str, intervalo: str):
@@ -48,7 +44,7 @@ def get_by_codigo_chart(codigo: str, periodo: str, intervalo: str):
     list_data = []
     list_close = []
     for data in cotacao['Close'].keys():
-        list_close.append(cotacao['Close'].get(data))
+        list_close.append(round(cotacao['Close'].get(data), 2))
         list_data.append("{:%d/%m/%Y}".format(data))
 
     return {
@@ -130,78 +126,42 @@ def get_moeda_cotacao():
     }
 
 
-def gerar_dados_historicos(db: Session, codigo: str, periodo: str = "1d", updated: bool = False):
-    """
-         codigo  = [CODIGO.SA]
-         periodo = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]\n
-    """
-    ativo = db.query(models.HistoricoCotacao).filter(models.HistoricoCotacao.codigo == codigo).first()
-
-    if ativo is None:
-        create_historico(db, codigo, periodo)
-    if updated:
-        deletar_dados_historicos_by_codigo(db, codigo)
-        create_historico(db, codigo, periodo)
-
-
-def deletar_dados_historicos(db: Session):
-    """
-
-    :param db:
-    """
-    valores = db.query(models.HistoricoCotacao).all()
-    for valor in valores:
-        db.delete(valor)
-
-    db.commit()
-
-
-def deletar_dados_historicos_by_codigo(db: Session, codigo: str):
-    """
-
-    :param db:
-    :param codigo:
-    """
-    valores = db.query(models.HistoricoCotacao).filter(models.HistoricoCotacao.codigo == codigo).all()
-    for valor in valores:
-        db.delete(valor)
-
-    db.commit()
-
-
-def create_historico(db: Session, codigo: str, periodo: str = "1d"):
-    """
-
-    :param db:
-    :param codigo:
-    :param periodo:
-    :return:
-    """
-    ticker = yf.Ticker(f'{codigo}.SA')
-    if ticker is None:
-        return None
-    else:
-        cotacoes = ticker.history(period=periodo)['Close']
-        for data in cotacoes.keys():
-            valor = cotacoes.get(data)
-            historico = HistoricoCotacao(codigo=codigo, data=data, valor=valor, periodo=periodo)
-            db.add(historico)
-            db.commit()
-            db.refresh(historico)
-
-
-def get_historico_dividendo(codigo: str):
+def get_historico_dividendo_anual(codigo: str):
     current_ticker = yf.Ticker(f'{codigo}.SA')
     valores = current_ticker.dividends
-    list_dividendos = []
 
     my_dict = {}
     for data in current_ticker.dividends.keys():
-        # ativo = DividendoSchema(codigo, data, valores.get(data))
-        # list_dividendos.append(ativo)
         ano = "{:%d/%m/%Y}".format(data).split('/')[2]
         my_dict.setdefault(ano, []).append(valores.get(data))
 
+    list_data, lista_valores = group_dividendo(my_dict)
+
+    return {
+        "datas": list_data,
+        "valores": lista_valores
+    }
+
+
+def get_historico_dividendo_mensal(codigo: str):
+    current_ticker = yf.Ticker(f'{codigo}.SA')
+    valores = current_ticker.dividends
+
+    my_dict = {}
+    for data in current_ticker.dividends.keys():
+        ano = "{:%d/%m/%Y}".format(data).split('/')[2]
+        mes = get_mes_str(int("{:%d/%m/%Y}".format(data).split('/')[1]))
+        my_dict.setdefault(f'{mes}/{ano}', []).append(valores.get(data))
+
+    list_data, lista_valores = group_dividendo(my_dict)
+
+    return {
+        "datas": list_data,
+        "valores": lista_valores
+    }
+
+
+def group_dividendo(my_dict):
     list_data = []
     lista_valores = []
     for k in my_dict.keys():
@@ -211,11 +171,7 @@ def get_historico_dividendo(codigo: str):
             total += valor
         list_data.append(k)
         lista_valores.append(round(total, 2))
-
-    return {
-        "datas": list_data,
-        "valores": lista_valores
-    }
+    return list_data, lista_valores
 
 
 def codigo_exception(codigo: str):
@@ -253,16 +209,19 @@ def get_cotacao_comparacao(alta: bool, tickers: []) -> CotacaoAltaOuBaixaSchema:
     return list_ativo[0:20]
 
 
-def get_preco_abertura_acoes():
-    workbook = load_workbook("src/analise/rendavariavel.xlsx")
-    sheet = workbook["Ações"]
-    row_count = sheet.max_row
-    tickers = []
-    for row in range(2, row_count + 1):
-        ticker = sheet.cell(row=row, column=1).value
-        tickers.append(f'{ticker}.SA')
-
-    dowload_tickers = yf.download(tickers, period='1d')['Close']
-
-    for ticker in tickers:
-        print(dowload_tickers[ticker][0])
+def get_mes_str(numero: int):
+    dict_mes = {
+        1: 'Janeiro',
+        2: 'Fevereiro',
+        3: 'Março',
+        4: 'Abril',
+        5: 'Maio',
+        6: 'Junho',
+        7: 'Julho',
+        8: 'Agosto',
+        9: 'Setembro',
+        10: 'Outubro',
+        11: 'Novembro',
+        12: 'Dezembro',
+    }
+    return dict_mes.get(numero)

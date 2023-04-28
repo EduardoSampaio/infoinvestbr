@@ -1,10 +1,11 @@
 import datetime
 
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status
 from src.cotacoes import service
 from src.core.schemas import Response
-from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
+from fastapi_cache.decorator import cache
+from fastapi_cache import JsonCoder
 
 
 # Dependency
@@ -20,7 +21,7 @@ router = APIRouter(
     prefix="/api/v1/cotacao",
     tags=["Cotacao"],
     dependencies=[],
-    responses={404: {"descrição": "Provento não encontrado"}},
+    responses={404: {"descrição": "Não encontrado"}},
 )
 
 
@@ -43,6 +44,7 @@ async def get_by_codigo(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
 
 
 @router.get("/codigo-ativo/{codigo_ativo}/chart")
+@cache(expire=60, coder=JsonCoder)
 async def get_by_codigo_chart(codigo_ativo: str, periodo: str, intervalo: str = "1d"):
     valor = service.get_by_codigo_chart(codigo_ativo, periodo, intervalo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
@@ -54,52 +56,38 @@ async def get_by_codigo_by_intervalo(codigo_ativo: str, inicio: datetime.date, f
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
-@router.post("/historico/{codigo}")
-async def gerar_dados_historicos(codigo: str, db: Session = Depends(get_db), periodo: str = "1d",
-                                 updated: bool = False):
-    valor = service.gerar_dados_historicos(db, codigo, periodo, updated)
-    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
-
-
-@router.delete("/historico")
-async def deletar_dados_historicos(db: Session = Depends(get_db)):
-    service.deletar_dados_historicos(db)
-    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
-                    message="Dados Históricos removidos com sucesso!").dict(exclude_none=True)
-
-
-@router.delete("/historico/{codigo}")
-async def deletar_dados_historicos(codigo: str, db: Session = Depends(get_db)):
-    service.deletar_dados_historicos_by_codigo(db, codigo)
-    return Response(code=status.HTTP_204_NO_CONTENT, status="No Content",
-                    message="Dados Históricos removidos com sucesso!").dict(exclude_none=True)
-
-
-@router.get("/historico/dividendos/{codigo}")
+@router.get("/historico/dividendos-anual/{codigo}")
+@cache(expire=60, coder=JsonCoder)
 async def get_historico_dividendo(codigo: str):
-    valor = service.get_historico_dividendo(codigo)
+    valor = service.get_historico_dividendo_anual(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
-@router.get("/codigo-fundo/{fundo}/maiores-altas")
-async def get_by_codigo():
+@router.get("/historico/dividendos-mensal/{codigo}")
+async def get_historico_dividendo(codigo: str):
+    valor = service.get_historico_dividendo_mensal(codigo)
+    return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
+
+
+@router.get("/codigo-fundo/{codigo}/maiores-altas")
+async def get_maiores_altas_dia_fundos():
     valor = service.get_maiores_altas_dia_fundos()
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
-@router.get("/codigo-fundo/{fundo}/maiores-baixa")
-async def get_by_codigo():
+@router.get("/codigo-fundo/{codigo}/maiores-baixa")
+async def get_maiores_baixa_dia_fundos():
     valor = service.get_maiores_baixa_dia_fundos()
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
-@router.get("/codigo-acao/{fundo}/maiores-altas")
-async def get_by_codigo():
+@router.get("/codigo-acao/{codigo}/maiores-altas")
+async def get_maiores_altas_dia_acoes():
     valor = service.get_maiores_altas_dia_acoes()
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
-@router.get("/codigo-acao/{fundo}/maiores-baixa")
-async def get_by_codigo():
+@router.get("/codigo-acao/{codigo}/maiores-baixa")
+async def get_maiores_baixa_dia_acoes():
     valor = service.get_maiores_baixa_dia_acoes()
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)

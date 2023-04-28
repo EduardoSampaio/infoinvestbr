@@ -1,33 +1,25 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
-import Indicadores from "./Indicadores";
-import BoxIndicador from "./BoxIndicador";
+import Indicadores from "../shared/Indicadores";
+import BoxIndicador from "../shared/BoxIndicador";
 import { Chip } from "@mui/material";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import * as echarts from "echarts";
 import BasicTable from "../shared/BasicTable";
 import { TOOLTIP_MSG } from "./tooltip";
 import { IAcao } from "@/models/acao.model";
 
-// let base = +new Date(1968, 9, 3);
-// let oneDay = 24 * 3600 * 1000;
-// let date = [];
-
-// let data = [Math.random() * 300];
-
-// for (let i = 1; i < 20000; i++) {
-//   var now = new Date((base += oneDay));
-//   date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join("/"));
-//   data.push(Math.round((Math.random() - 0.5) * 2 + data[i - 1]));
-// }
-
-function renderChart(datas: any[], series: any[]) {
+function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
     tooltip: {
       trigger: "axis",
+      formatter: "R$ {c}",
       position: function (pt: any) {
         return [pt[0], "10%"];
+      },
+      axisPointer: {
+          type: "line",
       },
     },
     title: {
@@ -42,6 +34,9 @@ function renderChart(datas: any[], series: any[]) {
     yAxis: {
       type: "value",
       boundaryGap: [0, "100%"],
+      axisLabel: {
+        formatter: "R$ {value},00"
+      }
     },
     dataZoom: [
       {
@@ -82,15 +77,19 @@ function renderChart(datas: any[], series: any[]) {
   return option;
 }
 
-
-function renderBarGrafico(datas: any, series: any) {
-  console.log(datas)
+function renderChartHistoricoPagamento(datas: any, series: any) {
   const optionBar: ReactEChartsProps["option"] = {
     tooltip: {
       trigger: "axis",
+      valueFormatter(value) {
+        return "R$" + Number(value).toFixed(2);
+      },
       position: function (pt: any) {
         return [pt[0], "10%"];
       },
+      axisPointer: {
+        type: "shadow",
+    },
     },
     xAxis: {
       type: "category",
@@ -98,6 +97,9 @@ function renderBarGrafico(datas: any, series: any) {
     },
     yAxis: {
       type: "value",
+      axisLabel: {
+        formatter: "R$ {value}"
+      }
     },
     series: [
       {
@@ -119,7 +121,7 @@ function renderizarIndicadores(acao: IAcao) {
         tooltip={TOOLTIP_MSG.PRECO}
       />
       <BoxIndicador
-        valor={`${acao?.dividend_yield}`}
+        valor={`${acao?.dividend_yield}%`}
         indicador="D.Y"
         tooltip={TOOLTIP_MSG.DY}
       />
@@ -166,12 +168,12 @@ function renderizarIndicadores(acao: IAcao) {
         tooltip={TOOLTIP_MSG.EV_EBITDA}
       />
       <BoxIndicador
-        valor={`${acao?.margem_ebit}`}
+        valor={`${acao?.margem_ebit}%`}
         indicador="MARGEM EBIT"
         tooltip={TOOLTIP_MSG.MARGEM_EBIT}
       />
       <BoxIndicador
-        valor={`${acao?.margem_liquida}`}
+        valor={`${acao?.margem_liquida}%`}
         indicador="MARGEM LIQ"
         tooltip={TOOLTIP_MSG.MARGEM_LIQ_EBIT}
       />
@@ -181,12 +183,12 @@ function renderizarIndicadores(acao: IAcao) {
         tooltip={TOOLTIP_MSG.LIQ_CORRENTE}
       />
       <BoxIndicador
-        valor={`${acao?.roe}`}
+        valor={`${acao?.roe}%`}
         indicador="ROE"
         tooltip={TOOLTIP_MSG.ROE}
       />
       <BoxIndicador
-        valor={`${acao?.roic}`}
+        valor={`${acao?.roic}%`}
         indicador="ROIC"
         tooltip={TOOLTIP_MSG.ROIC}
       />
@@ -197,7 +199,7 @@ function renderizarIndicadores(acao: IAcao) {
         tooltip={TOOLTIP_MSG.DIVIDA_LIQUIDA_PATRIM_LIQ}
       />
       <BoxIndicador
-        valor={`${acao?.cresc_rec_5a}`}
+        valor={`${acao?.cresc_rec_5a}%`}
         indicador="CRESC.REC.5A"
         tooltip={TOOLTIP_MSG.CAGR_RECEITA_5A}
       />
@@ -283,8 +285,11 @@ export default function DetalhesAcoes() {
   const codigo = router.query.codigo?.toString();
 
   const [acao, setAcao] = useState<IAcao>({});
-  const [chartData, setChartData] = useState<any>({datas: '' , fechamento: ''});
-  const [chartBar, setChartBar] = useState<any>({datas: '' , valores: ''});
+  const [chartLine, setChartLine] = useState<any>({
+    datas: "",
+    fechamento: "",
+  });
+  const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
 
   const fetchDataIndicadores = async () => {
     if (codigo === undefined) {
@@ -298,7 +303,9 @@ export default function DetalhesAcoes() {
     if (codigo === undefined) {
       return false;
     }
-    const data = await fetch(`${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`);
+    const data = await fetch(
+      `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
+    );
     return await data.json();
   };
 
@@ -306,22 +313,22 @@ export default function DetalhesAcoes() {
     if (codigo === undefined) {
       return false;
     }
-    const data = await fetch(`${API_HOST}/cotacao/historico/dividendos/${codigo}`);
+    const data = await fetch(
+      `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`
+    );
     return await data.json();
   };
-
-  
 
   useEffect(() => {
     fetchDataIndicadores()
       .then((json) => setAcao(json.result))
       .catch();
 
-      fetchDataGrafico()
-      .then((json) => setChartData(json.result))
+    fetchDataGrafico()
+      .then((json) => setChartLine(json.result))
       .catch();
 
-      fetchDataBarGrafico()
+    fetchDataBarGrafico()
       .then((json) => setChartBar(json.result))
       .catch();
   }, [router]);
@@ -354,12 +361,22 @@ export default function DetalhesAcoes() {
       {renderizarIndicadores(acao)}
       <Indicadores titulo="Histórico de Cotações">
         <div className="w-full">
-          <ReactECharts option={renderChart(chartData?.datas, chartData?.fechamento)} />
+          <ReactECharts
+            option={renderChartHistoricoCotacoes(
+              chartLine?.datas,
+              chartLine?.fechamento
+            )}
+          />
         </div>
       </Indicadores>
       <Indicadores titulo="Histórico Pagamento de Dividendo Anuais">
         <div className="w-full">
-          <ReactECharts option={renderBarGrafico(chartBar?.datas, chartBar?.valores)} />
+          <ReactECharts
+            option={renderChartHistoricoPagamento(
+              chartBar?.datas,
+              chartBar?.valores
+            )}
+          />
         </div>
       </Indicadores>
       <Indicadores titulo="Histórico de Dividendos do Ano">

@@ -6,7 +6,7 @@ class FundosImobiliario(Base):
     __tablename__ = "fundos_imobiliarios"
 
     id = Column("FUNDO_ID", Integer, index=True, primary_key=True)
-    codigo_do_fundo = Column("CODIGO_DO_FUNDO", String(30), index=True, unique=True, nullable=False)
+    codigo = Column("CODIGO_DO_FUNDO", String(30), index=True, unique=True, nullable=False)
     nome = Column("NOME", String(200), nullable=True)
     descricao = Column("DESCRICAO", Text, nullable=True)
     administrador = Column("ADMINISTRADOR", String(200), nullable=True)
@@ -58,7 +58,7 @@ class FundosImobiliario(Base):
                  administrador,
                  cnpj,
                  ):
-        self.codigo_do_fundo = codigo_do_fundo
+        self.codigo = codigo_do_fundo
         self.setor = setor
         self.liquidez_diaria = liquidez_diaria
         self.dividendo = dividendo

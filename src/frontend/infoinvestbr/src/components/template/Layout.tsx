@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Header from "./Header";
 import MenuLateral from "./MenuLateral";
 import { useTheme } from "@mui/material";
+import Head from "next/head";
 
 export default function Layout(props: any) {
   const theme = useTheme();
@@ -18,6 +19,10 @@ export default function Layout(props: any) {
 
   return (
     <div className={`flex flex-col w-full min-w-full ${dark}`}>
+      <Head>
+        <title>InfoInvest</title>
+        <meta property="og:title" content="My page title" key="title" />
+      </Head>
       <Header />
       <div className="flex w-full">
         <MenuLateral />

@@ -1,0 +1,31 @@
+export interface IFundoImobiliario {
+    id?: number
+    codigo?: string
+    nome?: string
+    descricao?: any
+    administrador?: string
+    cnpj?: string
+    setor?: string
+    liquidez_diaria?: number
+    quantidade_ativos?: number
+    taxa_administracao?: any
+    taxa_gestao?: any
+    taxa_performance?: any
+    tipo_gestao?: any
+    dividendo?: number
+    dividend_yield?: number
+    dy_ano?: number
+    variacao_preco?: number
+    rentab_periodo?: number
+    rentab_acumulada?: number
+    patrimonio_liq?: number
+    vpa?: number
+    p_vpa?: number
+    dy_patrimonial?: number
+    variacao_patrimonial?: number
+    rentab_patr_no_periodo?: number
+    rentab_patr_acumulada?: number
+    vacancia_fisica?: number
+    vacancia_financeira?: number
+    preco?: number
+  }

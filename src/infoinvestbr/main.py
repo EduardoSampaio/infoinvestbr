@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from redis import asyncio as aioredis
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -10,6 +11,7 @@ from functools import lru_cache
 import uvicorn
 import logging
 from datetime import datetime
+
 from src.core.config import settings
 from src.core.database import engine
 from src.usuarios import router as routerUsuario
@@ -24,7 +26,7 @@ from src.transacoes import models as transacao
 from src.proventos import models as proventos
 from src.core.exceptions import CodigoAtivoException
 from src.core.custom_logging import CustomizeLogger
-from redis import asyncio as aioredis
+
 
 core.Base.metadata.create_all(bind=engine)
 analise.Base.metadata.create_all(bind=engine)

@@ -21,7 +21,7 @@ const columns: GridColDef[] = [
       <img src={'/img/fiis.svg'} width="40px" height="40px" />
     ),
   },
-  { field: "codigo_do_fundo", headerName: "CÓDIGO", width: 80, editable: false },
+  { field: "codigo", headerName: "CÓDIGO", width: 80, editable: false },
   {
     field: "setor",
     headerName: "Setor",
@@ -82,8 +82,7 @@ export default function FundosImoboliariosListar() {
     event, // MuiEvent<React.MouseEvent<HTMLElement>>
     details, // GridCallbackDetails
   ) => {
-    console.log(params.row);
-    router.push(`/fundos-imobiliarios/${params.row.codigo_do_fundo}/detalhes`)
+    router.push(`/fundos-imobiliarios/${params.row.codigo}/detalhes`)
   };
 
   const [rows, setRows] = useState<any[]>([])

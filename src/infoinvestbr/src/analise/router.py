@@ -41,7 +41,7 @@ async def get_fundos_imobiliarios(setor: str, skip: int = 0, limit: int = 100, d
 
 @router.get("/acao/setor/{setor}")
 @cache(expire=60, coder=JsonCoder)
-async def get_acoes(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def get_acoes_by_setor(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes_by_setor(db, setor, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
@@ -54,32 +54,17 @@ async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session =
 
 
 @router.get("/acao/{codigo}")
-# @cache(expire=60, coder=JsonCoder)
+@cache(expire=60, coder=JsonCoder)
 async def get_acoes_by_codigo(codigo: str, db: Session = Depends(get_db)):
     acao = service.get_acoes_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acao).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios/{codigo}")
-@cache(expire=60, coder=JsonCoder)
-async def get_fundos_imobiliarios_by_codigo(provento_id: int, db: Session = Depends(get_db)):
-    fundos_imobiliario = service.get_fundos_imobiliarios_by_codigo(db, provento_id)
+# @cache(expire=60, coder=JsonCoder)
+async def get_fundos_imobiliarios_by_codigo(codigo: str, db: Session = Depends(get_db)):
+    fundos_imobiliario = service.get_fundos_imobiliarios_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliario).dict(exclude_none=True)
-
-
-@router.post("/fundos-imobiliarios")
-async def create_fundos(fundo_imobilario_request: FundosImobiliarioRequestSchema, db: Session = Depends(get_db)):
-    fundos_imobiliario = service.create_fundos(db, fundo_imobilario_request)
-    return Response(code=status.HTTP_201_CREATED, status="Created",
-                    message="Fundos Imobiliário cadastrado com sucesso!",
-                    result=fundos_imobiliario).dict(exclude_none=True)
-
-
-@router.post("/acoes")
-async def create_acoes(acoes_request: AcaoRequestSchema, db: Session = Depends(get_db)):
-    acoes = service.create_acoes(db, acoes_request)
-    return Response(code=status.HTTP_201_CREATED, status="Created", message="Ação cadastrada com sucesso!",
-                    result=acoes).dict(exclude_none=True)
 
 
 @router.post("/fundos-imobiliarios")

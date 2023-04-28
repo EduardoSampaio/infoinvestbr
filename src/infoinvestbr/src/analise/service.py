@@ -1,12 +1,13 @@
 from openpyxl import load_workbook
 from sqlalchemy.orm import Session
 from src.analise.models import Acao, FundosImobiliario
-from src.analise.schemas import AcaoRequestSchema, AcaoResponseSchema, FundosImobiliarioRequestSchema
+from src.analise.schemas import AcaoRequestSchema, AcaoResponseSchema, FundosImobiliarioRequestSchema, \
+    FundosImobiliarioResponseSchema
 import logging as logger
 import yfinance as yf
 
 
-def convert_to_schema(model: Acao):
+def convert_to_schema_acao(model: Acao):
     if model is None:
         return {}
 
@@ -19,35 +20,80 @@ def convert_to_schema(model: Acao):
     response = AcaoResponseSchema()
     response.id = model.id
     response.codigo = model.codigo
-    response.pl = model.pl
-    response.pvp = model.pvp
-    response.psr = model.psr
-    response.dividend_yield = model.dividend_yield * 100
-    response.p_ativo = model.p_ativo
-    response.p_cap_giro = model.p_cap_giro
-    response.p_ebit = model.p_ebit
-    response.p_ativ_circ_liq = model.p_ativ_circ_liq
-    response.ev_ebit = model.ev_ebit
-    response.ev_ebitda = model.ev_ebitda
-    response.margem_ebit = model.margem_ebit * 100
-    response.margem_liquida = model.margem_liquida * 100
-    response.liq_corrente = model.liq_corrente
-    response.roic = model.roic * 100
-    response.roe = model.roe * 100
-    response.liq_2meses = model.liq_2meses
-    response.patrimonio_liquido = model.patrimonio_liquido
-    response.div_bruta_patrim = model.div_bruta_patrim
-    response.cresc_rec_5a = model.cresc_rec_5a * 100
+
+    response.pl = formatar_numeros(model.pl)
+    response.pvp = formatar_numeros(model.pvp, 4)
+    response.psr = formatar_numeros(model.psr, 4)
+    response.dividend_yield = formatar_numeros(model.dividend_yield, porcentagem=True)
+    response.p_ativo = formatar_numeros(model.p_ativo)
+    response.p_cap_giro = formatar_numeros(model.p_cap_giro)
+    response.p_ebit = formatar_numeros(model.p_ebit)
+    response.p_ativ_circ_liq = formatar_numeros(model.p_ativ_circ_liq)
+    response.ev_ebit = formatar_numeros(model.ev_ebit)
+    response.ev_ebitda = formatar_numeros(model.ev_ebitda)
+    response.margem_ebit = formatar_numeros(model.margem_ebit, porcentagem=True)
+    response.margem_liquida = formatar_numeros(model.margem_liquida, porcentagem=True)
+    response.liq_corrente = formatar_numeros(model.liq_corrente)
+    response.roic = formatar_numeros(model.roic, porcentagem=True)
+    response.roe = formatar_numeros(model.roe, porcentagem=True)
+    response.liq_2meses = formatar_numeros(model.liq_2meses)
+    response.patrimonio_liquido = formatar_numeros(model.patrimonio_liquido)
+    response.div_bruta_patrim = formatar_numeros(model.div_bruta_patrim)
+    response.cresc_rec_5a = formatar_numeros(model.cresc_rec_5a, porcentagem=True)
+    response.preco = formatar_numeros(preco, 2)
+    response.lpa = model.lpa
+    response.vpa = model.vpa
     response.setor = model.setor
     response.tipo = model.tipo
     response.nome = model.nome
     response.imagem = model.imagem
-    response.lpa = model.lpa
-    response.vpa = model.vpa
     response.descricao = model.descricao
     response.cnpj = model.cnpj
     response.sub_setor = model.sub_setor
-    response.preco = round(preco, 2)
+
+    return response
+
+
+def convert_to_schema_fundos(model: FundosImobiliario):
+    if model is None:
+        return {}
+
+    preco = 0
+    current_ticker = yf.Ticker(f'{model.codigo}.SA')
+    history = current_ticker.history(period='1d')['Close']
+    if not history.empty:
+        preco = history[0]
+
+    response = FundosImobiliarioResponseSchema()
+    response.id = model.id
+    response.codigo = model.codigo
+    response.nome = model.nome
+    response.descricao = model.descricao
+    response.administrador = model.administrador
+    response.cnpj = model.cnpj
+    response.setor = model.setor
+    response.liquidez_diaria = model.liquidez_diaria
+    response.quantidade_ativos = model.quantidade_ativos
+    response.taxa_administracao = model.taxa_administracao
+    response.taxa_gestao = model.taxa_gestao
+    response.taxa_performance = model.taxa_performance
+    response.tipo_gestao = model.tipo_gestao
+    response.dividendo = formatar_numeros(model.dividendo, 4)
+    response.dividend_yield = formatar_numeros(model.dividend_yield, 4, True)
+    response.dy_ano = formatar_numeros(model.dy_ano, 4, True)
+    response.variacao_preco = formatar_numeros(model.variacao_preco, 4, True)
+    response.rentab_periodo = formatar_numeros(model.rentab_periodo, 4, True)
+    response.rentab_acumulada = formatar_numeros(model.rentab_acumulada, 4, True)
+    response.patrimonio_liq = formatar_numeros(model.patrimonio_liq, 4)
+    response.vpa = formatar_numeros(model.vpa, 4)
+    response.p_vpa = formatar_numeros(model.p_vpa, 4)
+    response.dy_patrimonial = formatar_numeros(model.dy_patrimonial, 4, True)
+    response.variacao_patrimonial = formatar_numeros(model.variacao_patrimonial, 4, True)
+    response.rentab_patr_no_periodo = formatar_numeros(model.rentab_patr_no_periodo, 4, True)
+    response.rentab_patr_acumulada = formatar_numeros(model.rentab_patr_acumulada, 4, True)
+    response.vacancia_fisica = formatar_numeros(model.vacancia_fisica, 4, True)
+    response.vacancia_financeira = formatar_numeros(model.vacancia_financeira, 4, True)
+    response.preco = formatar_numeros(preco, 2)
 
     return response
 
@@ -81,11 +127,12 @@ def get_fundos_imobiliarios_by_id(db: Session, fundos_id: int):
 
 
 def get_acoes_by_codigo(db: Session, codigo: str):
-    return convert_to_schema(db.query(Acao).filter(Acao.codigo == codigo).first())
+    return convert_to_schema_acao(db.query(Acao).filter(Acao.codigo == codigo).first())
 
 
 def get_fundos_imobiliarios_by_codigo(db: Session, codigo: str):
-    return db.query(FundosImobiliario).filter(FundosImobiliario.codigo_do_fundo == codigo).first()
+    fundo = db.query(FundosImobiliario).filter(FundosImobiliario.codigo == codigo).first()
+    return convert_to_schema_fundos(fundo)
 
 
 def update_acoes(db: Session, acao: AcaoRequestSchema):
@@ -122,41 +169,8 @@ def update_acoes(db: Session, acao: AcaoRequestSchema):
     db.refresh(_acao)
 
 
-def create_acoes(db: Session, acao: AcaoRequestSchema):
-    _acao = Acao(
-        codigo=acao.codigo,
-        nome=acao.nome,
-        imagem=acao.imagem,
-        setor=acao.setor,
-        cresc_rec_5a=acao.cresc_rec_5a,
-        div_bruta_patrim=acao.div_bruta_patrim,
-        ev_ebit=acao.ev_ebit,
-        dividend_yield=acao.dividend_yield,
-        liq_2meses=acao.liq_2meses,
-        pl=acao.pl,
-        pvp=acao.pvp,
-        psr=acao.psr,
-        p_ativo=acao.p_ativo,
-        p_cap_giro=acao.p_cap_giro,
-        p_ebit=acao.p_ebit,
-        p_ativ_circ_liq=acao.p_ativ_circ_liq,
-        ev_ebitda=acao.ev_ebitda,
-        margem_ebit=acao.margem_ebit,
-        margem_liquida=acao.margem_liquida,
-        liq_corrente=acao.liq_corrente,
-        roic=acao.roic,
-        roe=acao.roe,
-        patrimonio_liquido=acao.patrimonio_liquido,
-        cnpj=acao.cnpj,
-        sub_setor=acao.sub_setor)
-
-    db.add(_acao)
-    db.commit()
-    db.refresh(_acao)
-
-
 def update_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
-    _fundo = get_fundos_imobiliarios_by_id(db, fundo.fundo_id)
+    _fundo = get_fundos_imobiliarios_by_id(db, fundo.id)
     _fundo.nome = fundo.nome
     _fundo.descricao = fundo.descricao
     _fundo.administrador = fundo.administrador
@@ -184,36 +198,6 @@ def update_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
     _fundo.vacancia_financeira = fundo.vacancia_financeira
     _fundo.quantidade_ativos = fundo.quantidade_ativos
 
-    db.commit()
-    db.refresh(_fundo)
-
-
-def create_fundos(db: Session, fundo: FundosImobiliarioRequestSchema):
-    _fundo = FundosImobiliario(
-        codigo_do_fundo=fundo.codigo_do_fundo,
-        nome=fundo.nome,
-        administrador=fundo.administrador,
-        cnpj=fundo.cnpj,
-        setor=fundo.setor,
-        liquidez_diaria=fundo.liquidez_diaria,
-        dividendo=fundo.dividendo,
-        dividend_yield=fundo.dividend_yield,
-        dy_ano=fundo.dy_ano,
-        variacao_preco=fundo.variacao_preco,
-        rentab_periodo=fundo.rentab_periodo,
-        rentab_acumulada=fundo.rentab_acumulada,
-        patrimonio_liq=fundo.patrimonio_liq,
-        vpa=fundo.vpa,
-        p_vpa=fundo.p_vpa,
-        dy_patrimonial=fundo.dy_patrimonial,
-        variacao_patrimonial=fundo.variacao_patrimonial,
-        rentab_patr_no_periodo=fundo.rentab_patr_no_periodo,
-        rentab_patr_acumulada=fundo.rentab_patr_acumulada,
-        vacancia_fisica=fundo.vacancia_fisica,
-        vacancia_financeira=fundo.vacancia_financeira,
-        quantidade_ativos=fundo.quantidade_ativos)
-
-    db.add(_fundo)
     db.commit()
     db.refresh(_fundo)
 
@@ -315,3 +299,13 @@ def remove_todos_fundos(db: Session):
         db.delete(fundo)
 
     db.commit()
+
+
+def formatar_numeros(valor: float, decimais: int = 4, porcentagem: bool = False) -> float:
+    if valor is None:
+        return 0.0
+    valor_formatado = round(valor, decimais)
+    if porcentagem:
+        return valor_formatado * 100
+    else:
+        return valor_formatado
