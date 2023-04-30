@@ -1,9 +1,20 @@
+import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
 export default function Patrimonio() {
+  const breadcrumbs: LinkModel[] = [{titulo: 'Home', link: '/'}]
+  const currentBreadcrumbs: LinkModel = {titulo: 'Patrimônio', link: '/patrimonio'}
   return (
     <Layout>
-      <h2>Patrimônio</h2>
+      <Card
+        sizeText="text-sm"
+        titulo="Ações"
+        className="flex"
+        breadcrumbs={breadcrumbs}
+        current={currentBreadcrumbs}
+      > 
+
+      </Card>
     </Layout>
   );
 }

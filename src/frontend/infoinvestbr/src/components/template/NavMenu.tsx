@@ -7,10 +7,6 @@ import MenuItem from "./MenuItem";
 import { HiOutlineBuildingLibrary } from "react-icons/hi2";
 
 export default function NavMenu() {
-  function getMenuId(menuId: any) {
-    console.log(menuId);
-  }
-
   return (
     <nav className="flex h-12 justify-center flex-grow">
       <ul className="flex">

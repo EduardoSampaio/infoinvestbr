@@ -1,10 +1,12 @@
 import * as React from "react";
 import {
   DataGrid,
+  GridCellParams,
   GridColDef,
   GridEventListener,
   GridToolbar,
   GridToolbarQuickFilter,
+  MuiEvent,
   ptBR,
 } from "@mui/x-data-grid";
 import Box from '@mui/material/Box';
@@ -12,7 +14,9 @@ import Box from '@mui/material/Box';
 interface GridCustomProp {
   rows: any;
   columns: GridColDef[];
-  handleEvent: GridEventListener<"rowClick">;
+  onRowClick?: GridEventListener<"rowClick">;
+  onCellClick?: GridEventListener<"cellClick">;
+  disableRowSelectionOnClick?: boolean | undefined
 }
 
 const style = {
@@ -59,17 +63,14 @@ export default function GridCustom(props: GridCustomProp) {
     <div className="w-full p-10">
       <DataGrid
         localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
-        rows={props.rows}
-        columns={props.columns}
         initialState={initialState}
         pageSizeOptions={[5, 10, 25, 50]}
-        onRowClick={props.handleEvent}
+        onRowClick={props?.onRowClick}
         slots={{ toolbar: GridToolbar }}
         sx={style}
         autoHeight
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? 'white' : 'gray'
-        }
+        onCellClick={props.onCellClick}
+        {...props}
       />
     </div>
   );

@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 class Transacao(Base):
     __tablename__ = "transacoes"
 
-    transacao_id = Column("TRANSACAO_ID", Integer, index=True, primary_key=True)
+    id = Column("TRANSACAO_ID", Integer, index=True, primary_key=True)
     categoria = Column("CATEGORIA", String(30), nullable=False)
     codigo_ativo = Column("CODIGO_ATIVO", String(10), nullable=False)
     ordem = Column("ORDEM", String(30), nullable=False)
@@ -21,6 +21,7 @@ class Transacao(Base):
     posicao_zerada = Column("POSICAO_ZERADA", Boolean, nullable=True, default=False)
     usuario_id = Column("USUARIO_ID", UUID, ForeignKey("usuarios.USUARIO_ID"), index=True)
     usuario = relationship("Usuario", back_populates="transacoes")
+    imagem = Column("IMAGEM", String(200), nullable=True)
     patrimonios = relationship("Patrimonio", secondary="patrimonio_transacao", back_populates="transacoes")
 
     __table_args__ = (
@@ -36,7 +37,8 @@ class Transacao(Base):
                  data: datetime.date,
                  quantidade: str,
                  preco: float,
-                 usuario_id: int):
+                 usuario_id: int,
+                 imagem: str = ''):
         self.categoria = categoria
         self.codigo_ativo = codigo_ativo
         self.ordem = ordem
@@ -46,6 +48,7 @@ class Transacao(Base):
         self.preco = preco
         self.total = preco * quantidade
         self.usuario_id = usuario_id
+        self.imagem = imagem
 
 
 class PatrimonioTransacao(Base):
@@ -62,7 +65,7 @@ class PatrimonioTransacao(Base):
 class Patrimonio(Base):
     __tablename__ = "patrimonio"
 
-    patrimonio_id = Column("PATRIMONIO_ID", Integer, index=True, primary_key=True)
+    id = Column("PATRIMONIO_ID", Integer, index=True, primary_key=True)
     codigo_ativo = Column("CODIGO_ATIVO", String, index=True, unique=True)
     preco_medio = Column("PRECO_MEDIO", Numeric, nullable=False)
     quantidade = Column("QUANTIDADE", Integer, nullable=False)

@@ -105,7 +105,7 @@ export default function AcoesListar() {
 
   return (
     <div className="w-full flex">
-      <GridCustom columns={columns} rows={rows} handleEvent={handleEvent} />
+      <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} />
     </div>
   );
 }

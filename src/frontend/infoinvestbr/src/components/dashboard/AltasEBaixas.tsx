@@ -1,4 +1,4 @@
-import { ITicker } from "@/models/ticker";
+import { ITicker } from "@/models/ticker.model";
 import Image from "next/image";
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 

@@ -2,9 +2,10 @@ import datetime
 from dataclasses import dataclass
 from pydantic import BaseModel
 from src.core.tipos import EnumTipoCategoria, EnumOrdemOperacao
+from uuid import UUID
 
 
-class TransacaoRequestSchema(BaseModel):
+class TransacaoRequestCreateSchema(BaseModel):
     categoria: EnumTipoCategoria
     codigo_ativo: str
     ordem: EnumOrdemOperacao
@@ -12,7 +13,14 @@ class TransacaoRequestSchema(BaseModel):
     data: datetime.date
     quantidade: int
     preco: float
-    usuario_id: int
+    usuario_id: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class TransacaoRequestUpdateSchema(TransacaoRequestCreateSchema):
+    transacao_id: int
 
     class Config:
         orm_mode = True
@@ -20,7 +28,7 @@ class TransacaoRequestSchema(BaseModel):
 
 @dataclass
 class TransacaoResponseSchema:
-    transacao_id: int
+    id: int
     categoria: str
     codigo_ativo: str
     ordem: str
@@ -29,9 +37,10 @@ class TransacaoResponseSchema:
     quantidade: int
     preco: float
     total: float
-    usuario_id: int
+    usuario_id: UUID
+    imagem: str
 
-    def __init__(self, transacao_id: int,
+    def __init__(self, id: int,
                  categoria: str,
                  codigo_ativo: str,
                  ordem: str,
@@ -40,8 +49,9 @@ class TransacaoResponseSchema:
                  quantidade: int,
                  preco: float,
                  total: float,
-                 usuario_id: int):
-        self.transacao_id = transacao_id
+                 usuario_id: int,
+                 imagem: str):
+        self.id = id
         self.codigo_ativo = codigo_ativo
         self.ordem = ordem
         self.corretora = corretora
@@ -51,11 +61,12 @@ class TransacaoResponseSchema:
         self.total = total
         self.categoria = categoria
         self.usuario_id = usuario_id
+        self.imagem = imagem
 
 
 @dataclass()
 class PatrimonioSchemaResponse:
-    patrimonio_id: int
+    id: int
     codigo_ativo: str
     preco_medio: float
     quantidade: int
@@ -63,13 +74,13 @@ class PatrimonioSchemaResponse:
     total: float
     percentual_ativo: float
     percentual_carteira: float
-    usuario_id: int
+    usuario_id: UUID
     variacao_diaria: float
     variacao_total: float
     rentabilidade: float
 
     def __int__(self,
-                patrimonio_id: int,
+                id: int,
                 codigo_ativo: str,
                 preco_medio: float,
                 quantidade: int,
@@ -82,7 +93,7 @@ class PatrimonioSchemaResponse:
                 variacao_total: float,
                 rentabilidade: float,
                 ):
-        self.patrimonio_id = patrimonio_id
+        self.id = id
         self.codigo_ativo = codigo_ativo
         self.preco_medio = preco_medio
         self.quantidade = quantidade
@@ -99,7 +110,7 @@ class PatrimonioSchemaResponse:
 @dataclass()
 class CarteiraResponse:
     total: float
-    usuario_id: int
+    usuario_id: UUID
     variacao_diaria: float
     variacao_total: float
     patrimonio: list[PatrimonioSchemaResponse]

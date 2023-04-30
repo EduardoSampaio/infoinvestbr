@@ -1,44 +1,59 @@
 from sqlalchemy.orm import Session
 from src.transacoes.models import Transacao, Patrimonio, PatrimonioTransacao
 from src.analise.models import Acao, FundosImobiliario
-from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestSchema, PatrimonioSchemaResponse
+from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, PatrimonioSchemaResponse
 from fastapi import HTTPException, status
 from src.core.tipos import EnumTipoCategoria
 from src.cotacoes import service as cotacao
 
 
-def convert_schema(model: TransacaoResponseSchema) -> TransacaoResponseSchema:
+def get_enum_categoria(categoria: str):
+    if categoria == 'ACAO':
+        return 'Ação'
+    else:
+        return 'Fundo Imobiliário'
+
+
+def get_enum_ordem(ordem: str):
+    if ordem == 'COMPRA':
+        return 'Compra'
+    else:
+        return 'Venda'
+
+
+def get_imagem(model: Transacao):
+    if model.categoria == 'ACAO':
+        if model.imagem is None:
+            return '/img/acao.svg'
+        else:
+            return f'/img/acoes/{model.imagem}.jpg'
+    else:
+        return '/img/fiis.svg'
+
+
+def convert_schema(model: Transacao) -> TransacaoResponseSchema:
     return TransacaoResponseSchema(
-        categoria=model.categoria,
+        categoria=get_enum_categoria(model.categoria),
         corretora=model.corretora,
-        ordem=model.ordem,
+        ordem=get_enum_ordem(model.ordem),
         quantidade=model.quantidade,
         preco=model.preco,
         total=model.total,
         data=model.data,
         codigo_ativo=model.codigo_ativo,
-        transacao_id=model.transacao_id,
-        usuario_id=model.usuario_id
+        id=model.id,
+        usuario_id=model.usuario_id,
+        imagem=get_imagem(model)
     )
 
 
-def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transacao:
-    validar_codigo(db, transacao.codigo_ativo, transacao.categoria)
-    _trasacao = Transacao(
-        categoria=transacao.categoria.name,
-        codigo_ativo=transacao.codigo_ativo,
-        quantidade=transacao.quantidade,
-        corretora=transacao.corretora,
-        preco=transacao.preco,
-        ordem=transacao.ordem.name,
-        data=transacao.data,
-        usuario_id=transacao.usuario_id
-    )
+def create_transacao(db: Session, transacao: TransacaoRequestUpdateSchema) -> Transacao:
+    _trasacao = create_transacao_model(db, transacao)
 
     patrimonio_exists = db.query(Patrimonio).filter(Patrimonio.codigo_ativo == transacao.codigo_ativo
                                                     and Patrimonio.usuario_id == transacao.usuario_id).first()
     if patrimonio_exists is not None:
-        if transacao.ordem == "Compra":
+        if transacao.ordem.name == "COMPRA":
             atualizar_patrimonio_compra(patrimonio_exists, transacao)
             db.add(_trasacao)
             db.commit()
@@ -57,8 +72,8 @@ def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transaca
         db.flush()
 
         _patrimonio_transacao = PatrimonioTransacao(
-            transacao_id=_trasacao.transacao_id,
-            patrimonio_id=_patrimonio.patrimonio_id
+            transacao_id=_trasacao.id,
+            patrimonio_id=_patrimonio.id
         )
 
         db.add(_patrimonio_transacao)
@@ -70,6 +85,34 @@ def create_transacao(db: Session, transacao: TransacaoRequestSchema) -> Transaca
     return _trasacao
 
 
+def create_transacao_model(db, transacao):
+    ativo = validar_codigo(db, transacao.codigo_ativo, transacao.categoria)
+    if transacao.categoria.name == 'ACAO':
+        _trasacao = Transacao(
+            categoria=transacao.categoria.name,
+            codigo_ativo=transacao.codigo_ativo,
+            quantidade=transacao.quantidade,
+            corretora=transacao.corretora,
+            preco=transacao.preco,
+            ordem=transacao.ordem.name,
+            data=transacao.data,
+            usuario_id=transacao.usuario_id,
+            imagem=ativo.imagem
+        )
+    else:
+        _trasacao = Transacao(
+            categoria=transacao.categoria.name,
+            codigo_ativo=transacao.codigo_ativo,
+            quantidade=transacao.quantidade,
+            corretora=transacao.corretora,
+            preco=transacao.preco,
+            ordem=transacao.ordem.name,
+            data=transacao.data,
+            usuario_id=transacao.usuario_id,
+        )
+    return _trasacao
+
+
 def atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, transacao):
     verificar_quantidade_ativo(patrimonio_exists, transacao)
     patrimonio_exists.quantidade = patrimonio_exists.quantidade - transacao.quantidade
@@ -77,7 +120,7 @@ def atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, transacao):
     if patrimonio_exists.quantidade == 0:
         _trasacao.posicao_zerada = True
         patrimonio_transacao = db.query(PatrimonioTransacao).filter(
-            PatrimonioTransacao.patrimonio_id == patrimonio_exists.patrimonio_id).first()
+            PatrimonioTransacao.patrimonio_id == patrimonio_exists.id).first()
         db.delete(patrimonio_transacao)
         db.delete(patrimonio_exists)
 
@@ -98,7 +141,7 @@ def verificar_quantidade_ativo(patrimonio_exists, transacao):
         )
 
 
-def create_patrimonio(transacao: TransacaoRequestSchema):
+def create_patrimonio(transacao: TransacaoRequestUpdateSchema):
     return Patrimonio(
         codigo_ativo=transacao.codigo_ativo,
         categoria=transacao.categoria.name,
@@ -112,8 +155,8 @@ def get_transacao_by_usuario_id(db: Session, usuario_id: int) -> Transacao:
     return convert_schema(db.query(Transacao).filter(Transacao.usuario_id == usuario_id).first())
 
 
-def get_transacao_by_codigo(db: Session, codigo_ativo: str) -> list[TransacaoResponseSchema]:
-    _transacoes = db.query(Transacao).filter(Transacao.codigo_ativo == codigo_ativo).all()
+def get_transacoes_by_usuario_id(db: Session, usuario_id: int) -> Transacao:
+    _transacoes = db.query(Transacao).filter(Transacao.usuario_id == usuario_id).order_by(Transacao.data).all()
 
     list_transacoes = []
     for transacao in _transacoes:
@@ -122,8 +165,8 @@ def get_transacao_by_codigo(db: Session, codigo_ativo: str) -> list[TransacaoRes
     return list_transacoes
 
 
-def update_transacao(db: Session, transacao: TransacaoRequestSchema):
-    _transacao = get_transacao_by_usuario_id(db, transacao.usuario_id)
+def update_transacao(db: Session, transacao: TransacaoRequestUpdateSchema):
+    _transacao = db.query(Transacao).filter(Transacao.id == transacao.transacao_id).first()
     _transacao.data = transacao.data
     _transacao.ordem = transacao.ordem
     _transacao.preco = transacao.preco
@@ -136,11 +179,16 @@ def update_transacao(db: Session, transacao: TransacaoRequestSchema):
     db.refresh(_transacao)
 
 
-def remover_transacao(db: Session, usuario_id: int):
-    _transacao = get_transacao_by_usuario_id(db, usuario_id)
-
-    db.delete(_transacao)
-    db.commit()
+def remover_transacao(db: Session, transacao_id: int):
+    _transacao = db.query(Transacao).filter(Transacao.id == transacao_id).first()
+    if _transacao is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Transação inexistente"
+        )
+    else:
+        db.delete(_transacao)
+        db.commit()
 
 
 def validar_codigo(db: Session, codigo: str, categoria: EnumTipoCategoria):
@@ -151,13 +199,17 @@ def validar_codigo(db: Session, codigo: str, categoria: EnumTipoCategoria):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Código da ação é inexistente"
             )
+        else:
+            return exist
     else:
-        exist = db.query(FundosImobiliario).filter(Acao.codigo == codigo).first()
+        exist = db.query(FundosImobiliario).filter(FundosImobiliario.codigo == codigo).first()
         if exist is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Código do fundo imobiliário é inesistente"
+                detail="Código do fundo imobiliário é inexistente"
             )
+        else:
+            return exist
 
 
 def get_patrimonio_by_usuario(db: Session, usuario_id: str) -> list[PatrimonioSchemaResponse]:
@@ -177,7 +229,7 @@ def convert_patrimonio_schema(model: Patrimonio, list_model: list[Patrimonio]) -
     percentual_ativo = calcular_percentual_ativo(model, list_model)
     percentual_carteira = calcular_percentual_carteira(model, list_model)
     return PatrimonioSchemaResponse(
-        patrimonio_id=model.patrimonio_id,
+        id=model.id,
         usuario_id=model.usuario_id,
         quantidade=model.quantidade,
         codigo_ativo=model.codigo_ativo,

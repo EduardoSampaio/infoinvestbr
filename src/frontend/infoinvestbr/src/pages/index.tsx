@@ -2,7 +2,7 @@ import AltasEBaixas from "@/components/dashboard/AltasEBaixas";
 import TaxasEmoedas from "@/components/dashboard/TaxasEMoedas";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
-import { ITicker } from "@/models/ticker";
+import { ITicker } from "@/models/ticker.model";
 
 const tickersAlta: ITicker[] = [
   {

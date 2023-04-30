@@ -27,21 +27,21 @@ const columns: GridColDef[] = [
     field: "setor",
     headerName: "Setor",
     type: "string",
-    minWidth: 150,
+    width: 150,
     editable: false,
   },
   {
     field: "p_vpa",
     headerName: "P/VPA",
     type: "number",
-    minWidth: 100,
+    width: 100,
     editable: false,
   },
   {
     field: "dividend_yield",
     headerName: "Div.Yield",
     type: "number",
-    minWidth: 100,
+    width: 100,
     editable: false,
     valueFormatter: (params: GridValueFormatterParams<number>) => {
       if (params.value == null) {
@@ -56,22 +56,31 @@ const columns: GridColDef[] = [
     field: "dividendo",
     headerName: "Dividendo",
     type: "string",
-    minWidth: 100,
+    width: 100,
     editable: false,
   },
   {
     field: "liquidez_diaria",
     headerName: "Liquidez",
     type: "number",
-    minWidth: 100,
+    width: 100,
     editable: false,
   },
   {
     field: "patrimonio_liq",
     headerName: "Patrimônio",
     type: "number",
-    minWidth: 150,
+    width: 150,
     editable: false,
+    valueFormatter: (params: GridValueFormatterParams<number>) => {
+      if (params.value == null) {
+        return "";
+      }
+
+      return `R$ ${params.value.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })} `;
+    },
   },
 ];
 
@@ -103,7 +112,7 @@ export default function FundosImoboliariosListar() {
   return (
     <div className="w-full flex">
       <div className="w-full">
-          <GridCustom columns={columns} rows={rows} handleEvent={handleEvent}/>
+          <GridCustom columns={columns} rows={rows} onRowClick={handleEvent}/>
       </div>
     </div>
     );
