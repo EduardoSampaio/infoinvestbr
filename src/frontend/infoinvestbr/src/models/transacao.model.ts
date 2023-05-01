@@ -1,6 +1,6 @@
 export interface ITransacao {
-    categoria?: string
-    ordem?: string
+    categoria?: number
+    ordem?: number
     data?: string
     preco?: number
     ganho?: number

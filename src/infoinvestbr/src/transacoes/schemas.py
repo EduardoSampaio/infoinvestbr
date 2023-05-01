@@ -10,7 +10,7 @@ class TransacaoRequestCreateSchema(BaseModel):
     codigo_ativo: str
     ordem: EnumOrdemOperacao
     corretora: str
-    data: datetime.date
+    data: str
     quantidade: int
     preco: float
     usuario_id: UUID
@@ -19,11 +19,12 @@ class TransacaoRequestCreateSchema(BaseModel):
         orm_mode = True
 
 
-class TransacaoRequestUpdateSchema(TransacaoRequestCreateSchema):
-    transacao_id: int
-
-    class Config:
-        orm_mode = True
+class TransacaoRequestUpdateSchema(BaseModel):
+    id: int
+    corretora: str
+    data: str
+    quantidade: int
+    preco: float
 
 
 @dataclass

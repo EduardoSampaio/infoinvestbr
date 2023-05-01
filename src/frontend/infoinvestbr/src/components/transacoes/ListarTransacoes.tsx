@@ -6,11 +6,13 @@ import {
 import Image from "next/image";
 import GridCustom from "../shared/GridCustom";
 import useTransacao from "@/hooks/useTransacao";
-import { IconButton, TextField } from "@mui/material";
-import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import FormDialog from "./DialogEditarTransacao";
+import { Button, IconButton } from "@mui/material";
+import DialogEditarTransacao from "./DialogEditarTransacao";
+import SnackBarCustom from "../shared/SnackbarCustom";
+import ConfirmDialog from "../shared/dialog/ConfirmDialog";
+import { HiOutlinePlus } from "react-icons/hi2";
 
-function createColumns(onOpenEditar: any, onDeletar: any): GridColDef[] {
+function createColumns(onEditar: any, onDeletar: any): GridColDef[] {
   const columns: GridColDef[] = [
     {
       field: "imagem",
@@ -115,7 +117,7 @@ function createColumns(onOpenEditar: any, onDeletar: any): GridColDef[] {
       width: 100,
       renderCell: (params) => (
         <div className="flex">
-          <FormDialog transacao={params.row}/>
+          <DialogEditarTransacao transacao={params.row} onEditar={onEditar} />
           <IconButton
             aria-label="deletar"
             onClick={() => onDeletar(params.value)}
@@ -131,15 +133,57 @@ function createColumns(onOpenEditar: any, onDeletar: any): GridColDef[] {
 }
 
 export default function ListarTransacoes(props: any) {
-  const {onOpenEditar, onDeletar, transacoes } = useTransacao();
+  const {
+    onEditar,
+    onDeletar,
+    transacoes,
+    openSnack,
+    handleClose,
+    confirmOpen,
+    setConfirmOpen,
+    deleteHandle,
+  } = useTransacao();
+
+  function renderDialogs() {
+    return (
+      <>
+        <ConfirmDialog
+          title="Excluir Transação?"
+          open={confirmOpen.open}
+          onClose={() => setConfirmOpen({ open: false, value: undefined })}
+          onConfirm={deleteHandle}
+        >
+          Tem certeza que deseja excluir esta transação?
+        </ConfirmDialog>
+        <SnackBarCustom
+          severity={openSnack.type}
+          handleClose={handleClose}
+          openSnack={openSnack.open}
+          variant="filled"
+          vertical="top"
+          horizontal="right"
+          message={openSnack.message}
+        />
+      </>
+    );
+  }
 
   return (
-    <div className="w-full flex">
-      <GridCustom
-        columns={createColumns(onOpenEditar, onDeletar)}
-        rows={transacoes}
-        disableRowSelectionOnClick
-      />
+    <div className="w-full flex-col">
+      {renderDialogs()}
+      <div className="flex basis-full justify-end mr-10">
+        <Button variant="outlined" className=" dark:text-white dark:bg-gray-700">
+          <HiOutlinePlus className="text-lg mr-2"/>
+          Nova Transação
+        </Button>
+      </div>
+      <div>
+        <GridCustom
+          columns={createColumns(onEditar, onDeletar)}
+          rows={transacoes}
+          disableRowSelectionOnClick
+        />
+      </div>
     </div>
   );
 }

@@ -13,22 +13,22 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ITransacao } from "@/models/transacao.model";
 import dayjs from "dayjs";
 import { useRef } from "react";
+import { HiOutlinePlus } from "react-icons/hi";
 
 interface FormDialogProps {
   transacao: ITransacao;
-  onEditar: (transacao: ITransacao) => void;
+  onSalvar: (transacao: ITransacao) => void;
 }
 
-export default function DialogEditarTransacao(props: FormDialogProps) {
+export default function DialogNovaTransacao(props: FormDialogProps) {
   const [open, setOpen] = React.useState(false);
   const corretora = useRef<HTMLInputElement>(null);
   const quantidade = useRef<HTMLInputElement>(null);
   const preco = useRef<HTMLInputElement>(null);
   const data = useRef<HTMLInputElement>(null);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const ordem = useRef<HTMLInputElement>(null);
+  const codigo_ativo = useRef<HTMLInputElement>(null);
+  const categoria = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
     setOpen(false);
@@ -44,7 +44,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Ativo"
             variant="outlined"
             className="m-5"
-            defaultValue={props.transacao.codigo_ativo}
             contentEditable={false}
             aria-readonly={true}
             InputProps={{
@@ -57,7 +56,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Categoria"
             variant="outlined"
             className="m-5"
-            value={props.transacao.categoria}
             contentEditable={false}
             aria-readonly={true}
             InputProps={{
@@ -70,7 +68,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Ordem"
             variant="outlined"
             className="m-5"
-            value={props.transacao.ordem}
             contentEditable={false}
             aria-readonly={true}
             InputProps={{
@@ -82,7 +79,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Corretora"
             variant="outlined"
             className="m-5"
-            defaultValue={props.transacao.corretora}
             required
             inputRef={corretora}
           />
@@ -93,7 +89,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Preço"
             variant="outlined"
             className="m-5"
-            defaultValue={props.transacao.preco}
             required
             type="number"
             inputRef={preco}
@@ -104,7 +99,6 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             variant="outlined"
             type="number"
             className="m-5"
-            defaultValue={props.transacao.quantidade}
             required
             InputLabelProps={{
               shrink: true,
@@ -127,24 +121,28 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
 
   const submit = () => {
     const transacao: ITransacao = {
-      id: props.transacao.id,
+      codigo_ativo: codigo_ativo.current?.value,  
       quantidade: Number(quantidade.current?.value),
       data: data.current?.value,
       corretora: corretora.current?.value,
       preco: Number(preco.current?.value),
+      ordem: Number(ordem.current?.value),
+      categoria: Number(categoria.current?.value),
+      usuario_id: "146dde84-bc5a-4e9a-bcd7-44f221b63cda"
     };
 
-    props.onEditar(transacao);
+    props.onSalvar(transacao);
     setOpen(false);
   };
 
   return (
     <div>
-      <IconButton aria-label="editar" onClick={handleClickOpen}>
-        <CreateOutlinedIcon />
-      </IconButton>
+      <Button variant="outlined" className=" dark:text-white dark:bg-gray-700">
+          <HiOutlinePlus className="text-lg mr-2"/>
+          Nova Transação
+     </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Editar Transação</DialogTitle>
+        <DialogTitle>Nova Transação</DialogTitle>
         <DialogContent>
           <div className="flex flex-col h-[400px]">
             {renderTextFields()}

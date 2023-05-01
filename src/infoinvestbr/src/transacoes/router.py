@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from src.core.database import SessionLocal
-from src.transacoes.schemas import TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema
+from src.transacoes.schemas import TransacaoRequestCreateSchema , TransacaoRequestUpdateSchema
 from src.transacoes import service
 from src.core.schemas import Response
 from sqlalchemy.orm import Session

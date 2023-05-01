@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from src.transacoes.models import Transacao, Patrimonio, PatrimonioTransacao
 from src.analise.models import Acao, FundosImobiliario
-from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, PatrimonioSchemaResponse
+from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema,\
+    PatrimonioSchemaResponse
 from fastapi import HTTPException, status
 from src.core.tipos import EnumTipoCategoria
 from src.cotacoes import service as cotacao
+import datetime
 
 
 def get_enum_categoria(categoria: str):
@@ -47,7 +49,7 @@ def convert_schema(model: Transacao) -> TransacaoResponseSchema:
     )
 
 
-def create_transacao(db: Session, transacao: TransacaoRequestUpdateSchema) -> Transacao:
+def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema) -> Transacao:
     _trasacao = create_transacao_model(db, transacao)
 
     patrimonio_exists = db.query(Patrimonio).filter(Patrimonio.codigo_ativo == transacao.codigo_ativo
@@ -95,7 +97,7 @@ def create_transacao_model(db, transacao):
             corretora=transacao.corretora,
             preco=transacao.preco,
             ordem=transacao.ordem.name,
-            data=transacao.data,
+            data=convert_date_us(transacao.data),
             usuario_id=transacao.usuario_id,
             imagem=ativo.imagem
         )
@@ -107,7 +109,7 @@ def create_transacao_model(db, transacao):
             corretora=transacao.corretora,
             preco=transacao.preco,
             ordem=transacao.ordem.name,
-            data=transacao.data,
+            data=convert_date_us(transacao.data),
             usuario_id=transacao.usuario_id,
         )
     return _trasacao
@@ -141,7 +143,7 @@ def verificar_quantidade_ativo(patrimonio_exists, transacao):
         )
 
 
-def create_patrimonio(transacao: TransacaoRequestUpdateSchema):
+def create_patrimonio(transacao: TransacaoRequestCreateSchema):
     return Patrimonio(
         codigo_ativo=transacao.codigo_ativo,
         categoria=transacao.categoria.name,
@@ -166,14 +168,11 @@ def get_transacoes_by_usuario_id(db: Session, usuario_id: int) -> Transacao:
 
 
 def update_transacao(db: Session, transacao: TransacaoRequestUpdateSchema):
-    _transacao = db.query(Transacao).filter(Transacao.id == transacao.transacao_id).first()
-    _transacao.data = transacao.data
-    _transacao.ordem = transacao.ordem
+    _transacao = db.query(Transacao).filter(Transacao.id == transacao.id).first()
+    _transacao.data = convert_date_us(transacao.data)
     _transacao.preco = transacao.preco
     _transacao.corretora = transacao.corretora
     _transacao.quantidade = transacao.quantidade
-    _transacao.categoria = transacao.categoria
-    _transacao.codigo_ativo = transacao.codigo_ativo
 
     db.commit()
     db.refresh(_transacao)
@@ -314,3 +313,9 @@ def calcular_percentual_carteira(current_model: Patrimonio, list_model: list[Pat
 
     percentual = current_model.total / soma_ativos * 100
     return percentual
+
+
+def convert_date_us(datestr: str):
+    dia, mes, ano = datestr.split('/')
+    new_date = datetime.date(int(ano), int(mes), int(dia))
+    return new_date
