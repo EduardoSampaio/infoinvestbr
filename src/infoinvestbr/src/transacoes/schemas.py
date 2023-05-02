@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pydantic import BaseModel
 from src.core.tipos import EnumTipoCategoria, EnumOrdemOperacao
 from uuid import UUID
-
+from typing import Optional
 
 class TransacaoRequestCreateSchema(BaseModel):
     categoria: EnumTipoCategoria
@@ -14,6 +14,8 @@ class TransacaoRequestCreateSchema(BaseModel):
     quantidade: int
     preco: float
     usuario_id: UUID
+    outro: Optional[float] = None
+    corretagem: Optional[float] = None
 
     class Config:
         orm_mode = True

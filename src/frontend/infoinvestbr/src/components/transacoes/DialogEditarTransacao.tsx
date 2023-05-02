@@ -78,6 +78,7 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             }}
           />
           <TextField
+            disabled
             id="corretora"
             label="Corretora"
             variant="outlined"
@@ -85,6 +86,11 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             defaultValue={props.transacao.corretora}
             required
             inputRef={corretora}
+            contentEditable={false}
+            aria-readonly={true}
+            InputProps={{
+              readOnly: true,
+            }}
           />
         </div>
         <div>

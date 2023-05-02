@@ -11,13 +11,12 @@ export default function useTransacao() {
     const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
     const [open, setOpen] = useState(false);
     const [openSnack, setOpenSnack] = useState<SnackConfig>({ open: false, message: "", type: 'success' });
+    const [confirmOpen, setConfirmOpen] = useState<{ open: boolean, value?: number }>({ open: false })
+    const [openNewDialog, setOpenNewDialog] = useState<{ open: boolean, value?: number }>({ open: false })
+
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 
-
-    const [confirmOpen, setConfirmOpen] = useState<{open: boolean, value?: number}>({open: false})
-
     const deleteHandle = () => {
-        console.log("deletePost")
         fetch(`${API_HOST}/transacoes/${confirmOpen.value}`, { method: 'DELETE' })
             .then(() => {
                 onListar()
@@ -50,36 +49,71 @@ export default function useTransacao() {
         setOpenSnack({ open: false, message: "", type: 'success' });
     };
 
-    async function onEditar(value: ITransacao) {
-        fetch(`${API_HOST}/transacoes`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(value)
-            })
-            .then(() => {
-                onListar()
-                snackConfig(
-                    true,
-                    "Transação Salva com sucesso!",
-                    "success"
-                )
-            })
-            .catch((error) => snackConfig(
+    async function onEditar(transacao: ITransacao) {
+        try{
+            const response = await fetch(`${API_HOST}/transacoes`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(transacao)
+                    });
+            const data = await response.json()     
+            if(!response.ok){
+                throw Error(data.message)
+            }
+  
+            snackConfig(
                 true,
-                "Erro ao salvar Transação!",
+                data.message,
+                "success"
+            )
+            onListar()
+
+        }catch(error) {
+            snackConfig(
+                true,
+                `${error}`,
                 "error"
-            ))
+            )
+        }
     }
 
     async function onDeletar(value: number) {
-        setConfirmOpen({open: true, value})
+        setConfirmOpen({ open: true, value })
     }
 
     async function onSalvar(transacao: ITransacao) {
-        console.log("salvar")
+        try{
+            const response = await fetch(`${API_HOST}/transacoes`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(transacao)
+                    });
+            const data = await response.json()
+
+            if(!response.ok){
+                throw Error(data.message)
+            }
+  
+            snackConfig(
+                true,
+                data.message,
+                "success"
+            )
+            onListar()
+
+        }catch(error) {
+            snackConfig(
+                true,
+                `${error}`,
+                "error"
+            )
+        }
     }
 
     async function onListar() {
@@ -90,7 +124,6 @@ export default function useTransacao() {
 
     useEffect(() => {
         onListar();
-        console.log("useEffect");
     }, []);
 
     return {
@@ -102,6 +135,8 @@ export default function useTransacao() {
         handleClose,
         confirmOpen,
         setConfirmOpen,
-        deleteHandle
+        deleteHandle,
+        openNewDialog,
+        setOpenNewDialog
     }
 }

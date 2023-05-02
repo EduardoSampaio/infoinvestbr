@@ -11,6 +11,7 @@ import DialogEditarTransacao from "./DialogEditarTransacao";
 import SnackBarCustom from "../shared/SnackbarCustom";
 import ConfirmDialog from "../shared/dialog/ConfirmDialog";
 import { HiOutlinePlus } from "react-icons/hi2";
+import DialogNovaTransacao from "./DialogNovaTransacao";
 
 function createColumns(onEditar: any, onDeletar: any): GridColDef[] {
   const columns: GridColDef[] = [
@@ -53,7 +54,7 @@ function createColumns(onEditar: any, onDeletar: any): GridColDef[] {
       field: "corretora",
       headerName: "Corretora",
       type: "string",
-      width: 100,
+      width: 250,
       editable: false,
     },
     {
@@ -97,7 +98,7 @@ function createColumns(onEditar: any, onDeletar: any): GridColDef[] {
       field: "total",
       headerName: "Total",
       type: "string",
-      width: 100,
+      width: 120,
       editable: false,
       valueFormatter: (params: GridValueFormatterParams<number>) => {
         if (params.value == null) {
@@ -142,6 +143,9 @@ export default function ListarTransacoes(props: any) {
     confirmOpen,
     setConfirmOpen,
     deleteHandle,
+    onSalvar,
+    openNewDialog,
+    setOpenNewDialog
   } = useTransacao();
 
   function renderDialogs() {
@@ -171,11 +175,8 @@ export default function ListarTransacoes(props: any) {
   return (
     <div className="w-full flex-col">
       {renderDialogs()}
-      <div className="flex basis-full justify-end mr-10">
-        <Button variant="outlined" className=" dark:text-white dark:bg-gray-700">
-          <HiOutlinePlus className="text-lg mr-2"/>
-          Nova Transação
-        </Button>
+      <div className="flex w-full justify-end mr-5">
+        <DialogNovaTransacao open={openNewDialog.open} setOpenNewDialog={setOpenNewDialog} onSalvar={onSalvar}/>
       </div>
       <div>
         <GridCustom

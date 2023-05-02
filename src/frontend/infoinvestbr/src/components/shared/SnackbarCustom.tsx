@@ -26,11 +26,11 @@ export default function SnackBarCustom(props: SnackBarCustomProps) {
 
       
     return(
-        <Snackbar open={props.openSnack} autoHideDuration={3000} onClose={props.handleClose} 
+        <Snackbar open={props.openSnack} autoHideDuration={5000} onClose={props.handleClose} 
         anchorOrigin={{ vertical: props.vertical, horizontal: props.horizontal}}
         TransitionComponent={SlideTransition}
         >
-            <Alert onClose={props.handleClose} severity={props.severity} sx={{ width: "100%" }}>
+            <Alert onClose={props.handleClose} severity={props.severity} sx={{ width: "100%" }} className='dark:text-white'>
             {props.message}
             </Alert>
         </Snackbar>

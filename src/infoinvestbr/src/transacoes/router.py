@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from src.core.database import SessionLocal
 from src.transacoes.schemas import TransacaoRequestCreateSchema , TransacaoRequestUpdateSchema
 from src.transacoes import service
@@ -26,9 +26,9 @@ def get_db():
 
 @router.post("/")
 async def create(transacao_request: TransacaoRequestCreateSchema, db: Session = Depends(get_db)):
-    transacao = service.create_transacao(db, transacao_request)
+    response = service.create_transacao(db, transacao_request)
     return Response(code=status.HTTP_201_CREATED, status="Created", message="Transação criada com sucesso!",
-                    result=transacao)
+                    result=response)
 
 
 @router.delete("/{transacao_id}")

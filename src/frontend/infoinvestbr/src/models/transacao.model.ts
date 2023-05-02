@@ -6,8 +6,9 @@ export interface ITransacao {
     ganho?: number
     usuario_id?: string
     id?: number
-    codigo_ativo?: string
+    codigo_ativo?: any
     corretora?: string
     quantidade?: number
     total?: number
+    corretagem?: number
 }

@@ -49,7 +49,7 @@ def convert_schema(model: Transacao) -> TransacaoResponseSchema:
     )
 
 
-def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema) -> Transacao:
+def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema):
     _trasacao = create_transacao_model(db, transacao)
 
     patrimonio_exists = db.query(Patrimonio).filter(Patrimonio.codigo_ativo == transacao.codigo_ativo
@@ -67,6 +67,11 @@ def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema) -> Tr
             db.commit()
             db.refresh(_trasacao)
 
+    elif transacao.ordem.name == "VENDA":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não é possivel vender ativo que não possui"
+        )
     else:
         _patrimonio = create_patrimonio(transacao)
         db.add(_patrimonio)
@@ -99,7 +104,9 @@ def create_transacao_model(db, transacao):
             ordem=transacao.ordem.name,
             data=convert_date_us(transacao.data),
             usuario_id=transacao.usuario_id,
-            imagem=ativo.imagem
+            imagem=ativo.imagem,
+            corretagem=transacao.corretagem,
+            outro=transacao.outro
         )
     else:
         _trasacao = Transacao(
@@ -111,6 +118,8 @@ def create_transacao_model(db, transacao):
             ordem=transacao.ordem.name,
             data=convert_date_us(transacao.data),
             usuario_id=transacao.usuario_id,
+            corretagem=transacao.corretagem,
+            outro=transacao.outro
         )
     return _trasacao
 

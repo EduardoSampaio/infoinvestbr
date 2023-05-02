@@ -5,147 +5,236 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { ITransacao } from "@/models/transacao.model";
-import dayjs from "dayjs";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
-
+import { ITransacao } from "@/models/transacao.model";
+import { Autocomplete, MenuItem } from "@mui/material";
+import { CORRETORAS, ACAO_TICKER, FUNDOS_TICKER } from "../shared/autocomplete";
 interface FormDialogProps {
-  transacao: ITransacao;
   onSalvar: (transacao: ITransacao) => void;
+  open: boolean;
+  setOpenNewDialog: any;
 }
 
+
 export default function DialogNovaTransacao(props: FormDialogProps) {
-  const [open, setOpen] = React.useState(false);
-  const corretora = useRef<HTMLInputElement>(null);
+  const [corretora, setCorretora] = useState<string | undefined>("");
+  const [categoria, setCategoria] = useState<string | undefined>("");
+
+  const [carregarAtivo, setCarregarAtivo] = useState<any[]>([]);
+  const [codigo, setCodigo] = useState<any>("");
+  const [ordem, setOrdem] = useState<string | undefined>("");
+  const [total, setTotal] = useState<number>(0);
+
   const quantidade = useRef<HTMLInputElement>(null);
   const preco = useRef<HTMLInputElement>(null);
   const data = useRef<HTMLInputElement>(null);
-  const ordem = useRef<HTMLInputElement>(null);
-  const codigo_ativo = useRef<HTMLInputElement>(null);
-  const categoria = useRef<HTMLInputElement>(null);
+  const corretagem = useRef<HTMLInputElement>(null);
+  const outros = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
-    setOpen(false);
+    props.setOpenNewDialog({ open: false, value: undefined });
+    setCodigo("")
+    setOrdem("")
+    setTotal(0)
+    setCorretora("")
+    setCategoria("")
   };
 
-  function renderTextFields() {
+  const changeCategoria = (value: string) => {
+    setCodigo("");
+    setCategoria(value);
+    if (value == "1") {
+      setCarregarAtivo(ACAO_TICKER);
+    } else {
+      setCarregarAtivo(FUNDOS_TICKER);
+    }
+  };
+
+  const calcularTotal = () => {
+    let novoTotal = 0;
+    if(preco !== null && quantidade !== null){
+      const precoValor = Number(preco.current?.value);
+      const qtd = Number(quantidade.current?.value);
+      novoTotal = precoValor * qtd;
+    } 
+
+    if(corretagem !== null && outros !== null){
+      const corretagemValor = Number(corretagem.current?.value);
+      const outrosValor = Number(outros.current?.value);
+      novoTotal += corretagemValor + outrosValor
+    }
+    
+    setTotal(novoTotal)
+  }
+
+  function renderTextFieldsCompra() {
     return (
-      <>
-        <div>
+      <div className="flex flex-wrap mt-5">
+        <div className="flex w-full">
           <TextField
-            disabled
-            id="ativo"
-            label="Ativo"
-            variant="outlined"
-            className="m-5"
-            contentEditable={false}
-            aria-readonly={true}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-          <TextField
-            disabled
-            id="categoria"
-            label="Categoria"
-            variant="outlined"
-            className="m-5"
-            contentEditable={false}
-            aria-readonly={true}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-          <TextField
-            disabled
             id="ordem"
             label="Ordem"
             variant="outlined"
-            className="m-5"
-            contentEditable={false}
-            aria-readonly={true}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-          <TextField
-            id="corretora"
-            label="Corretora"
-            variant="outlined"
-            className="m-5"
+            className="ml-5 basis-full"
+            select
             required
-            inputRef={corretora}
+            value={ordem}
+            onChange={(event) => setOrdem(event.target.value)}
+          >
+            <MenuItem key={1} value={"1"}>
+              Compra
+            </MenuItem>
+            <MenuItem key={2} value={"2"}>
+              Venda
+            </MenuItem>
+          </TextField>
+          <Autocomplete
+            id="corretora"
+            options={CORRETORAS}
+            className="ml-5 basis-full"
+            renderInput={(params) => (
+              <TextField {...params} label="Corretoras" required/>
+            )}
+            onChange={(event, value) => setCorretora(value?.label)}
+            isOptionEqualToValue={(option, value) => option.label === value?.label}
           />
         </div>
-        <div>
+        <div className="flex w-full mt-5">
+          <TextField
+            id="categoria"
+            label="Categoria"
+            variant="outlined"
+            className="ml-5 basis-full"
+            select
+            required
+            value={categoria}
+            onChange={(event) => changeCategoria(event.target.value)}
+          >
+            <MenuItem key={3} value={"1"}>
+              Ação
+            </MenuItem>
+            <MenuItem key={4} value={"2"}>
+              Fundo Imobiliários
+            </MenuItem>
+          </TextField>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Data Operação"
+              className="ml-5 basis-full"
+              format="DD/MM/YYYY"
+              inputRef={data}
+            />
+          </LocalizationProvider>
+        </div>
+        <div className="flex w-full mt-5">
+          <Autocomplete
+            id="ativo"
+            options={carregarAtivo}
+            className="ml-5 basis-full"
+            renderInput={(params) => (
+              <TextField {...params} label="Ativos" value={codigo} required/>
+            )}
+            onChange={(event, value) => setCodigo(value?.label)}
+            isOptionEqualToValue={(option, value) => {
+              return true
+            }}
+          />
           <TextField
             id="preco"
             label="Preço"
             variant="outlined"
-            className="m-5"
+            className="ml-5 basis-full"
             required
             type="number"
             inputRef={preco}
+            onChange={() => calcularTotal()}
           />
           <TextField
             id="quantidade"
             label="Quantidade"
             variant="outlined"
             type="number"
-            className="m-5"
+            className="ml-5 basis-full"
             required
             InputLabelProps={{
               shrink: true,
             }}
             inputRef={quantidade}
+            onChange={() => calcularTotal()}
           />
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Data Operação"
-              className="ml-5 mt-5 w-[40%]"
-              defaultValue={dayjs(props.transacao.data)}
-              format="DD/MM/YYYY"
-              inputRef={data}
-            />
-          </LocalizationProvider>
         </div>
-      </>
+        <div className="flex w-full mt-5">
+          <TextField
+            id="corretagem"
+            label="Corretagem"
+            variant="outlined"
+            type="number"
+            className="ml-5 basis-full"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputRef={corretagem}
+            onChange={() => calcularTotal()}
+          />
+          <TextField
+            id="outros"
+            label="Outros Custos"
+            variant="outlined"
+            type="number"
+            className="ml-5 basis-full"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputRef={outros}
+            onChange={() => calcularTotal()}
+          />
+        </div>
+        <div className=" w-full h-10 m-5">
+            <span className="font-bold">Total {ordem === '1'? 'Compra' : 'Venda'}: 
+            R$ {total.toLocaleString('pt-BR', {maximumFractionDigits: 2})}
+            </span>
+        </div>
+      </div>
     );
   }
 
   const submit = () => {
     const transacao: ITransacao = {
-      codigo_ativo: codigo_ativo.current?.value,  
+      codigo_ativo: codigo,
       quantidade: Number(quantidade.current?.value),
       data: data.current?.value,
-      corretora: corretora.current?.value,
+      corretora: corretora,
       preco: Number(preco.current?.value),
-      ordem: Number(ordem.current?.value),
-      categoria: Number(categoria.current?.value),
-      usuario_id: "146dde84-bc5a-4e9a-bcd7-44f221b63cda"
+      ordem: Number(ordem),
+      categoria: Number(categoria),
+      usuario_id: "146dde84-bc5a-4e9a-bcd7-44f221b63cda",
+      corretagem: Number(corretagem.current?.value),
     };
-
     props.onSalvar(transacao);
-    setOpen(false);
+    console.log(transacao)
+    handleClose();
   };
 
   return (
     <div>
-      <Button variant="outlined" className=" dark:text-white dark:bg-gray-700">
-          <HiOutlinePlus className="text-lg mr-2"/>
-          Nova Transação
-     </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Nova Transação</DialogTitle>
+      <Button
+        variant="outlined"
+        className="mr-10 dark:text-white dark:bg-gray-700"
+        onClick={() => props.setOpenNewDialog({ open: true, value: undefined })}
+      >
+        <HiOutlinePlus className="text-lg mr-2" />
+        Nova Transação
+      </Button>
+      <Dialog open={props.open} onClose={handleClose} className="w-full">
+        <DialogTitle className="ml-5 font-bold">Nova Transação</DialogTitle>
         <DialogContent>
-          <div className="flex flex-col h-[400px]">
-            {renderTextFields()}
+          <div className="flex flex-col h-[400px] w-full">
+            {renderTextFieldsCompra()}
           </div>
         </DialogContent>
         <DialogActions className="flex w-full justify-center mb-10">

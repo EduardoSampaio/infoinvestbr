@@ -18,6 +18,8 @@ class Transacao(Base):
     preco = Column("PRECO", Numeric, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
     ganho = Column("GANHO", Numeric, nullable=True)
+    corretagem = Column("CORRETAGEM", Numeric, nullable=True)
+    outro = Column("OUTRO", Numeric, nullable=True)
     posicao_zerada = Column("POSICAO_ZERADA", Boolean, nullable=True, default=False)
     usuario_id = Column("USUARIO_ID", UUID, ForeignKey("usuarios.USUARIO_ID"), index=True)
     usuario = relationship("Usuario", back_populates="transacoes")
@@ -38,7 +40,10 @@ class Transacao(Base):
                  quantidade: str,
                  preco: float,
                  usuario_id: int,
-                 imagem: str = ''):
+                 imagem: str = '',
+                 outro: float = None,
+                 corretagem: float = None
+                 ):
         self.categoria = categoria
         self.codigo_ativo = codigo_ativo
         self.ordem = ordem
@@ -49,6 +54,8 @@ class Transacao(Base):
         self.total = preco * quantidade
         self.usuario_id = usuario_id
         self.imagem = imagem
+        self.outro = outro
+        self.corretagem = corretagem
 
 
 class PatrimonioTransacao(Base):

@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from redis import asyncio as aioredis
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,11 +57,20 @@ app = create_app()
 
 # Exceptions
 @app.exception_handler(CodigoAtivoException)
-async def handle_http_exception(exc: CodigoAtivoException):
+async def handle_http_codigo_exception(request: Request, exc: CodigoAtivoException):
     return JSONResponse(
         status_code=400,
         content={
-            "mensagem": f"Erro de solicitação para o código: {exc.name}, o código do ativo é formado de {exc.name}.SA"}
+            "message": f"Erro de solicitação para o código: {exc.name}, o código do ativo é formado de {exc.name}.SA"}
+    )
+
+
+@app.exception_handler(HTTPException)
+async def handle_http_exception(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "message": exc.detail}
     )
 
 
@@ -86,16 +95,23 @@ async def healh_check():
     }
 
 
-# Middleware
-app.add_middleware(SessionMiddleware, secret_key="some-random-string")
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+origins = [
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Middleware
+app.add_middleware(SessionMiddleware, secret_key="some-random-string")
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_exception_handler(HTTPException, handle_http_exception)
+app.add_exception_handler(CodigoAtivoException, handle_http_codigo_exception)
 
 if __name__ == '__main__':
     uvicorn.run(app, port=8000)
