@@ -11,14 +11,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
 import { ITransacao } from "@/models/transacao.model";
-import { Autocomplete, MenuItem } from "@mui/material";
+import { Autocomplete, InputAdornment, MenuItem } from "@mui/material";
 import { CORRETORAS, ACAO_TICKER, FUNDOS_TICKER } from "../shared/autocomplete";
 interface FormDialogProps {
   onSalvar: (transacao: ITransacao) => void;
   open: boolean;
   setOpenNewDialog: any;
 }
-
 
 export default function DialogNovaTransacao(props: FormDialogProps) {
   const [corretora, setCorretora] = useState<string | undefined>("");
@@ -37,11 +36,11 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
 
   const handleClose = () => {
     props.setOpenNewDialog({ open: false, value: undefined });
-    setCodigo("")
-    setOrdem("")
-    setTotal(0)
-    setCorretora("")
-    setCategoria("")
+    setCodigo("");
+    setOrdem("");
+    setTotal(0);
+    setCorretora("");
+    setCategoria("");
   };
 
   const changeCategoria = (value: string) => {
@@ -56,149 +55,158 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
 
   const calcularTotal = () => {
     let novoTotal = 0;
-    if(preco !== null && quantidade !== null){
+    if (preco !== null && quantidade !== null) {
       const precoValor = Number(preco.current?.value);
       const qtd = Number(quantidade.current?.value);
       novoTotal = precoValor * qtd;
-    } 
+    }
 
-    if(corretagem !== null && outros !== null){
+    if (corretagem !== null && outros !== null) {
       const corretagemValor = Number(corretagem.current?.value);
       const outrosValor = Number(outros.current?.value);
-      novoTotal += corretagemValor + outrosValor
+      novoTotal += corretagemValor + outrosValor;
     }
-    
-    setTotal(novoTotal)
-  }
+
+    setTotal(novoTotal);
+  };
 
   function renderTextFieldsCompra() {
     return (
       <div className="flex flex-wrap mt-5">
-        <div className="flex w-full">
-          <TextField
-            id="ordem"
-            label="Ordem"
-            variant="outlined"
-            className="ml-5 basis-full"
-            select
-            required
-            value={ordem}
-            onChange={(event) => setOrdem(event.target.value)}
-          >
-            <MenuItem key={1} value={"1"}>
-              Compra
-            </MenuItem>
-            <MenuItem key={2} value={"2"}>
-              Venda
-            </MenuItem>
-          </TextField>
-          <Autocomplete
-            id="corretora"
-            options={CORRETORAS}
-            className="ml-5 basis-full"
-            renderInput={(params) => (
-              <TextField {...params} label="Corretoras" required/>
-            )}
-            onChange={(event, value) => setCorretora(value?.label)}
-            isOptionEqualToValue={(option, value) => option.label === value?.label}
-          />
-        </div>
-        <div className="flex w-full mt-5">
-          <TextField
-            id="categoria"
-            label="Categoria"
-            variant="outlined"
-            className="ml-5 basis-full"
-            select
-            required
-            value={categoria}
-            onChange={(event) => changeCategoria(event.target.value)}
-          >
-            <MenuItem key={3} value={"1"}>
-              Ação
-            </MenuItem>
-            <MenuItem key={4} value={"2"}>
-              Fundo Imobiliários
-            </MenuItem>
-          </TextField>
-
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Data Operação"
+        <form>
+          <div className="flex w-full">
+            <TextField
+              id="ordem"
+              label="Ordem"
+              variant="outlined"
               className="ml-5 basis-full"
-              format="DD/MM/YYYY"
-              inputRef={data}
+              select
+              required
+              value={ordem}
+              onChange={(event) => setOrdem(event.target.value)}
+            >
+              <MenuItem key={1} value={"1"}>
+                Compra
+              </MenuItem>
+              <MenuItem key={2} value={"2"}>
+                Venda
+              </MenuItem>
+            </TextField>
+            <Autocomplete
+              id="corretora"
+              options={CORRETORAS}
+              className="ml-5 basis-full"
+              renderInput={(params) => (
+                <TextField {...params} label="Corretoras" required />
+              )}
+              onChange={(event, value) => setCorretora(value?.label)}
+              isOptionEqualToValue={(option, value) =>
+                option.label === value?.label
+              }
             />
-          </LocalizationProvider>
-        </div>
-        <div className="flex w-full mt-5">
-          <Autocomplete
-            id="ativo"
-            options={carregarAtivo}
-            className="ml-5 basis-full"
-            renderInput={(params) => (
-              <TextField {...params} label="Ativos" value={codigo} required/>
-            )}
-            onChange={(event, value) => setCodigo(value?.label)}
-            isOptionEqualToValue={(option, value) => {
-              return true
-            }}
-          />
-          <TextField
-            id="preco"
-            label="Preço"
-            variant="outlined"
-            className="ml-5 basis-full"
-            required
-            type="number"
-            inputRef={preco}
-            onChange={() => calcularTotal()}
-          />
-          <TextField
-            id="quantidade"
-            label="Quantidade"
-            variant="outlined"
-            type="number"
-            className="ml-5 basis-full"
-            required
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputRef={quantidade}
-            onChange={() => calcularTotal()}
-          />
-        </div>
-        <div className="flex w-full mt-5">
-          <TextField
-            id="corretagem"
-            label="Corretagem"
-            variant="outlined"
-            type="number"
-            className="ml-5 basis-full"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputRef={corretagem}
-            onChange={() => calcularTotal()}
-          />
-          <TextField
-            id="outros"
-            label="Outros Custos"
-            variant="outlined"
-            type="number"
-            className="ml-5 basis-full"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputRef={outros}
-            onChange={() => calcularTotal()}
-          />
-        </div>
-        <div className=" w-full h-10 m-5">
-            <span className="font-bold">Total {ordem === '1'? 'Compra' : 'Venda'}: 
-            R$ {total.toLocaleString('pt-BR', {maximumFractionDigits: 2})}
+          </div>
+          <div className="flex w-full mt-5">
+            <TextField
+              id="categoria"
+              label="Categoria"
+              variant="outlined"
+              className="ml-5 basis-full"
+              select
+              required
+              value={categoria}
+              onChange={(event) => changeCategoria(event.target.value)}
+            >
+              <MenuItem key={3} value={"1"}>
+                Ação
+              </MenuItem>
+              <MenuItem key={4} value={"2"}>
+                Fundo Imobiliários
+              </MenuItem>
+            </TextField>
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Data Operação"
+                className="ml-5 basis-full"
+                format="DD/MM/YYYY"
+                inputRef={data}
+              />
+            </LocalizationProvider>
+          </div>
+          <div className="flex w-full mt-5">
+            <Autocomplete
+              id="ativo"
+              options={carregarAtivo}
+              className="ml-5 basis-full"
+              renderInput={(params) => (
+                <TextField {...params} label="Ativos" value={codigo} required />
+              )}
+              onChange={(event, value) => setCodigo(value?.label)}
+              isOptionEqualToValue={(option, value) => {
+                return true;
+              }}
+            />
+            <TextField
+              id="preco"
+              label="Preço"
+              variant="outlined"
+              className="ml-5 basis-full"
+              required
+              type="number"
+              inputRef={preco}
+              onChange={() => calcularTotal()}
+              inputProps={{
+                startadornment: <InputAdornment position="start">R$</InputAdornment>
+   
+              }}
+            />
+            <TextField
+              id="quantidade"
+              label="Quantidade"
+              variant="outlined"
+              type="number"
+              className="ml-5 basis-full"
+              required
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputRef={quantidade}
+              onChange={() => calcularTotal()}
+            />
+          </div>
+          <div className="flex w-full mt-5">
+            <TextField
+              id="corretagem"
+              label="Corretagem"
+              variant="outlined"
+              type="number"
+              className="ml-5 basis-full"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputRef={corretagem}
+              onChange={() => calcularTotal()}
+            />
+            <TextField
+              id="outros"
+              label="Outros Custos"
+              variant="outlined"
+              type="number"
+              className="ml-5 basis-full"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputRef={outros}
+              onChange={() => calcularTotal()}
+            />
+          </div>
+          <div className=" w-full h-10 m-5">
+            <span className="font-bold">
+              Total {ordem === "1" ? "Compra" : "Venda"}: R${" "}
+              {total.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}
             </span>
-        </div>
+          </div>
+        </form>
       </div>
     );
   }
@@ -216,7 +224,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
       corretagem: Number(corretagem.current?.value),
     };
     props.onSalvar(transacao);
-    console.log(transacao)
+    console.log(transacao);
     handleClose();
   };
 

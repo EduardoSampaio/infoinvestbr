@@ -5,6 +5,7 @@ from src.core.tipos import EnumTipoCategoria, EnumOrdemOperacao
 from uuid import UUID
 from typing import Optional
 
+
 class TransacaoRequestCreateSchema(BaseModel):
     categoria: EnumTipoCategoria
     codigo_ativo: str
