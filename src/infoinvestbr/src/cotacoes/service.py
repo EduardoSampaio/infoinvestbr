@@ -104,14 +104,14 @@ def get_by_codigo_by_intervalo(codigo, inicio: datetime.date, fim: datetime.date
 
 def get_by_codigo_atual(codigo: str) -> float:
     cotacao = yf.Ticker(f'{codigo}.SA')
-    cotacao = cotacao.history(period="1d")['Close'][0]
-    return cotacao
+    cotacao = cotacao.info
+    return cotacao.get('previousClose')
 
 
-def get_by_codigo_varicao_diaria(codigo: str):
+def get_by_codigo_variacao_diaria(codigo: str):
     cotacao = yf.Ticker(f'{codigo}.SA')
     fechamento_anterior = cotacao.history(period="2d")['Close'][-2]
-    fechamento_atual = cotacao.history(period="1d")['Close'][0]
+    fechamento_atual = cotacao.info.get('previousClose')
     return fechamento_atual, fechamento_anterior
 
 

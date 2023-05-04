@@ -49,10 +49,10 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-# @app.on_event("startup")
-# async def startup():
-#     redis = await aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
-#     FastAPICache.init(RedisBackend(redis), prefix="info-invest")
+@app.on_event("startup")
+async def startup():
+    redis = await aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="info-invest")
 
 
 # Exceptions

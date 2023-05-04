@@ -7,7 +7,6 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"Login" | "Cadastro">("Login");
 
   function changeMode() {
-    console.log("Chamou");
     if (mode === "Login") {
       setMode("Cadastro");
     } else {

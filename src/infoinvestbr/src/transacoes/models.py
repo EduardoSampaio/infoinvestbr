@@ -79,6 +79,7 @@ class Patrimonio(Base):
     categoria = Column("CATEGORIA", String, nullable=False)
     total = Column("TOTAL", Numeric, nullable=False)
     usuario_id = Column("USUARIO_ID", UUID, ForeignKey("usuarios.USUARIO_ID"), index=True)
+    imagem = Column("IMAGEM", String(200), nullable=True)
     transacoes = relationship("Transacao", secondary="patrimonio_transacao", back_populates="patrimonios")
 
     __table_args__ = (
@@ -90,10 +91,12 @@ class Patrimonio(Base):
                  preco_medio,
                  quantidade,
                  categoria,
-                 usuario_id):
+                 usuario_id,
+                 imagem):
         self.codigo_ativo = codigo_ativo
         self.quantidade = quantidade
         self.usuario_id = usuario_id
         self.preco_medio = preco_medio
         self.categoria = categoria
         self.total = preco_medio * quantidade
+        self.imagem = imagem

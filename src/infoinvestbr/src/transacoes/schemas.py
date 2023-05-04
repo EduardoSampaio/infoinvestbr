@@ -72,6 +72,7 @@ class TransacaoResponseSchema:
 class PatrimonioSchemaResponse:
     id: int
     codigo_ativo: str
+    preco: float
     preco_medio: float
     quantidade: int
     categoria: EnumTipoCategoria
@@ -82,6 +83,7 @@ class PatrimonioSchemaResponse:
     variacao_diaria: float
     variacao_total: float
     rentabilidade: float
+    imagem: str
 
     def __int__(self,
                 id: int,
@@ -96,6 +98,8 @@ class PatrimonioSchemaResponse:
                 variacao_diaria: float,
                 variacao_total: float,
                 rentabilidade: float,
+                imagem: str,
+                preco: float
                 ):
         self.id = id
         self.codigo_ativo = codigo_ativo
@@ -109,6 +113,8 @@ class PatrimonioSchemaResponse:
         self.variacao_total = variacao_total
         self.variacao_diaria = variacao_diaria
         self.rentabilidade = rentabilidade
+        self.imagem = imagem
+        self.preco = preco
 
 
 @dataclass()

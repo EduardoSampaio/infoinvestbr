@@ -16,7 +16,8 @@ interface GridCustomProp {
   columns: GridColDef[];
   onRowClick?: GridEventListener<"rowClick">;
   onCellClick?: GridEventListener<"cellClick">;
-  disableRowSelectionOnClick?: boolean | undefined
+  disableRowSelectionOnClick?: boolean | undefined;
+  showToolBar?: boolean
 }
 
 const style = {
@@ -66,7 +67,7 @@ export default function GridCustom(props: GridCustomProp) {
         initialState={initialState}
         pageSizeOptions={[5, 10, 25, 50]}
         onRowClick={props?.onRowClick}
-        slots={{ toolbar: GridToolbar }}
+        slots={props.showToolBar == true ? { toolbar: GridToolbar } : {}}
         sx={style}
         autoHeight
         onCellClick={props.onCellClick}

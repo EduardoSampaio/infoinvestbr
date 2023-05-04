@@ -1,3 +1,4 @@
+import ListaPatrimonio from "@/components/patrimonio/ListarPatrimonio";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
@@ -13,7 +14,7 @@ export default function Patrimonio() {
         breadcrumbs={breadcrumbs}
         current={currentBreadcrumbs}
       > 
-
+        <ListaPatrimonio />
       </Card>
     </Layout>
   );

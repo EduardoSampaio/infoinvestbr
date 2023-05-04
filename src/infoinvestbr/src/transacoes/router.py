@@ -1,8 +1,11 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
+from fastapi_cache import JsonCoder
+from fastapi_cache.decorator import cache
+
 from src.core.database import SessionLocal
-from src.transacoes.schemas import TransacaoRequestCreateSchema , TransacaoRequestUpdateSchema
+from src.transacoes.schemas import TransacaoRequestCreateSchema, TransacaoRequestUpdateSchema
 from src.transacoes import service
 from src.core.schemas import Response
 from sqlalchemy.orm import Session
@@ -49,7 +52,8 @@ async def get_transacao_by_usuario_id(usuario_id: UUID, db: Session = Depends(ge
     return Response(code=status.HTTP_200_OK, status="OK", result=transacoes)
 
 
-@router.get("/patrimonio/{usuarios_id}")
+@router.get("/{usuarios_id}/patrimonio")
+# @cache(expire=60, coder=JsonCoder)
 async def get_patrimonio_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     patrimonios = service.get_patrimonio_by_usuario(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="OK", result=patrimonios)
