@@ -5,8 +5,6 @@ import { Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import * as echarts from "echarts";
-import BasicTable from "../shared/BasicTable";
-import { IAcao } from "@/models/acao.model";
 import { IFundoImobiliario } from "@/models/fundos.model";
 import CardTitle from "../shared/Indicadores";
 import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
@@ -234,7 +232,7 @@ export default function DetalhesFundosImobiliario() {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=1y&intervalo=1mo`
       );
       return await data.json();
     };

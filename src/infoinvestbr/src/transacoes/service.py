@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 from yfinance import Ticker
 from uuid import UUID
@@ -14,20 +14,20 @@ import yfinance as yf
 
 
 def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
-    query = db.query(Transacao.id,
-                     Transacao.usuario_id,
+    query = db.query(Transacao.usuario_id,
                      Transacao.imagem,
                      Transacao.codigo_ativo,
                      Transacao.categoria,
                      (func.sum(Transacao.total) / func.sum(Transacao.quantidade)).label("preco"),
                      func.sum(Transacao.quantidade).label("quantidade"),
                      func.sum(Transacao.total).label("total_investido")) \
+        .distinct(Transacao.codigo_ativo)\
         .filter(Transacao.usuario_id == usuario_id) \
-        .distinct(Transacao.codigo_ativo) \
-        .group_by(Transacao.id, Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
+        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
         .all()
 
-    return get_patrimonio_by_usuario(query)
+    patrimonio = get_patrimonio_by_usuario(query)
+    return patrimonio
 
 
 def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema):
@@ -118,7 +118,6 @@ def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaRespon
     percentual_carteira = calcular_percentual_carteira(valor, valores)
 
     return PatrimonioSchemaResponse(
-        id=valor.id,
         usuario_id=valor.usuario_id,
         quantidade=valor.quantidade,
         codigo_ativo=valor.codigo_ativo,
@@ -220,7 +219,7 @@ def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
         soma_variacao_total_acao += float(valor.variacao_total)
 
     total_porcentagem_acao = 0.0
-    if total_porcentagem_acao != 0:
+    if soma_total_acao != 0:
         total_porcentagem_acao = (float(soma_variacao_total_acao) / float(soma_total_acao)) * 100
 
     soma_total_fundo = 0.0
@@ -239,7 +238,7 @@ def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
 
     rentabilidade_total = 0.0
     if total_patrimonio != 0:
-        rentabilidade_total = ((float(soma_variacao_total_acao) - float(soma_variacao_total_fundo)) / float(
+        rentabilidade_total = ((float(soma_variacao_total_acao) + float(soma_variacao_total_fundo)) / float(
             total_patrimonio)) * 100
 
     ganhos_totais = float(soma_variacao_total_acao) + float(soma_variacao_total_fundo)

@@ -70,7 +70,6 @@ class TransacaoResponseSchema:
 
 @dataclass()
 class PatrimonioSchemaResponse:
-    id: int
     codigo_ativo: str
     preco: float
     preco_medio: float
@@ -86,7 +85,6 @@ class PatrimonioSchemaResponse:
     imagem: str
 
     def __int__(self,
-                id: int,
                 codigo_ativo: str,
                 preco_medio: float,
                 quantidade: int,
@@ -101,7 +99,6 @@ class PatrimonioSchemaResponse:
                 imagem: str,
                 preco: float
                 ):
-        self.id = id
         self.codigo_ativo = codigo_ativo
         self.preco_medio = preco_medio
         self.quantidade = quantidade

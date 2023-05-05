@@ -275,6 +275,7 @@ function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
           showToolBar={false}
           className="px-10 pt-0"
           disableRowSelectionOnClick
+          id={"codigo_ativo"}
         />
       </div>
     </div>
@@ -358,6 +359,7 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
           showToolBar={false}
           className="px-10 pt-0"
           disableRowSelectionOnClick
+          id={"codigo_ativo"}
         />
       </div>
     </div>

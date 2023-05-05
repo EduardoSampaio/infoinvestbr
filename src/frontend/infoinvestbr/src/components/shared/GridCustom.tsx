@@ -20,6 +20,7 @@ interface GridCustomProp {
   showToolBar?: boolean
   classNameGrid?: string
   className?: string
+  id?: any
 }
 
 const style = {
@@ -75,6 +76,7 @@ export default function GridCustom(props: GridCustomProp) {
         onCellClick={props.onCellClick}
         {...props}
         className={props.classNameGrid}
+        getRowId={(row) => props?.id ? row[props?.id] : row.id}
       />
     </div>
   );
