@@ -1,52 +1,52 @@
-import { IPatrimonio } from "@/models/patrimonio.model";
 import {
-  GridCellParams,
   GridColDef,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import GridCustom from "../shared/GridCustom";
-import clsx from "clsx";
-import { Box } from "@mui/material";
-import { HiOutlineArrowSmUp, HiOutlineArrowSmDown } from "react-icons/hi";
 import { HiOutlineArrowLongDown, HiOutlineArrowLongUp } from "react-icons/hi2";
 import { ITotalizacao } from "@/models/totalizacao.model";
 
-function cellRenderArrows(
-  value: number,
-  formatador: "%" | "R$",
-  position: "inicio" | "fim"
+function formatNumberWithArrows(
+  value?: number,
+  formatador?: "%" | "R$",
+  position?: "inicio" | "fim",
+  cssIcon?: string
 ) {
-  const valueFormatted = Number(value).toLocaleString("pt-BR", {
+
+  if(value === undefined) {
+    return "";
+  }
+
+  const valueFormatted = Number(value)?.toLocaleString("pt-BR", {
     maximumFractionDigits: 2,
   });
 
-  const inicio = position === "inicio" ? "hidden" : "";
-  const fim = position === "fim" ? "hidden" : "";
-
-  if (value >= 0) {
+  if (value !== undefined && value >= 0) {
     return (
       <>
-        <HiOutlineArrowLongUp className="text-green-500 " />
-        <h2
-          className={`text-green-500 ${inicio}`}
-        >{`${formatador}${valueFormatted}`}</h2>
-        <h2
-          className={`text-green-500 ${fim}`}
-        >{`${valueFormatted}${formatador}`}</h2>
+        <HiOutlineArrowLongUp className={`text-green-500 ${cssIcon}`} />
+        {position === "inicio" ? (
+          <h2
+            className={`text-green-500`}
+          >{`${formatador} ${valueFormatted}`}</h2>
+        ) : (
+          <h2
+            className={`text-green-500`}
+          >{`${valueFormatted} ${formatador}`}</h2>
+        )}
       </>
     );
   } else {
     return (
       <>
-        <HiOutlineArrowLongDown className="text-red-500 " />
-        <h2
-          className={`text-red-500 ${inicio}`}
-        >{`${formatador}${valueFormatted}`}</h2>
-        <h2
-          className={`text-red-500 ${fim}`}
-        >{`${valueFormatted}${formatador}`}</h2>
+        <HiOutlineArrowLongDown className={`text-red-500 ${cssIcon}`} />
+        {position === "inicio" ? (
+          <h2 className={`text-red-500`}>{`${formatador}${valueFormatted}`}</h2>
+        ) : (
+          <h2 className={`text-red-500`}>{`${valueFormatted}${formatador}`}</h2>
+        )}
       </>
     );
   }
@@ -79,7 +79,7 @@ const columns: GridColDef[] = [
     field: "preco",
     headerName: "Preço",
     type: "number",
-    width: 80,
+    width: 120,
     editable: false,
     valueFormatter: (params: GridValueFormatterParams<number>) => {
       if (params.value == null) {
@@ -87,7 +87,7 @@ const columns: GridColDef[] = [
       }
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })} `;
     },
   },
@@ -103,7 +103,7 @@ const columns: GridColDef[] = [
       }
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })} `;
     },
   },
@@ -126,7 +126,7 @@ const columns: GridColDef[] = [
       }
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })} `;
     },
   },
@@ -140,7 +140,7 @@ const columns: GridColDef[] = [
       if (params.value == null) {
         return "";
       }
-      return cellRenderArrows(params.value, "R$", "fim");
+      return formatNumberWithArrows(params.value, "R$", "inicio");
     },
   },
   {
@@ -153,7 +153,7 @@ const columns: GridColDef[] = [
       if (params.value == null) {
         return "";
       }
-      return cellRenderArrows(params.value, "%", "inicio");
+      return formatNumberWithArrows(params.value, "%", "fim");
     },
   },
   {
@@ -192,7 +192,89 @@ const columns: GridColDef[] = [
   },
 ];
 
-function renderGridsAtivo(row: IPatrimonio[], titulo: string) {
+function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
+  return (
+    <div
+      className={`flex flex-col h-auto
+    rounded-xl border-2 mt-5 
+    dark:border-gray-600
+    w-full
+    `}
+    >
+      <div className={`w-full bg-gray-200 dark:bg-gray-800 rounded-t-lg`}>
+        <h3
+          className={`text-sm font-semibold text-gray-600 dark:text-white m-2.5`}
+        >
+          {titulo}
+        </h3>
+      </div>
+      <div className={`w-full flex flex-wrap`}>
+        <div
+          className={`w-full mx-10 mt-5 border-t border-l border-r
+        flex justify-end dark:border-gray-500
+      `}
+        >
+          <div
+            className="border-l dark:border-gray-500
+          flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Número de Ativos
+            </h2>
+            <div className="flex">{row.acoes?.length}</div>
+          </div>
+          <div
+            className={`border-l px-10 dark:border-gray-500
+          flex flex-col justify-center
+        `}
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Ganhos Totais
+            </h2>
+            <div className="flex">
+              {formatNumberWithArrows(row?.ganho_acoes, "R$", "inicio", "mt-1")}
+            </div>
+          </div>
+          <div
+            className="border-l dark:border-gray-500
+          flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Rentabilidade
+            </h2>
+            <div className="flex">
+              {formatNumberWithArrows(
+                row?.total_porcentagem_acao,
+                "%",
+                "fim",
+                "mt-1"
+              )}
+            </div>
+          </div>
+          <div
+            className="border-l border-r dark:border-gray-500
+          flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">Total</h2>
+            R$
+            {row.total_acao?.toLocaleString("pt-BR", {
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        </div>
+        <GridCustom
+          columns={columns}
+          rows={row?.acoes}
+          showToolBar={false}
+          className="px-10 pt-0"
+          disableRowSelectionOnClick
+        />
+      </div>
+    </div>
+  );
+}
+
+function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
   return (
     <div
       className={`flex flex-col h-auto
@@ -201,73 +283,81 @@ function renderGridsAtivo(row: IPatrimonio[], titulo: string) {
       w-full
       `}
     >
-      <div className={`w-full h-10 bg-gray-200 dark:bg-gray-800 rounded-t-lg`}>
+      <div className={`w-full bg-gray-200 dark:bg-gray-800 rounded-t-lg`}>
         <h3
           className={`text-sm font-semibold text-gray-600 dark:text-white m-2.5`}
         >
           {titulo}
         </h3>
       </div>
-      <div className={`w-full flex flex-wrap min-h-[400px]`}>
-        <GridCustom columns={columns} rows={row} showToolBar={false} />
+      <div className={`w-full flex flex-wrap`}>
+        <div
+          className={`w-full mx-10 mt-5 border-t border-l border-r
+          flex justify-end dark:border-gray-500
+        `}
+        >
+          <div
+            className="border-l dark:border-gray-500
+            flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Número de Ativos
+            </h2>
+            <div className="flex">{row?.fundos?.length}</div>
+          </div>
+          <div
+            className={`border-l px-10 dark:border-gray-500
+            flex flex-col justify-center
+          `}
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Ganhos Totais
+            </h2>
+            <div className="flex">
+              {formatNumberWithArrows(row?.ganho_fundo, "R$", "inicio", "mt-1")}
+            </div>
+          </div>
+          <div
+            className="border-l dark:border-gray-500
+            flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">
+              Rentabilidade
+            </h2>
+            <div className="flex">
+              {formatNumberWithArrows(
+                row?.total_porcentagem_fundo,
+                "%",
+                "fim",
+                "mt-1"
+              )}
+            </div>
+          </div>
+          <div
+            className="border-l border-r dark:border-gray-500
+            flex flex-col justify-center items-center w-1/6"
+          >
+            <h2 className="text-sm text-gray-500 dark:text-white">Total</h2>
+            R$
+            {row?.total_fundo?.toLocaleString("pt-BR", {
+              maximumFractionDigits: 2,
+            })}
+          </div>
+        </div>
+        <GridCustom
+          columns={columns}
+          rows={row?.fundos}
+          showToolBar={false}
+          className="px-10 pt-0"
+          disableRowSelectionOnClick
+        />
       </div>
     </div>
   );
 }
 
-function renderTotalizacao(row: ITotalizacao) {
-  return (
-    <div
-        className={`flex flex-col h-auto
-            rounded-xl border-2 mt-5 
-            dark:border-gray-600
-            w-full
-            `}
-      >
-        <div
-          className={`w-full h-10 bg-gray-200 dark:bg-gray-800 rounded-t-lg`}
-        >
-          <h3
-            className={`text-sm font-semibold text-gray-600 dark:text-white m-2.5`}
-          >
-            Totalização
-          </h3>
-        </div>
-        <div className={`w-full flex flex-wrap min-h-[200px]`}>
-          <div>
-            <h2>Total Ganho/Perda Ações</h2>
-            <h2>
-              R$
-              {row.ganho_acoes?.toLocaleString("pt-BR", {
-                maximumFractionDigits: 2,
-              })}
-            </h2>
-          </div>
-          <div>
-            <h2>Rentabilidade em Ações</h2>
-            <h2>
-              {row.total_porcentagem_acao?.toLocaleString("pt-BR", {
-                maximumFractionDigits: 2,
-              })}
-              %
-            </h2>
-          </div>
-          <div>
-            <h2>Total Ações</h2>
-            <h2>
-              R$
-              {row.total_acao?.toLocaleString("pt-BR", {
-                maximumFractionDigits: 2,
-              })}
-            </h2>
-          </div>
-        </div>
-      </div>
-  )
-}
 
 export default function ListaPatrimonio() {
-  const [visible, setVisible] = useState<"hidden" | "">("");
   const [row, setRow] = useState<ITotalizacao>({ acoes: [], fundos: [] });
 
   useEffect(() => {
@@ -291,24 +381,59 @@ export default function ListaPatrimonio() {
           total_porcentagem_fundo: json.result.total_porcentagem_fundo,
           total_acao: json.result.total_acao,
           total_fundo: json.result.total_fundo,
+          total_investido: json.result.total_investido,
+          rentabilidade_total: json.result.rentabilidade_total,
+          ganhos_totais: json.result.ganhos_totais,
         });
       })
       .catch((error) => console.log(error));
   }, []);
 
-  const changeVisible = () => {
-    if (visible === "") {
-      setVisible("hidden");
-    } else {
-      setVisible("");
-    }
-  };
-
   return (
     <div className="w-full px-5 py-5">
-      {renderTotalizacao(row)}
-      {renderGridsAtivo(row.acoes, "Ações")}
-      {renderGridsAtivo(row.fundos, "Fundos Imobiliários")}
+      <div className="flex justify-around">
+        <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+          <div className="flex flex-col w-full justify-center items-center">
+            <h3 className=" text-gray-400">Total Bruto</h3>
+            <h2 className="font-semibold">R$ {row?.total_patrimonio?.toLocaleString("pt-BR", {
+                  maximumFractionDigits: 2,
+                })}</h2>
+          </div>
+       </div>
+
+       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+          <div className="flex flex-col w-full justify-center items-center">
+            <h3 className=" text-gray-400">Total Investido</h3>
+            <h2 className="font-semibold">R$ {row?.total_investido?.toLocaleString("pt-BR", {
+              maximumFractionDigits: 2,
+            })}</h2>
+          </div>
+       </div>
+
+       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+          <div className="flex flex-col w-full justify-center items-center">
+            <h3 className="text-gray-400">Ganhos totais</h3>
+           <div className="flex">
+            {formatNumberWithArrows(row?.ganhos_totais, 'R$', 'inicio', 'mt-0.5')}
+            </div>
+          </div>
+       </div>
+ 
+       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+          <div className="flex flex-col w-full justify-center items-center">
+            <h3 className=" text-gray-400">Rentabilidade</h3>
+            <div className="flex">
+              {formatNumberWithArrows(row?.rentabilidade_total, '%', 'fim', 'mt-0.5')}
+            </div>
+          </div>
+       </div>
+      </div>
+      {renderGridsAtivoAcao(row, "Ações")}
+      {renderGridsAtivoFundo(row, "Fundos Imobiliários")}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import DashboardCarteira from "@/components/patrimonio/DashboardCarteira";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
@@ -8,12 +9,12 @@ export default function Carteira() {
     <Layout>
       <Card
         sizeText="text-sm"
-        titulo="Ações"
-        className="flex"
+        titulo=""
+        className=""
         breadcrumbs={breadcrumbs}
         current={currentBreadcrumbs}
       > 
-
+      <DashboardCarteira />
       </Card>
     </Layout>
   );

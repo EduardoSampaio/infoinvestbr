@@ -18,6 +18,8 @@ interface GridCustomProp {
   onCellClick?: GridEventListener<"cellClick">;
   disableRowSelectionOnClick?: boolean | undefined;
   showToolBar?: boolean
+  classNameGrid?: string
+  className?: string
 }
 
 const style = {
@@ -61,7 +63,7 @@ function QuickSearchToolbar() {
 
 export default function GridCustom(props: GridCustomProp) {
   return (
-    <div className="w-full p-10">
+    <div className={`w-full p-10 ${props.className}`}>
       <DataGrid
         localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
         initialState={initialState}
@@ -72,6 +74,7 @@ export default function GridCustom(props: GridCustomProp) {
         autoHeight
         onCellClick={props.onCellClick}
         {...props}
+        className={props.classNameGrid}
       />
     </div>
   );

@@ -64,7 +64,7 @@ def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema):
             db.refresh(_trasacao)
             db.refresh(patrimonio_exists)
         else:
-            atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, _trasacao)
+            atualizar_patrimonio_venda(db, patrimonio_exists, _trasacao)
             db.add(_trasacao)
             db.commit()
             db.refresh(_trasacao)
@@ -126,12 +126,12 @@ def create_transacao_model(db, transacao):
     return _trasacao
 
 
-def atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, transacao):
+def atualizar_patrimonio_venda(db, patrimonio_exists, transacao):
     verificar_quantidade_ativo(patrimonio_exists, transacao)
     patrimonio_exists.quantidade = patrimonio_exists.quantidade - transacao.quantidade
-    _trasacao.lucro_prejuizo = (_trasacao.preco - float(patrimonio_exists.preco_medio)) * transacao.quantidade
+    transacao.lucro_prejuizo = (float(transacao.preco) - float(patrimonio_exists.preco_medio)) * transacao.quantidade
     if patrimonio_exists.quantidade == 0:
-        _trasacao.posicao_zerada = True
+        transacao.posicao_zerada = True
         patrimonio_transacao = db.query(PatrimonioTransacao).filter(
             PatrimonioTransacao.patrimonio_id == patrimonio_exists.id).first()
         db.delete(patrimonio_transacao)
@@ -141,7 +141,8 @@ def atualizar_patrimonio_venda(_trasacao, db, patrimonio_exists, transacao):
 def atualizar_patrimonio_compra(patrimonio_exists, transacao):
     total_transacao = transacao.preco * transacao.quantidade
     total_patrimonio_qtd = patrimonio_exists.quantidade + transacao.quantidade
-    preco_medio = (float(patrimonio_exists.total) + total_transacao) / total_patrimonio_qtd
+    preco_medio = (float(patrimonio_exists.total) + float(total_transacao)) / total_patrimonio_qtd
+    patrimonio_exists.total = float(patrimonio_exists.total) + float(total_transacao)
     patrimonio_exists.quantidade = total_patrimonio_qtd
     patrimonio_exists.preco_medio = preco_medio
 
@@ -191,13 +192,22 @@ def update_transacao(db: Session, transacao: TransacaoRequestUpdateSchema):
 
 
 def remover_transacao(db: Session, transacao_id: int):
-    _transacao = db.query(Transacao).filter(Transacao.id == transacao_id).first()
+    _transacao: Transacao = db.query(Transacao).filter(Transacao.id == transacao_id).first()
     if _transacao is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Transação inexistente"
         )
     else:
+        patrimonio_exists = db.query(Patrimonio).filter(Patrimonio.codigo_ativo == _transacao.codigo_ativo
+                                                        and Patrimonio.usuario_id == _transacao.usuario_id).first()
+        if patrimonio_exists is not None:
+            if _transacao.ordem == "VENDA":
+                atualizar_patrimonio_compra(patrimonio_exists, _transacao)
+            else:
+                atualizar_patrimonio_venda(db, patrimonio_exists, _transacao)
+
+        db.refresh(patrimonio_exists)
         db.delete(_transacao)
         db.commit()
 
@@ -372,6 +382,13 @@ def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
 
     total_patrimonio = float(soma_total_fundo) + float(soma_total_acao)
 
+    total_investido = float(total_patrimonio) - float(soma_variacao_total_acao) - float(soma_variacao_total_fundo)
+
+    rentabilidade_total = ((float(soma_variacao_total_acao) - float(soma_variacao_total_fundo)) / float(
+        total_patrimonio)) * 100
+
+    ganhos_totais = float(soma_variacao_total_acao) + float(soma_variacao_total_fundo)
+
     return {
         "acoes": list_valores_acoes,
         "ganho_acoes": soma_variacao_total_acao,
@@ -381,5 +398,8 @@ def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
         "ganho_fundo": soma_variacao_total_fundo,
         "total_fundo": soma_total_fundo,
         "total_patrimonio": total_patrimonio,
-        "total_porcentagem_fundo": total_porcentagem_fundo
+        "total_porcentagem_fundo": total_porcentagem_fundo,
+        "total_investido": total_investido,
+        "rentabilidade_total": rentabilidade_total,
+        "ganhos_totais": ganhos_totais
     }

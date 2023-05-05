@@ -5,7 +5,7 @@ interface IndicadoresProps {
     children: any
 }
 
-export default function Indicadores(props: IndicadoresProps) {
+export default function CardTitle(props: IndicadoresProps) {
     return(
         <div
         className={`flex flex-col h-auto

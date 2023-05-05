@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
-import Indicadores from "../shared/Indicadores";
+import CardTitle from "../shared/Indicadores";
 import BoxIndicador from "../shared/BoxIndicador";
 import { Chip } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -114,7 +114,7 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
 
 function renderizarIndicadores(acao: IAcao) {
   return (
-    <Indicadores titulo="Indicadores Fundamentalistas">
+    <CardTitle titulo="Indicadores Fundamentalistas">
       <BoxIndicador
         valor={`R$${acao?.preco}`}
         indicador="Preço"
@@ -203,7 +203,7 @@ function renderizarIndicadores(acao: IAcao) {
         indicador="CRESC.REC.5A"
         tooltip={TOOLTIP_MSG.CAGR_RECEITA_5A}
       />
-    </Indicadores>
+    </CardTitle>
   );
 }
 
@@ -355,7 +355,7 @@ export default function DetalhesAcoes() {
         </div>
       </div>
       {renderizarIndicadores(acao)}
-      <Indicadores titulo="Histórico de Cotações">
+      <CardTitle titulo="Histórico de Cotações">
         <div className="w-full">
           <ReactECharts
             option={renderChartHistoricoCotacoes(
@@ -364,8 +364,8 @@ export default function DetalhesAcoes() {
             )}
           />
         </div>
-      </Indicadores>
-      <Indicadores titulo="Histórico Pagamento de Dividendo Anuais">
+      </CardTitle>
+      <CardTitle titulo="Histórico Pagamento de Dividendo Anuais">
         <div className="w-full">
           <ReactECharts
             option={renderChartHistoricoPagamento(
@@ -374,15 +374,15 @@ export default function DetalhesAcoes() {
             )}
           />
         </div>
-      </Indicadores>
-      <Indicadores titulo="Histórico de Dividendos do Ano">
+      </CardTitle>
+      <CardTitle titulo="Histórico de Dividendos do Ano">
         <div className="w-full h-[500px] overflow-y-scroll">
           <BasicTable
             columns={dataDividendo.columns}
             rows={dataDividendo.rows}
           />
         </div>
-      </Indicadores>
+      </CardTitle>
     </div>
   );
 }

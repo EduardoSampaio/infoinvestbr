@@ -113,7 +113,7 @@ export default function FundosImoboliariosListar() {
   return (
     <div className="w-full flex">
       <div className="w-full">
-          <GridCustom columns={columns} rows={rows} onRowClick={handleEvent}/>
+          <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} showToolBar={true}/>
       </div>
     </div>
     );

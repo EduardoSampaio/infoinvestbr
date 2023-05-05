@@ -10,4 +10,7 @@ export interface ITotalizacao {
     total_porcentagem_fundo?: number
     total_fundo?: number
     total_acao?: number
+    total_investido?:number
+    rentabilidade_total?:number
+    ganhos_totais?:number
 }

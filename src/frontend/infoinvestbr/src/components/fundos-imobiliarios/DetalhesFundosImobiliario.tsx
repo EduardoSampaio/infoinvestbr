@@ -8,7 +8,7 @@ import * as echarts from "echarts";
 import BasicTable from "../shared/BasicTable";
 import { IAcao } from "@/models/acao.model";
 import { IFundoImobiliario } from "@/models/fundos.model";
-import Indicadores from "../shared/Indicadores";
+import CardTitle from "../shared/Indicadores";
 import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
@@ -127,7 +127,7 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
 
 function renderizarIndicadores(fundo: IFundoImobiliario) {
   return (
-    <Indicadores titulo="Indicadores">
+    <CardTitle titulo="Indicadores">
       <BoxIndicador
         valor={`R$${fundo?.preco}`}
         indicador="Preço"
@@ -201,7 +201,7 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
         indicador="Quantidade de Ativos"
         tooltip={TOOLTIP_MSG.QTD_ATIVOS}
       />
-    </Indicadores>
+    </CardTitle>
   );
 }
 
@@ -284,7 +284,7 @@ export default function DetalhesFundosImobiliario() {
         </div>
       </div>
       {renderizarIndicadores(fundo)}
-      <Indicadores titulo="Histórico de Cotações">
+      <CardTitle titulo="Histórico de Cotações">
         <div className="w-full">
           <ReactECharts
             option={renderChartHistoricoCotacoes(
@@ -293,8 +293,8 @@ export default function DetalhesFundosImobiliario() {
             )}
           />
         </div>
-      </Indicadores>
-      <Indicadores titulo="Histórico Pagamento de Dividendo Mensais">
+      </CardTitle>
+      <CardTitle titulo="Histórico Pagamento de Dividendo Mensais">
         <div className="w-full">
           <ReactECharts
             option={renderChartHistoricoPagamento(
@@ -303,7 +303,7 @@ export default function DetalhesFundosImobiliario() {
             )}
           />
         </div>
-      </Indicadores>
+      </CardTitle>
     </div>
   );
 }
