@@ -5,6 +5,7 @@ from fastapi_cache import JsonCoder
 from fastapi_cache.decorator import cache
 
 from src.core.database import SessionLocal
+from src.core.tipos import EnumTipoCategoria, EnumTipoCategoriaStr
 from src.transacoes.schemas import TransacaoRequestCreateSchema, TransacaoRequestUpdateSchema
 from src.transacoes import service
 from src.core.schemas import Response
@@ -55,5 +56,5 @@ async def get_transacao_by_usuario_id(usuario_id: UUID, db: Session = Depends(ge
 @router.get("/{usuarios_id}/patrimonio")
 # @cache(expire=60, coder=JsonCoder)
 async def get_patrimonio_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
-    patrimonios = service.get_patrimonio_by_usuario(db, usuario_id)
+    patrimonios = service.get_patrimonio_by_usuario_id(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="OK", result=patrimonios)

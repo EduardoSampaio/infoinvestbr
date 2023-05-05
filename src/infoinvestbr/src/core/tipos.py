@@ -19,6 +19,16 @@ class EnumTipoCategoria(Enum):
     FUNDO_IMOBILIARIO = 2
 
 
+class EnumTipoCategoriaStr(str, Enum):
+    """
+    ACAO = 1
+    FUNDO_IMOBILIARIO = 2
+    """
+    ACAO = "ACAO"
+    FUNDO_IMOBILIARIO = "FUNDO_IMOBILIARIO"
+
+
+
 class EnumTipoPagamento(Enum):
     """
     JCP = 1

@@ -15,6 +15,7 @@ export default function useTransacao() {
     const [openNewDialog, setOpenNewDialog] = useState<{ open: boolean, value?: number }>({ open: false })
 
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+    const USER=process.env.NEXT_PUBLIC_USER_ID
 
     const deleteHandle = () => {
         fetch(`${API_HOST}/transacoes/${confirmOpen.value}`, { method: 'DELETE' })
@@ -117,7 +118,7 @@ export default function useTransacao() {
     }
 
     async function onListar() {
-        fetch(`${API_HOST}/transacoes/146dde84-bc5a-4e9a-bcd7-44f221b63cda`)
+        fetch(`${API_HOST}/transacoes/${USER}`)
             .then((data) => data.json())
             .then((json) => setTransacoes(json.result));
     }

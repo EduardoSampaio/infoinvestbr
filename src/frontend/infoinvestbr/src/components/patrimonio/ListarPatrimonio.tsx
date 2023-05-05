@@ -21,6 +21,7 @@ function formatNumberWithArrows(
 
   const valueFormatted = Number(value)?.toLocaleString("pt-BR", {
     maximumFractionDigits: 2,
+    minimumFractionDigits: 2
   });
 
   if (value !== undefined && value >= 0) {
@@ -88,6 +89,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
+        minimumFractionDigits: 2
       })} `;
     },
   },
@@ -104,6 +106,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
+        minimumFractionDigits: 2
       })} `;
     },
   },
@@ -127,6 +130,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
+        minimumFractionDigits: 2
       })} `;
     },
   },
@@ -169,6 +173,7 @@ const columns: GridColDef[] = [
 
       const valueFormatted = Number(params.value).toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
+        minimumFractionDigits: 2
       });
       return `${valueFormatted}%`;
     },
@@ -186,6 +191,7 @@ const columns: GridColDef[] = [
 
       const valueFormatted = Number(params.value).toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
+        minimumFractionDigits: 2
       });
       return `${valueFormatted}%`;
     },
@@ -259,6 +265,7 @@ function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
             R$
             {row.total_acao?.toLocaleString("pt-BR", {
               maximumFractionDigits: 2,
+              minimumFractionDigits: 2
             })}
           </div>
         </div>
@@ -341,6 +348,7 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
             R$
             {row?.total_fundo?.toLocaleString("pt-BR", {
               maximumFractionDigits: 2,
+              minimumFractionDigits: 2
             })}
           </div>
         </div>
@@ -363,8 +371,9 @@ export default function ListaPatrimonio() {
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+      const USER=process.env.NEXT_PUBLIC_USER_ID
       const data = await fetch(
-        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=146dde84-bc5a-4e9a-bcd7-44f221b63cda`
+        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=${USER}`
       );
       return await data.json();
     };

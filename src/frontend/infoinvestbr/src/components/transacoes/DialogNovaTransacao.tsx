@@ -34,6 +34,8 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
   const corretagem = useRef<HTMLInputElement>(null);
   const outros = useRef<HTMLInputElement>(null);
 
+  const USER = process.env.NEXT_PUBLIC_USER_ID;
+
   const handleClose = () => {
     props.setOpenNewDialog({ open: false, value: undefined });
     setCodigo("");
@@ -220,11 +222,10 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
       preco: Number(preco.current?.value),
       ordem: Number(ordem),
       categoria: Number(categoria),
-      usuario_id: "146dde84-bc5a-4e9a-bcd7-44f221b63cda",
+      usuario_id: USER,
       corretagem: Number(corretagem.current?.value),
     };
     props.onSalvar(transacao);
-    console.log(transacao);
     handleClose();
   };
 
