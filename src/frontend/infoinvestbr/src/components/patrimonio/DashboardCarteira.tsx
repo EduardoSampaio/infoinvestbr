@@ -1,116 +1,122 @@
+import { useEffect, useState } from "react";
 import CardTitle from "../shared/Indicadores";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 
-const option: ReactEChartsProps["option"] = {
-  tooltip: {
-    trigger: "item",
-    formatter: (params: any) => `${params?.value}%`,
-  },
-  legend: {
-    top: "5%",
-    left: "center",
-  },
-  series: [
-    {
-      name: "",
-      type: "pie",
-      radius: ["40%", "70%"],
-      avoidLabelOverlap: false,
-      label: {
-        show: true,
-        position: "left",
-      },
-      emphasis: {
+
+function renderChartComposicao(row: any[]):ReactEChartsProps["option"] {
+  return  {
+    tooltip: {
+      trigger: "item",
+      formatter: (params: any) => `${params?.value.toLocaleString('pt-BR', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2
+      })}%`,
+    },
+    legend: {
+      top: "5%",
+      left: "center",
+    },
+    label: {
+      show: true,
+      position: 'center',
+    },
+    series: [
+      {
+        name: "",
+        type: "pie",
+        radius: ["40%", "70%"],
+        avoidLabelOverlap: false,
         label: {
-          show: false,
-          fontSize: 40,
-          fontWeight: "bold",
+          show: true,
+          position: "left",
+        },
+        emphasis: {
+          label: {
+            show: false,
+            fontSize: 40,
+            fontWeight: "bold",
+          },
+        },
+        labelLine: {
+          show: true,
+        },
+        data: row
+      },
+    ],
+  };
+}
+
+function renderChartAtivos(row: any[]): ReactEChartsProps["option"] {
+  return {
+    title: {
+      text: "",
+      subtext: "",
+      left: "center",
+    },
+    tooltip: {
+      trigger: "item",
+      formatter: (params: any) => `${params?.value.toLocaleString('pt-BR', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2
+      })}%`,
+    },
+    legend: {
+      orient: "vertical",
+      left: "left",
+    },
+    series: [
+      {
+        name: "",
+        type: "pie",
+        radius: "50%",
+        data:row,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
         },
       },
-      labelLine: {
-        show: true,
-      },
-      data: [
-        { value: 60, name: "Ações" },
-        { value: 40, name: "Fundos Imobiliários" },
-      ],
-    },
-  ],
-};
-
-const option2: ReactEChartsProps["option"] = {
-  title: {
-    text: "",
-    subtext: "",
-    left: "center",
-  },
-  tooltip: {
-    trigger: "item",
-    formatter: (params: any) => `${params?.value}%`,
-  },
-  legend: {
-    orient: "vertical",
-    left: "left",
-  },
-  series: [
-    {
-      name: "",
-      type: "pie",
-      radius: "50%",
-      data: [
-        { value: 5.26, name: "BBAS3" },
-        { value: 4.81, name: "CMIG4" },
-        { value: 5.38, name: "CPLE6" },
-        { value: 10.68, name: "RANI3" },
-        { value: 7.81, name: "CXSE3" },
-        { value: 7.44, name: "SANB11" },
-        { value: 9.61, name: "TAEE11" },
-        { value: 7.94, name: "TRLP4" },
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: "rgba(0, 0, 0, 0.5)",
-        },
-      },
-    },
-  ],
-};
-
-const option3: ReactEChartsProps["option"] = {
-  xAxis: {
-    type: "category",
-    data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  },
-  yAxis: {
-    type: "value",
-  },
-  series: [
-    {
-      data: [150, 230, 224, 218, 135, 147, 260],
-      type: "line",
-    },
-  ],
-};
+    ],
+  };
+}
 
 export default function DashboardCarteira() {
+  const [row, setRow] = useState<any>({});
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+      const USER = process.env.NEXT_PUBLIC_USER_ID;
+      const data = await fetch(
+        `${API_HOST}/transacoes/{usuarios_id}/composicao?usuario_id=${USER}`
+      );
+      return await data.json();
+    };
+
+    
+    fetchData()
+      .then((json) => {
+        setRow({
+          composicao: json.result.composicao,
+          ativos: json.result.ativos,
+        });
+      })
+      .catch((error) => console.log(error));
+  },[]);
+
   return (
     <div className="w-full px-10">
-      {/* <div className="w-full">
-          <CardTitle titulo="Patrimônio">
-            <ReactECharts option={option3}/>
-          </CardTitle>
-     </div>     */}
-      <div className="w-full flex flex-nowrap">
+      <div className="w-full flex lg:flex-wrap xl:flex-nowrap sm:flex-wrap xs: flex-wrap">
         <div className="w-full mr-5 mb-5">
-          <CardTitle titulo="Composição classe de ativo">
-            <ReactECharts option={option2} />
+          <CardTitle titulo="Composição ativos">
+            <ReactECharts option={renderChartAtivos(row.ativos)} />
           </CardTitle>
         </div>
         <div className="w-full mb-5">
-          <CardTitle titulo="Composição Ativos">
-            <ReactECharts option={option} />
+          <CardTitle titulo="Composição Carteira">
+            <ReactECharts option={renderChartComposicao(row.composicao)} />
           </CardTitle>
         </div>
       </div>

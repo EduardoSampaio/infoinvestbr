@@ -368,7 +368,7 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
 
 
 export default function ListaPatrimonio() {
-  const [row, setRow] = useState<ITotalizacao>({ acoes: [], fundos: [] });
+  const [row, setRow] = useState<any>({ acoes: [], fundos: [] });
 
   useEffect(() => {
     const fetchData = async () => {

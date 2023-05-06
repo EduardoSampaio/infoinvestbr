@@ -1,16 +1,53 @@
-from sqlalchemy import func, text
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from yfinance import Ticker
 from uuid import UUID
 
 from src.transacoes.models import Transacao
 from src.analise.models import Acao, FundosImobiliario
-from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema,\
+from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema, \
     PatrimonioSchemaResponse
 from fastapi import HTTPException, status
 from src.core.tipos import EnumTipoCategoria
 import datetime
 import yfinance as yf
+
+
+def get_chart_composicao(db: Session, usuario_id: UUID):
+    valores = db.query(Transacao.codigo_ativo,
+                       Transacao.categoria,
+                       func.sum(Transacao.total).label("total_investido")) \
+        .distinct(Transacao.codigo_ativo) \
+        .filter(Transacao.usuario_id == usuario_id) \
+        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
+        .all()
+    soma_total = 0.0
+    soma_total_acoes = 0.0
+    soma_total_fundos = 0.0
+    valor_acao = 0.0
+    valor_fundo = 0.0
+    for valor in valores:
+        soma_total += float(valor.total_investido)
+        if valor.categoria == "ACAO":
+            soma_total_acoes += float(valor.total_investido)
+        else:
+            soma_total_fundos += float(valor.total_investido)
+
+    list_ativos = []
+    if soma_total != 0:
+        valor_acao = (soma_total_acoes / soma_total) * 100
+        valor_fundo = (soma_total_fundos / soma_total) * 100
+        for valor in valores:
+            resultado = (float(valor.total_investido) / soma_total) * 100
+            list_ativos.append({"value": resultado, "name": valor.codigo_ativo})
+
+    return {
+        "composicao": [
+            {"value": valor_acao, "name": "Ações"},
+            {"value": valor_fundo, "name": "Fundos Imobiliários"},
+        ],
+        "ativos": list_ativos
+    }
 
 
 def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
@@ -21,7 +58,7 @@ def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
                      (func.sum(Transacao.total) / func.sum(Transacao.quantidade)).label("preco"),
                      func.sum(Transacao.quantidade).label("quantidade"),
                      func.sum(Transacao.total).label("total_investido")) \
-        .distinct(Transacao.codigo_ativo)\
+        .distinct(Transacao.codigo_ativo) \
         .filter(Transacao.usuario_id == usuario_id) \
         .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
         .all()
@@ -59,6 +96,7 @@ def update_transacao(db: Session, transacao: TransacaoRequestUpdateSchema):
     _transacao.preco = transacao.preco
     _transacao.corretora = transacao.corretora
     _transacao.quantidade = transacao.quantidade
+    _transacao.total = transacao.quantidade * transacao.preco
 
     db.commit()
     db.refresh(_transacao)
