@@ -25,7 +25,7 @@ export default function Layout(props: any) {
       </Head>
       <Header />
       <div className="flex w-full">
-        <MenuLateral />
+        {/* <MenuLateral /> */}
         <div className="w-full">{props.children}</div>
       </div>
     </div>

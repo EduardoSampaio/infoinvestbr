@@ -1,28 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-
+import { useRouter } from "next/router";
+import { GoogleLogin } from "@react-oauth/google";
+import jwt_decode from "jwt-decode";
+import useAuth from "@/hooks/useAuth";
 interface LoginProps {
-  changeMode?: () => void
+  changeMode?: () => void;
 }
 
 export default function Login(props: LoginProps) {
+  const {loginGoogle} = useAuth()
+
+
   return (
     <>
       <div className="flex flex-col h-full justify-center">
-        <button
-          type="button"
-          className="flex py-2.5 active:ring-2 border-2 mb-5 justify-center"
-        >
-          <Image
-            className="-mb-2"
-            priority
-            src="/img/google.svg"
-            height="18"
-            width="18"
-            alt="Google Login"
-          />
-          <p className="pl-2 text-gray-700 text-xs">ENTRAR COM O GOOGLE</p>
-        </button>
+        <div className="flex w-full justify-center">
+          <GoogleLogin onSuccess={(response) => loginGoogle?.(response)}  locale="pt-BR" size="large" />
+        </div>
         <div className="mb-6">
           <label
             htmlFor="email"
@@ -64,11 +59,12 @@ export default function Login(props: LoginProps) {
           </button>
         </div>
         <div className="flex mt-5">
-            <button onClick={props.changeMode}
-              className="text-blue-500 active:text-blue-800"
-            >
-              Não tem conta ? Criar uma nova conta
-            </button>
+          <button
+            onClick={props.changeMode}
+            className="text-blue-500 active:text-blue-800"
+          >
+            Não tem conta ? Criar uma nova conta
+          </button>
         </div>
       </div>
     </>

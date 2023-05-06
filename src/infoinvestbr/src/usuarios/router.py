@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, status
 from src.core.database import SessionLocal
 from src.core.schemas import UsuarioRequestSchema, UsuarioResponseSchema, Response
@@ -42,7 +44,7 @@ async def update_usuario(usuario: UsuarioResponseSchema, db: Session = Depends(g
 
 
 @router.delete("/{id}")
-async def remover_usuario(usuario_id: int, db: Session = Depends(get_db)):
+async def remover_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     service.remove_usuario(db, usuario_id=usuario_id)
     return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário removido com sucesso!")\
         .dict(exclude_none=True)
@@ -55,7 +57,7 @@ async def get_usuarios(skip: int = 0, limit: int = 100, db: Session = Depends(ge
 
 
 @router.get("/{id}")
-async def get_usuario_by_id(usuario_id: int, db: Session = Depends(get_db)):
+async def get_usuario_by_id(usuario_id: UUID, db: Session = Depends(get_db)):
     usuario = service.get_usuario_by_id(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="ok", result=usuario).dict(exclude_none=True)
 

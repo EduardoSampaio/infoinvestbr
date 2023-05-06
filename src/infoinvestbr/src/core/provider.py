@@ -4,7 +4,8 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.requests import Request as StarletteRequest
 from src.core.database import SessionLocal
 from src.core.config import settings
-from src.usuarios.utils import create_access_token, create_refresh_token
+from src.core.schemas import UsuarioRequestProviderSchema
+from src.usuarios.utils import create_access_token
 from src.usuarios import service
 from datetime import timedelta
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ google_sso = GoogleSSO(settings.GOOGLE_CLIENT_ID, settings.GOOGLE_CLIENT_SECRET,
 
 router = APIRouter(
     tags=["Auth"],
+    prefix="/api/v1",
     dependencies=[],
     responses={404: {"descrição": "Usuario não encontrado"}},
 )
@@ -31,36 +33,48 @@ def get_db():
 @router.get("/google/login")
 async def google_login():
     """Generate login url and redirect"""
-    return await google_sso.get_login_redirect()
+    redirect = await google_sso.get_login_redirect()
+    location, url = redirect.headers.raw[1]
+    return {
+        "location": url
+    }
 
 
 @router.get("/google/callback")
-async def google_callback(request: StarletteRequest, db: Session = Depends(get_db)):
+async def google_callback(request: StarletteRequest):
     """Process login response from Google and return user info"""
     usuario = await google_sso.verify_and_process(request)
     request.session["usuario"] = dict(usuario)
+    return RedirectResponse(url=f'http://localhost:3000')
 
+
+@router.post("/auth/google")
+async def auth_google_token(usuario: UsuarioRequestProviderSchema, db: Session = Depends(get_db)):
     exist_usuario = service.get_usuario_by_email(db, usuario.email)
     if exist_usuario is None:
-        service.create_usuario_google(db, nome=usuario.display_name, email=usuario.email, imagem=usuario.picture)
+        novo_usuario = service.create_usuario_google(db,
+                                                     nome=usuario.nome,
+                                                     email=usuario.email,
+                                                     imagem=usuario.imagem)
+        return criar_usuario_provider(novo_usuario, usuario)
+    else:
+        return criar_usuario_provider(exist_usuario, usuario)
 
+
+def criar_usuario_provider(exist_usuario, usuario):
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
     access_token = create_access_token(
         data={"sub": usuario.email, "scopes": "openid"},
         expires_delta=access_token_expires,
     )
-
     return {
-        "id": usuario.id,
-        "picture": usuario.picture,
-        "display_name": usuario.display_name,
-        "email": usuario.email,
-        "provider": usuario.provider,
+        "id": exist_usuario.id,
+        "imagem": exist_usuario.imagem,
+        "nome": usuario.nome,
+        "email": exist_usuario.email,
         "access_token": access_token,
-        "refresh_token": create_refresh_token(usuario.email),
         "token_type": "bearer"
     }
-    # return RedirectResponse(url='/')
 
 
 @router.get('/')

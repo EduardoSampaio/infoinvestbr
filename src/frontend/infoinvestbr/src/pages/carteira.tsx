@@ -1,20 +1,20 @@
-import DashboardCarteira from "@/components/patrimonio/DashboardCarteira";
+import ListaPatrimonio from "@/components/patrimonio/ListarPatrimonio";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
-export default function Carteira() {
+export default function Patrimonio() {
   const breadcrumbs: LinkModel[] = [{titulo: 'Home', link: '/'}]
   const currentBreadcrumbs: LinkModel = {titulo: 'Carteira', link: '/carteira'}
   return (
     <Layout>
       <Card
         sizeText="text-sm"
-        titulo=""
-        className=""
+        titulo="Ações"
+        className="flex"
         breadcrumbs={breadcrumbs}
         current={currentBreadcrumbs}
       > 
-      <DashboardCarteira />
+        <ListaPatrimonio />
       </Card>
     </Layout>
   );

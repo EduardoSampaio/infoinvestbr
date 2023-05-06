@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CardTitle from "../shared/Indicadores";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
+import useAuth from "@/hooks/useAuth";
 
 
 function renderChartComposicao(row: any[]):ReactEChartsProps["option"] {
@@ -84,30 +85,32 @@ function renderChartAtivos(row: any[]): ReactEChartsProps["option"] {
 
 export default function DashboardCarteira() {
   const [row, setRow] = useState<any>({});
+  const {usuario, headers} = useAuth()
   
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      const USER = process.env.NEXT_PUBLIC_USER_ID;
       const data = await fetch(
-        `${API_HOST}/transacoes/{usuarios_id}/composicao?usuario_id=${USER}`
+        `${API_HOST}/transacoes/{usuarios_id}/composicao?usuario_id=${usuario?.id}`,
+        {headers:headers}
       );
       return await data.json();
     };
 
-    
-    fetchData()
-      .then((json) => {
-        setRow({
-          composicao: json.result.composicao,
-          ativos: json.result.ativos,
-        });
-      })
-      .catch((error) => console.log(error));
-  },[]);
+    if(usuario?.id) {
+      fetchData()
+        .then((json) => {
+          setRow({
+            composicao: json.result.composicao,
+            ativos: json.result.ativos,
+          });
+        })
+        .catch((error) => console.log(error));
+    }
+  },[usuario?.id]);
 
   return (
-    <div className="w-full px-10">
+    <div className="w-full">
       <div className="w-full flex lg:flex-wrap xl:flex-nowrap sm:flex-wrap xs: flex-wrap">
         <div className="w-full mr-5 mb-5">
           <CardTitle titulo="Composição ativos">

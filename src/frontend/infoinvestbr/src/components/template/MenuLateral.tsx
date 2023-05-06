@@ -13,7 +13,6 @@ export default function MenuLateral(props: MenuLateralProps) {
         <Perfil />
         <ul className="flex flex-col ml-10 text-lg">
           <MenuLateralItem texto="Carteira" url="/carteira" />
-          <MenuLateralItem texto="Patrimônio" url="/patrimonio" />
           <MenuLateralItem texto="Transações" url="/transacao" />
           {/* <MenuLateralItem texto="Proventos" url="/proventos" /> */}
         </ul>

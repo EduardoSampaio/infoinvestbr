@@ -1,5 +1,6 @@
 import { ITransacao } from "@/models/transacao.model";
 import { useEffect, useState } from "react";
+import useAuth from "./useAuth";
 
 interface SnackConfig {
     open: boolean
@@ -13,12 +14,13 @@ export default function useTransacao() {
     const [openSnack, setOpenSnack] = useState<SnackConfig>({ open: false, message: "", type: 'success' });
     const [confirmOpen, setConfirmOpen] = useState<{ open: boolean, value?: number }>({ open: false })
     const [openNewDialog, setOpenNewDialog] = useState<{ open: boolean, value?: number }>({ open: false })
+    const { usuario, headers } = useAuth()
 
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-    const USER=process.env.NEXT_PUBLIC_USER_ID
+    const USER = usuario?.id
 
     const deleteHandle = () => {
-        fetch(`${API_HOST}/transacoes/${confirmOpen.value}`, { method: 'DELETE' })
+        fetch(`${API_HOST}/transacoes/${confirmOpen.value}`, { method: 'DELETE', headers: headers })
             .then(() => {
                 onListar()
                 snackConfig(
@@ -51,20 +53,18 @@ export default function useTransacao() {
     };
 
     async function onEditar(transacao: ITransacao) {
-        try{
+        try {
             const response = await fetch(`${API_HOST}/transacoes`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(transacao)
-                    });
-            const data = await response.json()     
-            if(!response.ok){
+                {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(transacao)
+                });
+            const data = await response.json()
+            if (!response.ok) {
                 throw Error(data.message)
             }
-  
+
             snackConfig(
                 true,
                 data.message,
@@ -72,7 +72,7 @@ export default function useTransacao() {
             )
             onListar()
 
-        }catch(error) {
+        } catch (error) {
             snackConfig(
                 true,
                 `${error}`,
@@ -86,21 +86,19 @@ export default function useTransacao() {
     }
 
     async function onSalvar(transacao: ITransacao) {
-        try{
+        try {
             const response = await fetch(`${API_HOST}/transacoes`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(transacao)
-                    });
+                {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(transacao)
+                });
             const data = await response.json()
 
-            if(!response.ok){
+            if (!response.ok) {
                 throw Error(data.message)
             }
-  
+
             snackConfig(
                 true,
                 data.message,
@@ -108,7 +106,7 @@ export default function useTransacao() {
             )
             onListar()
 
-        }catch(error) {
+        } catch (error) {
             snackConfig(
                 true,
                 `${error}`,
@@ -118,14 +116,16 @@ export default function useTransacao() {
     }
 
     async function onListar() {
-        fetch(`${API_HOST}/transacoes/${USER}`)
-            .then((data) => data.json())
-            .then((json) => setTransacoes(json.result));
+        if(usuario?.id) {
+            fetch(`${API_HOST}/transacoes/${USER}`, {headers: headers})
+                .then((data) => data.json())
+                .then((json) => setTransacoes(json.result));
+        }
     }
 
     useEffect(() => {
         onListar();
-    }, []);
+    }, [usuario?.id]);
 
     return {
         transacoes,

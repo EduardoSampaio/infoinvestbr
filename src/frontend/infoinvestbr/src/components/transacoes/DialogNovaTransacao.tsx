@@ -233,14 +233,13 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
     <div>
       <Button
         variant="outlined"
-        className="mr-10 dark:text-white dark:bg-gray-700"
+        className="dark:text-white dark:bg-gray-700 mr-10"
         onClick={() => props.setOpenNewDialog({ open: true, value: undefined })}
       >
-        <HiOutlinePlus className="text-lg mr-2" />
         Nova Transação
       </Button>
       <Dialog open={props.open} onClose={handleClose} className="w-full">
-        <DialogTitle className="ml-5 font-bold">Nova Transação</DialogTitle>
+        <DialogTitle className="font-bold">Nova Transação</DialogTitle>
         <DialogContent>
           <div className="flex flex-col h-[400px] w-full">
             {renderTextFieldsCompra()}

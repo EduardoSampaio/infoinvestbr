@@ -23,11 +23,11 @@ def get_usuario_by_id(db: Session, usuario_id: int) -> UsuarioResponseSchema:
     return convert_model_to_schema(usuario)
 
 
-def get_usuario_by_email(db: Session, email: str) -> UsuarioResponseSchema:
+def get_usuario_by_email(db: Session, email: str) -> Usuario:
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
     if usuario is None:
         return None
-    return convert_model_to_schema(usuario)
+    return usuario
 
 
 def create_usuario(db: Session, usuario: UsuarioRequestSchema) -> Usuario:

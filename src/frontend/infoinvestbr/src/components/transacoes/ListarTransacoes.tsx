@@ -82,7 +82,7 @@ function createColumns(onEditar: any, onDeletar: any): GridColDef[] {
       field: "preco",
       headerName: "Preco",
       type: "string",
-      width: 80,
+      width: 120,
       editable: false,
       valueFormatter: (params: GridValueFormatterParams<number>) => {
         if (params.value == null) {

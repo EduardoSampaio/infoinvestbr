@@ -84,3 +84,9 @@ class DividendoSchema:
         self.codigo = codigo
         self.data = data
         self.valor = valor
+
+
+class UsuarioRequestProviderSchema(BaseModel):
+    nome: str
+    email: str
+    imagem: Optional[str] = None

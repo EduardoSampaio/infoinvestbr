@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import GridCustom from "../shared/GridCustom";
 import { HiOutlineArrowLongDown, HiOutlineArrowLongUp } from "react-icons/hi2";
 import { ITotalizacao } from "@/models/totalizacao.model";
+import DashboardCarteira from "./DashboardCarteira";
+import useAuth from "@/hooks/useAuth";
 
 function formatNumberWithArrows(
   value?: number,
@@ -369,36 +371,40 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
 
 export default function ListaPatrimonio() {
   const [row, setRow] = useState<any>({ acoes: [], fundos: [] });
+  const {usuario, headers} = useAuth()
 
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      const USER=process.env.NEXT_PUBLIC_USER_ID
       const data = await fetch(
-        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=${USER}`
+        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=${usuario?.id}`,
+        {headers: headers}
       );
       return await data.json();
     };
+    
+    if(usuario?.id){
 
-    fetchData()
-      .then((json) => {
-        setRow({
-          acoes: json.result.acoes,
-          fundos: json.result.fundos,
-          ganho_acoes: json.result.ganho_acoes,
-          ganho_fundo: json.result.ganho_fundo,
-          total_patrimonio: json.result.total_patrimonio,
-          total_porcentagem_acao: json.result.total_porcentagem_acao,
-          total_porcentagem_fundo: json.result.total_porcentagem_fundo,
-          total_acao: json.result.total_acao,
-          total_fundo: json.result.total_fundo,
-          total_investido: json.result.total_investido,
-          rentabilidade_total: json.result.rentabilidade_total,
-          ganhos_totais: json.result.ganhos_totais,
-        });
-      })
-      .catch((error) => console.log(error));
-  }, []);
+      fetchData()
+        .then((json) => {
+          setRow({
+            acoes: json.result.acoes,
+            fundos: json.result.fundos,
+            ganho_acoes: json.result.ganho_acoes,
+            ganho_fundo: json.result.ganho_fundo,
+            total_patrimonio: json.result.total_patrimonio,
+            total_porcentagem_acao: json.result.total_porcentagem_acao,
+            total_porcentagem_fundo: json.result.total_porcentagem_fundo,
+            total_acao: json.result.total_acao,
+            total_fundo: json.result.total_fundo,
+            total_investido: json.result.total_investido,
+            rentabilidade_total: json.result.rentabilidade_total,
+            ganhos_totais: json.result.ganhos_totais,
+          });
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [usuario?.id]);
 
   return (
     <div className="w-full px-5 py-5">
@@ -443,6 +449,7 @@ export default function ListaPatrimonio() {
           </div>
        </div>
       </div>
+      <DashboardCarteira />
       {renderGridsAtivoAcao(row, "Ações")}
       {renderGridsAtivoFundo(row, "Fundos Imobiliários")}
     </div>
