@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CardTitle from "../shared/Indicadores";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import useAuth from "@/data/hooks/useAuth";
+import useFetchApi from "@/data/hooks/useFetchApi";
 
 
 function renderChartComposicao(row: any[]):ReactEChartsProps["option"] {
@@ -85,16 +86,15 @@ function renderChartAtivos(row: any[]): ReactEChartsProps["option"] {
 
 export default function DashboardCarteira() {
   const [row, setRow] = useState<any>({});
-  const {usuario, headers} = useAuth()
+  const {usuario} = useAuth()
+  const {find} = useFetchApi()
   
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      const data = await fetch(
+      return await  find(
         `${API_HOST}/transacoes/{usuarios_id}/composicao?usuario_id=${usuario?.id}`,
-        {headers:headers}
       );
-      return await data.json();
     };
 
     if(usuario?.id) {

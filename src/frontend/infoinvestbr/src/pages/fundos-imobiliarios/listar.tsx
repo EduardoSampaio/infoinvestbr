@@ -1,5 +1,5 @@
 
-import FundosImoboliariosListar from "@/components/fundos-imobiliarios/FundosImoboliariosListar";
+import FundosImobiliariosListar from "@/components/fundos-imobiliarios/FundosImoboliariosListar";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 
@@ -17,7 +17,7 @@ export default function ListarFundosImobiliarios() {
             breadcrumbs={breadcrumbs}
             current={currentBreadcrumbs}
           > 
-            <FundosImoboliariosListar />
+            <FundosImobiliariosListar />
           </Card>
         </Layout>
       );

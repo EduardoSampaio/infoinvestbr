@@ -10,6 +10,7 @@ import BasicTable from "../shared/BasicTable";
 import { TOOLTIP_MSG } from "./tooltip";
 import { IAcao } from "@/models/acao.model";
 import useAuth from "@/data/hooks/useAuth";
+import useFetchApi from "@/data/hooks/useFetchApi";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -288,7 +289,6 @@ function getImage(imagem?: string) {
 
 export default function DetalhesAcoes() {
   const router = useRouter();
-  const {headers} = useAuth();
   const codigo = router.query.codigo?.toString();
   const [acao, setAcao] = useState<IAcao>({});
   const [chartLine, setChartLine] = useState<any>({
@@ -297,55 +297,44 @@ export default function DetalhesAcoes() {
   });
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
 
+  const { find } = useFetchApi();
+
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
     const fetchDataIndicadores = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(`${API_HOST}/analises/acao/${codigo}`, {headers: headers});
-      return await data.json();
+      return await find(`${API_HOST}/analises/acao/${codigo}`);
     };
 
     const fetchDataGrafico = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(
-        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`,
-        {headers: headers}
+      return await find(
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
       );
-      return await data.json();
     };
 
     const fetchDataBarGrafico = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(
-        `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`,
-        {headers: headers}
+      return await find(
+        `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`
       );
-      return await data.json();
     };
 
-    fetchDataIndicadores()
-      .then((json) => setAcao(json.result))
-      .catch();
+    if (codigo !== undefined) {
+      fetchDataIndicadores().then((json) => setAcao(json.result));
 
-    fetchDataGrafico()
-      .then((json) => setChartLine(json.result))
-      .catch();
+      fetchDataGrafico().then((json) => setChartLine(json.result));
 
-    fetchDataBarGrafico()
-      .then((json) => setChartBar(json.result))
-      .catch();
+      fetchDataBarGrafico().then((json) => setChartBar(json.result));
+    }
   }, [router, codigo]);
 
   return (
     <div className="flex flex-wrap m-5">
       <div className="flex flex-row w-full">
-        <Image alt={`detalhes ${codigo}`} src={getImage(acao?.imagem)} width={"50"} height={"50"} />
+        <Image
+          alt={`detalhes ${codigo}`}
+          src={getImage(acao?.imagem)}
+          width={"50"}
+          height={"50"}
+        />
         <div className="w-[500px]">
           <h2 className="text-xl font-semibold ml-2.5">{codigo}</h2>
           <h4 className="text-xs font-semibold ml-2.5">{acao?.nome}</h4>

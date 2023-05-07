@@ -138,8 +138,6 @@ export default function ListarTransacoes(props: any) {
     onEditar,
     onDeletar,
     transacoes,
-    openSnack,
-    handleClose,
     confirmOpen,
     setConfirmOpen,
     deleteHandle,
@@ -159,15 +157,6 @@ export default function ListarTransacoes(props: any) {
         >
           Tem certeza que deseja excluir esta transação?
         </ConfirmDialog>
-        <SnackBarCustom
-          severity={openSnack.type}
-          handleClose={handleClose}
-          openSnack={openSnack.open}
-          variant="filled"
-          vertical="top"
-          horizontal="right"
-          message={openSnack.message}
-        />
       </>
     );
   }

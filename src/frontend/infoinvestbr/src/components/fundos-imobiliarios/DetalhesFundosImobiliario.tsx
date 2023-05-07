@@ -9,6 +9,7 @@ import { IFundoImobiliario } from "@/models/fundos.model";
 import CardTitle from "../shared/Indicadores";
 import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
 import useAuth from "@/data/hooks/useAuth";
+import useFetchApi from "@/data/hooks/useFetchApi";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -157,13 +158,17 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
       />
 
       <BoxIndicador
-        valor={`${fundo?.liquidez_diaria?.toLocaleString('pt-br',{minimumFractionDigits: 0})}`}
+        valor={`${fundo?.liquidez_diaria?.toLocaleString("pt-br", {
+          minimumFractionDigits: 0,
+        })}`}
         indicador="Liquidez Diária"
         tooltip={TOOLTIP_MSG.LIQUIDEZ_DIARIA}
       />
 
       <BoxIndicador
-        valor={`R$ ${(fundo?.patrimonio_liq)?.toLocaleString('pt-br',{minimumFractionDigits: 2})}`}
+        valor={`R$ ${fundo?.patrimonio_liq?.toLocaleString("pt-br", {
+          minimumFractionDigits: 2,
+        })}`}
         indicador="Patrimônio Líquido"
         tooltip={TOOLTIP_MSG.PATRIMONIO_LIQ}
       />
@@ -190,12 +195,12 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
         indicador="Vacância Financeira"
         tooltip={TOOLTIP_MSG.VACANCIA_FIANCEIRA}
       />
-        <BoxIndicador
+      <BoxIndicador
         valor={`${fundo?.vacancia_fisica}%`}
         indicador="Vacância Física"
         tooltip={TOOLTIP_MSG.VACANCIA_FISICA}
       />
-        <BoxIndicador
+      <BoxIndicador
         valor={`${fundo?.quantidade_ativos}`}
         indicador="Quantidade de Ativos"
         tooltip={TOOLTIP_MSG.QTD_ATIVOS}
@@ -207,61 +212,47 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
 export default function DetalhesFundosImobiliario() {
   const router = useRouter();
   const codigo = router.query.codigo?.toString();
-  const {headers} = useAuth();
-
   const [fundo, setFundo] = useState<IFundoImobiliario>({});
   const [chartLine, setChartLine] = useState<any>({
     datas: "",
     fechamento: "",
   });
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
+  const { find } = useFetchApi();
 
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-   
+
     const fetchDataIndicadores = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(
-        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`, {headers: headers}
-      );
-      return await data.json();
+      return await find(
+        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`)
     };
 
     const fetchDataGrafico = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(
-        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=1y&intervalo=1mo`,
-        {headers: headers}
+      return await find(
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=1y&intervalo=1mo`
       );
-      return await data.json();
     };
 
     const fetchDataBarGrafico = async () => {
-      if (codigo === undefined) {
-        return false;
-      }
-      const data = await fetch(
-        `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`,
-        {headers: headers}
+      return await find(
+        `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`
       );
-      return await data.json();
     };
 
-    fetchDataIndicadores()
-      .then((json) => setFundo(json.result))
-      .catch();
+    if (codigo !== undefined) {
+      fetchDataIndicadores()
+        .then((json) => setFundo(json.result))
+        .catch();
 
-    fetchDataGrafico()
-      .then((json) => setChartLine(json.result))
-      .catch();
+      fetchDataGrafico()
+        .then((json) => setChartLine(json.result))
+        .catch();
 
-    fetchDataBarGrafico()
-      .then((json) => setChartBar(json.result))
-      .catch();
+      fetchDataBarGrafico()
+        .then((json) => setChartBar(json.result))
+        .catch();
+    }
   }, [router, codigo]);
 
   return (

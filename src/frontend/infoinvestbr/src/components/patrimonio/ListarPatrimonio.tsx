@@ -1,7 +1,4 @@
-import {
-  GridColDef,
-  GridValueFormatterParams,
-} from "@mui/x-data-grid";
+import { GridColDef, GridValueFormatterParams } from "@mui/x-data-grid";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import GridCustom from "../shared/GridCustom";
@@ -9,6 +6,7 @@ import { HiOutlineArrowLongDown, HiOutlineArrowLongUp } from "react-icons/hi2";
 import { ITotalizacao } from "@/models/totalizacao.model";
 import DashboardCarteira from "./DashboardCarteira";
 import useAuth from "@/data/hooks/useAuth";
+import useFetchApi from "@/data/hooks/useFetchApi";
 
 function formatNumberWithArrows(
   value?: number,
@@ -16,14 +14,13 @@ function formatNumberWithArrows(
   position?: "inicio" | "fim",
   cssIcon?: string
 ) {
-
-  if(value === undefined) {
+  if (value === undefined) {
     return "";
   }
 
   const valueFormatted = Number(value)?.toLocaleString("pt-BR", {
     maximumFractionDigits: 2,
-    minimumFractionDigits: 2
+    minimumFractionDigits: 2,
   });
 
   if (value !== undefined && value >= 0) {
@@ -91,7 +88,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
       })} `;
     },
   },
@@ -108,7 +105,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
       })} `;
     },
   },
@@ -132,7 +129,7 @@ const columns: GridColDef[] = [
 
       return `R$ ${params.value.toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
       })} `;
     },
   },
@@ -175,7 +172,7 @@ const columns: GridColDef[] = [
 
       const valueFormatted = Number(params.value).toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
       });
       return `${valueFormatted}%`;
     },
@@ -193,7 +190,7 @@ const columns: GridColDef[] = [
 
       const valueFormatted = Number(params.value).toLocaleString("pt-BR", {
         maximumFractionDigits: 2,
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
       });
       return `${valueFormatted}%`;
     },
@@ -267,7 +264,7 @@ function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
             R$
             {row.total_acao?.toLocaleString("pt-BR", {
               maximumFractionDigits: 2,
-              minimumFractionDigits: 2
+              minimumFractionDigits: 2,
             })}
           </div>
         </div>
@@ -351,7 +348,7 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
             R$
             {row?.total_fundo?.toLocaleString("pt-BR", {
               maximumFractionDigits: 2,
-              minimumFractionDigits: 2
+              minimumFractionDigits: 2,
             })}
           </div>
         </div>
@@ -368,90 +365,106 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
   );
 }
 
-
 export default function ListaPatrimonio() {
   const [row, setRow] = useState<any>({ acoes: [], fundos: [] });
-  const {usuario, headers} = useAuth()
+  const { usuario, headers } = useAuth();
+  const { find } = useFetchApi();
 
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      const data = await fetch(
-        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=${usuario?.id}`,
-        {headers: headers}
+      return await find(
+        `${API_HOST}/transacoes/{usuarios_id}/patrimonio?usuario_id=${usuario?.id}`
       );
-      return await data.json();
     };
-    
-    if(usuario?.id){
 
+    if (usuario?.id) {
       fetchData()
         .then((json) => {
-          if(json !== undefined && json.result) {
-            setRow({
-              acoes: json.result.acoes,
-              fundos: json.result.fundos,
-              ganho_acoes: json.result.ganho_acoes,
-              ganho_fundo: json.result.ganho_fundo,
-              total_patrimonio: json.result.total_patrimonio,
-              total_porcentagem_acao: json.result.total_porcentagem_acao,
-              total_porcentagem_fundo: json.result.total_porcentagem_fundo,
-              total_acao: json.result.total_acao,
-              total_fundo: json.result.total_fundo,
-              total_investido: json.result.total_investido,
-              rentabilidade_total: json.result.rentabilidade_total,
-              ganhos_totais: json.result.ganhos_totais,
-            });
-          }else{
-            throw Error("Acesso Negado")
-          }
+          setRow({
+            acoes: json.result.acoes,
+            fundos: json.result.fundos,
+            ganho_acoes: json.result.ganho_acoes,
+            ganho_fundo: json.result.ganho_fundo,
+            total_patrimonio: json.result.total_patrimonio,
+            total_porcentagem_acao: json.result.total_porcentagem_acao,
+            total_porcentagem_fundo: json.result.total_porcentagem_fundo,
+            total_acao: json.result.total_acao,
+            total_fundo: json.result.total_fundo,
+            total_investido: json.result.total_investido,
+            rentabilidade_total: json.result.rentabilidade_total,
+            ganhos_totais: json.result.ganhos_totais,
+          });
         })
-        .catch((error) => console.log(error));
     }
   }, [usuario?.id]);
 
   return (
     <div className="w-full px-5 py-5">
       <div className="flex justify-around">
-        <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
-          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+        <div
+          className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}
+        >
           <div className="flex flex-col w-full justify-center items-center">
             <h3 className=" text-gray-400">Total Bruto</h3>
-            <h2 className="font-semibold">R$ {row?.total_patrimonio?.toLocaleString("pt-BR", {
-                  maximumFractionDigits: 2,
-                })}</h2>
+            <h2 className="font-semibold">
+              R${" "}
+              {row?.total_patrimonio?.toLocaleString("pt-BR", {
+                maximumFractionDigits: 2,
+              })}
+            </h2>
           </div>
-       </div>
+        </div>
 
-       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
-          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+        <div
+          className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}
+        >
           <div className="flex flex-col w-full justify-center items-center">
             <h3 className=" text-gray-400">Total Investido</h3>
-            <h2 className="font-semibold">R$ {row?.total_investido?.toLocaleString("pt-BR", {
-              maximumFractionDigits: 2,
-            })}</h2>
+            <h2 className="font-semibold">
+              R${" "}
+              {row?.total_investido?.toLocaleString("pt-BR", {
+                maximumFractionDigits: 2,
+              })}
+            </h2>
           </div>
-       </div>
+        </div>
 
-       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
-          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+        <div
+          className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}
+        >
           <div className="flex flex-col w-full justify-center items-center">
             <h3 className="text-gray-400">Ganhos totais</h3>
-           <div className="flex">
-            {formatNumberWithArrows(row?.ganhos_totais, 'R$', 'inicio', 'mt-0.5')}
+            <div className="flex">
+              {formatNumberWithArrows(
+                row?.ganhos_totais,
+                "R$",
+                "inicio",
+                "mt-0.5"
+              )}
             </div>
           </div>
-       </div>
- 
-       <div className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
-          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}>
+        </div>
+
+        <div
+          className={`flex xl:basis-[22%] lg:basis-[25%] md:basis-[100%] sm:basis-[100%]  min-h-[80px] h-auto
+          border-2 dark:border-gray-600 m-2.5 justify-center items-center`}
+        >
           <div className="flex flex-col w-full justify-center items-center">
             <h3 className=" text-gray-400">Rentabilidade</h3>
             <div className="flex">
-              {formatNumberWithArrows(row?.rentabilidade_total, '%', 'fim', 'mt-0.5')}
+              {formatNumberWithArrows(
+                row?.rentabilidade_total,
+                "%",
+                "fim",
+                "mt-0.5"
+              )}
             </div>
           </div>
-       </div>
+        </div>
       </div>
       <DashboardCarteira />
       {renderGridsAtivoAcao(row, "Ações")}

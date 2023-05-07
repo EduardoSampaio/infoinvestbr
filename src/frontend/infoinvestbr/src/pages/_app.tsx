@@ -6,6 +6,7 @@ import React from "react";
 import { ColorModeContextProvider } from "@/data/context/ThemeContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "@/data/context/AuthContext";
+import NotificationContext, { NotificationProvider } from "@/data/context/NotificationContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [mode, setMode] = React.useState<PaletteMode>("light");
@@ -23,13 +24,15 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <AuthProvider>
-      <ColorModeContextProvider theme={colorMode}>
-        <CssBaseline />
-        <GoogleOAuthProvider clientId={CLIENT_ID !== undefined ? CLIENT_ID : ""}>
-          <Component {...pageProps} />
-        </GoogleOAuthProvider>
-      </ColorModeContextProvider>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <ColorModeContextProvider theme={colorMode}>
+          <CssBaseline />
+          <GoogleOAuthProvider clientId={CLIENT_ID !== undefined ? CLIENT_ID : ""}>
+            <Component {...pageProps} />
+          </GoogleOAuthProvider>
+        </ColorModeContextProvider>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }

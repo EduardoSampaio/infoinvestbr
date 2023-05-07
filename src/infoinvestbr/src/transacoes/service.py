@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, case
 from sqlalchemy.orm import Session
 from yfinance import Ticker
 from uuid import UUID
@@ -16,10 +16,11 @@ import yfinance as yf
 def get_chart_composicao(db: Session, usuario_id: UUID):
     valores = db.query(Transacao.codigo_ativo,
                        Transacao.categoria,
+                       func.sum(Transacao.quantidade).label("quantidade"),
                        func.sum(Transacao.total).label("total_investido")) \
         .distinct(Transacao.codigo_ativo) \
         .filter(Transacao.usuario_id == usuario_id) \
-        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
+        .group_by(Transacao.codigo_ativo, Transacao.categoria) \
         .all()
     soma_total = 0.0
     soma_total_acoes = 0.0
@@ -28,9 +29,9 @@ def get_chart_composicao(db: Session, usuario_id: UUID):
     valor_fundo = 0.0
     for valor in valores:
         soma_total += float(valor.total_investido)
-        if valor.categoria == "ACAO":
+        if valor.categoria == "ACAO" and valor.quantidade != 0:
             soma_total_acoes += float(valor.total_investido)
-        else:
+        elif valor.categoria == "FUNDO_IMOBILIARIO" and valor.quantidade != 0:
             soma_total_fundos += float(valor.total_investido)
 
     list_ativos = []
@@ -55,12 +56,12 @@ def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
                      Transacao.imagem,
                      Transacao.codigo_ativo,
                      Transacao.categoria,
-                     (func.sum(Transacao.total) / func.sum(Transacao.quantidade)).label("preco"),
+                     Transacao.preco,
                      func.sum(Transacao.quantidade).label("quantidade"),
                      func.sum(Transacao.total).label("total_investido")) \
         .distinct(Transacao.codigo_ativo) \
         .filter(Transacao.usuario_id == usuario_id) \
-        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
+        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria, Transacao.preco) \
         .all()
 
     patrimonio = get_patrimonio_by_usuario(query)
@@ -71,12 +72,18 @@ def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema):
     _transacao_db = create_transacao_model(db, transacao)
 
     if _transacao_db.ordem == "VENDA":
-        validar_quantidade_venda(_transacao_db, db, transacao)
+        qtd_total = db.query(func.sum(Transacao.quantidade).label('total')).filter(
+            Transacao.usuario_id == _transacao_db.usuario_id
+            and _transacao_db.codigo_ativo == transacao.codigo_ativo).first()
+        if qtd_total.total is None or qtd_total.total < transacao.quantidade:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Quantidade Indisponível para venda"
+            )
 
     db.add(_transacao_db)
     db.commit()
     db.refresh(_transacao_db)
-
     return _transacao_db
 
 
@@ -150,8 +157,9 @@ def get_patrimonio_by_usuario(query: any) -> list[PatrimonioSchemaResponse]:
 
 def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaResponse:
     ticker = yf.Ticker(f'{valor.codigo_ativo}.SA')
-    variacao_total = calcular_variacao_total(ticker, valor.preco, valor.quantidade)
-    rentabilidade = calcular_rentabilidade(ticker, valor.preco)
+    preco_atual = get_preco_ultimo_fechamento(ticker)
+    variacao_total = calcular_variacao_total(preco_atual, valor.preco, valor.quantidade)
+    rentabilidade = calcular_rentabilidade(preco_atual, valor.preco)
     percentual_ativo = calcular_percentual_ativo(valor, valores)
     percentual_carteira = calcular_percentual_carteira(valor, valores)
 
@@ -159,7 +167,7 @@ def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaRespon
         usuario_id=valor.usuario_id,
         quantidade=valor.quantidade,
         codigo_ativo=valor.codigo_ativo,
-        preco_medio=valor.preco,
+        preco_medio=valor.total_investido / valor.quantidade,
         categoria=get_enum_categoria(valor.categoria),
         total=float(valor.preco) * valor.quantidade,
         rentabilidade=rentabilidade,
@@ -172,26 +180,24 @@ def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaRespon
     )
 
 
-def calcular_rentabilidade(codigo_ativo: Ticker, preco_medio: float) -> float:
+def calcular_rentabilidade(preco_atual: float, preco_medio: float) -> float:
     """
     ROI = [(Preço atual da ação - Preço de compra da ação) / Preço de compra da ação] x 100
-    :param codigo_ativo:
+    :param preco_atual:
     :param preco_medio:
     :return: rentabilidade
     """
-    preco_atual = get_preco_ultimo_fechamento(codigo_ativo)
     return ((float(preco_atual) - float(preco_medio)) / float(preco_medio)) * 100
 
 
-def calcular_variacao_total(codigo_ativo: Ticker, preco_inicial: float, quantidade: int):
+def calcular_variacao_total(preco_atual: float, preco_inicial: float, quantidade: int):
     """
     variacao_total =  (preco_atual - preco_inicial) * quantidade
-    :param codigo_ativo:
+    :param preco_atual:
     :param preco_inicial:
     :param quantidade:
     :return:
     """
-    preco_atual = get_preco_ultimo_fechamento(codigo_ativo)
     variacao_total = (float(preco_atual) - float(preco_inicial)) * quantidade
     return variacao_total
 
@@ -238,13 +244,7 @@ def convert_date_us(datestr: str):
 
 
 def get_preco_ultimo_fechamento(ticker: Ticker) -> float:
-    return ticker.info.get('previousClose')
-
-
-def get_by_codigo_variacao_diaria(ticker: Ticker):
-    fechamento_anterior = ticker.history(period="2d")['Close'][-2]
-    fechamento_atual = ticker.info.get('previousClose')
-    return fechamento_atual, fechamento_anterior
+    return ticker.history(period="1mo").tail(1)['Close'][0]
 
 
 def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
@@ -371,8 +371,8 @@ def create_transacao_model(db, transacao):
 def validar_quantidade_venda(_transacao_db, db, transacao):
     qtd_total = db.query(func.sum(Transacao.quantidade).label('total')).filter(
         Transacao.usuario_id == _transacao_db.usuario_id
-        and _transacao_db.codigo_ativo == transacao.codigo_ativo).first()
-    if qtd_total.total <= transacao.quantidade:
+        and _transacao_db.codigo_ativo == transacao.codigo_ativo).all()
+    if qtd_total is None or qtd_total.total < transacao.quantidade:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Quantidade Indisponível para venda"

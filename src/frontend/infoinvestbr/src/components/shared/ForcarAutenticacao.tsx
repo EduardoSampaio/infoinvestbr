@@ -1,6 +1,5 @@
 import useAuth from "@/data/hooks/useAuth"
 import Image from "next/image"
-import Forbbiden from "./Forbbiden"
 
 export default function ForcarAutenticacao(props: any) {
     const {carregando, usuario} = useAuth()

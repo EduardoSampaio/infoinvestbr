@@ -108,13 +108,6 @@ def get_by_codigo_atual(codigo: str) -> float:
     return cotacao.get('previousClose')
 
 
-def get_by_codigo_variacao_diaria(codigo: str):
-    cotacao = yf.Ticker(f'{codigo}.SA')
-    fechamento_anterior = cotacao.history(period="2d")['Close'][-2]
-    fechamento_atual = cotacao.info.get('previousClose')
-    return fechamento_atual, fechamento_anterior
-
-
 def get_moeda_cotacao():
     request_url = requests.get("https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,ETH-BRL")
     request_url_dic = request_url.json()

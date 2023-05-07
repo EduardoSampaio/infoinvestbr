@@ -68,7 +68,6 @@ export function AuthProvider(props: any) {
         gerenciarCookie(usuario);
         configHeader(usuario);
       }
-      console.log(usuario);
       route.push("/");
     } finally {
       setCarregando(false);

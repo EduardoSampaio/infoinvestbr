@@ -63,6 +63,7 @@ function QuickSearchToolbar() {
 
 
 export default function GridCustom(props: GridCustomProp) {
+  const rows = props.rows !== undefined ? props.rows : []
   return (
     <div className={`w-full p-10 ${props.className}`}>
       <DataGrid
@@ -77,6 +78,7 @@ export default function GridCustom(props: GridCustomProp) {
         {...props}
         className={props.classNameGrid}
         getRowId={(row) => props?.id ? row[props?.id] : row.id}
+        rows={rows}
       />
     </div>
   );

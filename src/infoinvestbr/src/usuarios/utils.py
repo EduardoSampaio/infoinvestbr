@@ -3,10 +3,11 @@ from typing import Optional
 from fastapi import Depends, HTTPException, Request
 from datetime import datetime, timedelta
 from typing import Union, Any
-from  src.core.config import settings
+from src.core.config import settings
+from src.core.database import SessionLocal
 from src.usuarios.exceptions import get_user_exception
 from jose import JWTError, jwt
-
+from src.usuarios import service
 from fastapi.security import (
     OAuth2PasswordBearer,
 )
@@ -24,15 +25,13 @@ async def get_user(request: Request) -> Optional[dict]:
     else:
         raise HTTPException(status_code=403, detail='Could not validate credentials.')
 
-    return None
-
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=60)
+        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt

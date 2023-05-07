@@ -1,6 +1,8 @@
 import { ITransacao } from "@/models/transacao.model";
 import { useEffect, useState } from "react";
 import useAuth from "./useAuth";
+import useFetchApi from "./useFetchApi";
+import useNotification from "./useNotification";
 
 interface SnackConfig {
     open: boolean
@@ -10,7 +12,6 @@ interface SnackConfig {
 
 export default function useTransacao() {
     const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
-    const [open, setOpen] = useState(false);
     const [openSnack, setOpenSnack] = useState<SnackConfig>({ open: false, message: "", type: 'success' });
     const [confirmOpen, setConfirmOpen] = useState<{ open: boolean, value?: number }>({ open: false })
     const [openNewDialog, setOpenNewDialog] = useState<{ open: boolean, value?: number }>({ open: false })
@@ -18,32 +19,19 @@ export default function useTransacao() {
 
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
     const USER = usuario?.id
+    const {save, remove, update, find} = useFetchApi();
+    const {setVisible} = useNotification();
 
     const deleteHandle = () => {
-        fetch(`${API_HOST}/transacoes/${confirmOpen.value}`, { method: 'DELETE', headers: headers })
+        remove(`${API_HOST}/transacoes/${confirmOpen.value}`)
             .then(() => {
                 onListar()
-                snackConfig(
-                    true,
-                    "Transação excluída com sucesso!",
-                    "success"
-                )
+                setVisible?.("Transação excluída com sucesso!",'success')
             })
-            .catch(() => snackConfig(
-                true,
-                "Erro ao excluir uma Transação!",
-                "error"
-            ))
+            .catch(() => {
+                setVisible?.("Erro ao excluir uma Transação!",'error')
+            })
     }
-
-    function snackConfig(open: boolean, message: string, type: 'success' | 'error' | 'info' | 'warning') {
-        setOpenSnack({
-            open,
-            message,
-            type
-        })
-    }
-
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
@@ -53,32 +41,13 @@ export default function useTransacao() {
     };
 
     async function onEditar(transacao: ITransacao) {
-        try {
-            const response = await fetch(`${API_HOST}/transacoes`,
-                {
-                    method: 'PUT',
-                    headers: headers,
-                    body: JSON.stringify(transacao)
-                });
-            const data = await response.json()
-            if (!response.ok) {
-                throw Error(data.message)
-            }
-
-            snackConfig(
-                true,
-                data.message,
-                "success"
-            )
+        update(`${API_HOST}/transacoes`, transacao).then(result => {
+            setVisible?.(`${result.message}`,'success')
             onListar()
 
-        } catch (error) {
-            snackConfig(
-                true,
-                `${error}`,
-                "error"
-            )
-        }
+        }).catch(result => { 
+            setVisible?.( `${result.error}`,'success')
+        })
     }
 
     async function onDeletar(value: number) {
@@ -86,50 +55,22 @@ export default function useTransacao() {
     }
 
     async function onSalvar(transacao: ITransacao) {
-        console.log(transacao)
-        try {
-            const response = await fetch(`${API_HOST}/transacoes`,
-                {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(transacao)
-                });
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw Error(data.message)
-            }
-
-            snackConfig(
-                true,
-                data.message,
-                "success"
-            )
+        save(`${API_HOST}/transacoes`, transacao).then(result => {
+            setVisible?.(`${result.message}`,'success')
             onListar()
 
-        } catch (error) {
-            snackConfig(
-                true,
-                `${error}`,
-                "error"
-            )
-        }
+        }).catch(result => { 
+            setVisible?.( `${result.error}`,'error')
+        })
     }
 
     async function onListar() {
         if(usuario?.id) {
-            fetch(`${API_HOST}/transacoes/${USER}`, {headers: headers})
-                .then((data) => data.json())
+            find(`${API_HOST}/transacoes/${USER}`)
                 .then((json) => {
-                    if(json !== undefined && json.result) {
-                      setTransacoes(json.result)
-                    }else{
-                        snackConfig(
-                            true,
-                            `${json.message}`,
-                            "error"
-                        )
-                    }
+                    setTransacoes(json.result)              
+                }).catch(result => {
+                    setVisible?.( `${result.error}`,'error')
                 });
         }
     }
