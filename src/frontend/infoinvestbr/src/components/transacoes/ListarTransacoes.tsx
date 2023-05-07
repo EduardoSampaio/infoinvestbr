@@ -5,7 +5,7 @@ import {
 } from "@mui/x-data-grid";
 import Image from "next/image";
 import GridCustom from "../shared/GridCustom";
-import useTransacao from "@/hooks/useTransacao";
+import useTransacao from "@/data/hooks/useTransacao";
 import { Button, IconButton } from "@mui/material";
 import DialogEditarTransacao from "./DialogEditarTransacao";
 import SnackBarCustom from "../shared/SnackbarCustom";

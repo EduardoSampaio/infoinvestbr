@@ -1,16 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { GoogleLogin } from "@react-oauth/google";
-import jwt_decode from "jwt-decode";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/data/hooks/useAuth";
 interface LoginProps {
   changeMode?: () => void;
 }
 
 export default function Login(props: LoginProps) {
   const {loginGoogle} = useAuth()
-
 
   return (
     <>

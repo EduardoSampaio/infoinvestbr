@@ -19,7 +19,7 @@
       "@/models/*": ["./src/models/*"],
       "@/components/*": ["./src/components/*"],
       "@/data/*": ["./src/data/*"],
-      "@/hooks/*": ["./src/hooks/*"],
+      "@/hooks/*": ["src/data/hooks/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/shared/GridCustom.tsx"],

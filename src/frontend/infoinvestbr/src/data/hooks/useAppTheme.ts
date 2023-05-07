@@ -1,4 +1,4 @@
-import ColorModeContext from "@/data/ThemeContext";
+import ColorModeContext from "@/data/context/ThemeContext";
 import { useContext } from "react";
 
 

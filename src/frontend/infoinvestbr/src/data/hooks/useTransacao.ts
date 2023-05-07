@@ -119,7 +119,17 @@ export default function useTransacao() {
         if(usuario?.id) {
             fetch(`${API_HOST}/transacoes/${USER}`, {headers: headers})
                 .then((data) => data.json())
-                .then((json) => setTransacoes(json.result));
+                .then((json) => {
+                    if(json !== undefined && json.result) {
+                      setTransacoes(json.result)
+                    }else{
+                        snackConfig(
+                            true,
+                            `${json.message}`,
+                            "error"
+                        )
+                    }
+                });
         }
     }
 

@@ -8,7 +8,7 @@ import GridCustom from "../shared/GridCustom";
 import { HiOutlineArrowLongDown, HiOutlineArrowLongUp } from "react-icons/hi2";
 import { ITotalizacao } from "@/models/totalizacao.model";
 import DashboardCarteira from "./DashboardCarteira";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/data/hooks/useAuth";
 
 function formatNumberWithArrows(
   value?: number,
@@ -387,20 +387,24 @@ export default function ListaPatrimonio() {
 
       fetchData()
         .then((json) => {
-          setRow({
-            acoes: json.result.acoes,
-            fundos: json.result.fundos,
-            ganho_acoes: json.result.ganho_acoes,
-            ganho_fundo: json.result.ganho_fundo,
-            total_patrimonio: json.result.total_patrimonio,
-            total_porcentagem_acao: json.result.total_porcentagem_acao,
-            total_porcentagem_fundo: json.result.total_porcentagem_fundo,
-            total_acao: json.result.total_acao,
-            total_fundo: json.result.total_fundo,
-            total_investido: json.result.total_investido,
-            rentabilidade_total: json.result.rentabilidade_total,
-            ganhos_totais: json.result.ganhos_totais,
-          });
+          if(json !== undefined && json.result) {
+            setRow({
+              acoes: json.result.acoes,
+              fundos: json.result.fundos,
+              ganho_acoes: json.result.ganho_acoes,
+              ganho_fundo: json.result.ganho_fundo,
+              total_patrimonio: json.result.total_patrimonio,
+              total_porcentagem_acao: json.result.total_porcentagem_acao,
+              total_porcentagem_fundo: json.result.total_porcentagem_fundo,
+              total_acao: json.result.total_acao,
+              total_fundo: json.result.total_fundo,
+              total_investido: json.result.total_investido,
+              rentabilidade_total: json.result.rentabilidade_total,
+              ganhos_totais: json.result.ganhos_totais,
+            });
+          }else{
+            throw Error("Acesso Negado")
+          }
         })
         .catch((error) => console.log(error));
     }

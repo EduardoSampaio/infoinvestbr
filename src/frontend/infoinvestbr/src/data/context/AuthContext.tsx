@@ -1,17 +1,25 @@
 import { Usuario } from "@/models/usuario.model";
-import { useRouter } from "next/router";
-import { createContext, useEffect, useState } from "react";
+import { NextRouter, useRouter } from "next/router";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from "react";
 import Cookies from "js-cookie";
 import jwt_decode from "jwt-decode";
 
 interface AuthContextProps {
   usuario?: Usuario;
   carregando?: boolean;
+  mudarStatusCarregando?: (valor: boolean) => void;
   cadastrar?: (email: string, senha: string) => Promise<void>;
   login?: (email: string, senha: string) => Promise<void>;
   loginGoogle?: (response: any) => void;
   logout?: () => Promise<void>;
-  headers?: any
+  route?: NextRouter;
+  headers?: any;
 }
 
 const AuthContext = createContext<AuthContextProps>({});
@@ -58,9 +66,9 @@ export function AuthProvider(props: any) {
         usuario.is_authenticated = true;
         setUsuario(usuario);
         gerenciarCookie(usuario);
-        configHeader(usuario)
+        configHeader(usuario);
       }
-
+      console.log(usuario);
       route.push("/");
     } finally {
       setCarregando(false);
@@ -68,11 +76,11 @@ export function AuthProvider(props: any) {
   }
 
   async function configHeader(usuario: Usuario) {
-    const headers =  {
+    const headers = {
       Authorization: `Bearer ${usuario.access_token}`,
       Accept: "application/json",
     };
-    setHeaders(headers)
+    setHeaders(headers);
   }
 
   async function logout() {
@@ -92,11 +100,15 @@ export function AuthProvider(props: any) {
     if (cookie !== undefined) {
       const usuarioLogado: Usuario = JSON.parse(cookie);
       setUsuario(usuarioLogado);
-      configHeader(usuarioLogado)
+      configHeader(usuarioLogado);
     } else {
       route.push("/login");
     }
   }, []);
+
+  function mudarStatusCarregando(valor: boolean) {
+    setCarregando(valor);
+  }
 
   return (
     <AuthContext.Provider
@@ -104,8 +116,10 @@ export function AuthProvider(props: any) {
         usuario,
         carregando,
         loginGoogle,
+        mudarStatusCarregando,
         logout,
-        headers
+        headers,
+        route
       }}
     >
       {props.children}

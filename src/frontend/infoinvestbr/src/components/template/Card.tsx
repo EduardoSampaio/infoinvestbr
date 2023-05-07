@@ -1,6 +1,6 @@
 import Image from "next/image";
 import BasicBreadcrumbs from "../shared/BasicBreadcrumbs";
-import useAppTheme from "@/hooks/useAppTheme";
+import useAppTheme from "@/data/hooks/useAppTheme";
 import IconButton from "@mui/material/IconButton";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";

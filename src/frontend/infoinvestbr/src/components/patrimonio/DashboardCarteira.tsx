@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CardTitle from "../shared/Indicadores";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/data/hooks/useAuth";
 
 
 function renderChartComposicao(row: any[]):ReactEChartsProps["option"] {

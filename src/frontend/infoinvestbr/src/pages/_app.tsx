@@ -3,9 +3,9 @@ import type { AppProps } from "next/app";
 import CssBaseline from "@mui/material/CssBaseline";
 import { PaletteMode } from "@mui/material";
 import React from "react";
-import { ColorModeContextProvider } from "@/data/ThemeContext";
+import { ColorModeContextProvider } from "@/data/context/ThemeContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { AuthProvider } from "@/data/AuthContext";
+import { AuthProvider } from "@/data/context/AuthContext";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [mode, setMode] = React.useState<PaletteMode>("light");

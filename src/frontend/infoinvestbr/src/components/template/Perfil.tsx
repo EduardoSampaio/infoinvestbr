@@ -1,4 +1,4 @@
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/data/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
 import { HiOutlineLogout } from "react-icons/hi";

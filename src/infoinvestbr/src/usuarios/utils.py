@@ -51,11 +51,10 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) ->
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.ALGORITHM)
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
         username: str = payload.get("sub")
-        user_id: int = payload.get("id")
-        if username is None or user_id is None:
+        if username is None:
             raise HTTPException(status_code=404, detail="User not found")
-        return {"username": username, "id": user_id}
+        return {"username": username}
     except JWTError:
         raise get_user_exception()
