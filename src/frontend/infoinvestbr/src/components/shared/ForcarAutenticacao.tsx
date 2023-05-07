@@ -19,13 +19,14 @@ export default function ForcarAutenticacao(props: any) {
             </div>
         )
     }
-    
     if(!carregando && usuario?.is_authenticated) {
         return renderizarConteudo()
+    }else if(carregando){
+        return renderizarCarregando();
     }else{
-        // if (typeof window !== "undefined") {
-        //     document.location.href = "/login"
-        // }
-        return (<Forbbiden />);
+        if (typeof window !== "undefined") {
+            document.location.href = "/login"
+        }
+        return null;
     }
 }

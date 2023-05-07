@@ -1,6 +1,9 @@
+import useAuth from "@/data/hooks/useAuth";
 import { useEffect } from "react";
 
 export default function Forbbiden() {
+  const { carregando, usuario } = useAuth();
+
   useEffect(() => {
     function redirect() {
       if (typeof window !== "undefined") {

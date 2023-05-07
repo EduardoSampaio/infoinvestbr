@@ -96,13 +96,16 @@ export function AuthProvider(props: any) {
   }
 
   useEffect(() => {
+    setCarregando(true)
     const cookie = Cookies.get("infoinvest-auth");
     if (cookie !== undefined) {
       const usuarioLogado: Usuario = JSON.parse(cookie);
       setUsuario(usuarioLogado);
       configHeader(usuarioLogado);
+      setCarregando(false)
     } else {
       route.push("/login");
+      setCarregando(false)
     }
   }, []);
 
