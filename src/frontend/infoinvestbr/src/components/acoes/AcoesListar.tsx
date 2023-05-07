@@ -10,6 +10,7 @@ import GridCustom from "../shared/GridCustom";
 import { useEffect, useState } from "react";
 import { IAcao } from "@/models/acao.model";
 import Image from "next/image";
+import useAuth from "@/data/hooks/useAuth";
 
 
 const columns: GridColDef[] = [
@@ -86,6 +87,7 @@ const columns: GridColDef[] = [
 
 export default function AcoesListar() {
   const router = useRouter();
+  const {headers} = useAuth();
   const handleEvent: GridEventListener<"rowClick"> = (
     params, // GridRowParams
     event, // MuiEvent<React.MouseEvent<HTMLElement>>
@@ -98,7 +100,7 @@ export default function AcoesListar() {
   
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-    fetch(`${API_HOST}/analises/acao?skip=0&limit=500`)
+    fetch(`${API_HOST}/analises/acao?skip=0&limit=500`, {headers: headers})
     .then(response => response.json())
     .then(data => setRows(data.result));
   }, []);

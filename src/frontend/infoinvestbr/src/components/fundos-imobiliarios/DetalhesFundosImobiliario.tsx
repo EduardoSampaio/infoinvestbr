@@ -8,6 +8,7 @@ import * as echarts from "echarts";
 import { IFundoImobiliario } from "@/models/fundos.model";
 import CardTitle from "../shared/Indicadores";
 import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
+import useAuth from "@/data/hooks/useAuth";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -206,6 +207,7 @@ function renderizarIndicadores(fundo: IFundoImobiliario) {
 export default function DetalhesFundosImobiliario() {
   const router = useRouter();
   const codigo = router.query.codigo?.toString();
+  const {headers} = useAuth();
 
   const [fundo, setFundo] = useState<IFundoImobiliario>({});
   const [chartLine, setChartLine] = useState<any>({
@@ -216,13 +218,13 @@ export default function DetalhesFundosImobiliario() {
 
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-
+   
     const fetchDataIndicadores = async () => {
       if (codigo === undefined) {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`
+        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`, {headers: headers}
       );
       return await data.json();
     };
@@ -232,7 +234,8 @@ export default function DetalhesFundosImobiliario() {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=1y&intervalo=1mo`
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=1y&intervalo=1mo`,
+        {headers: headers}
       );
       return await data.json();
     };
@@ -242,7 +245,8 @@ export default function DetalhesFundosImobiliario() {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`
+        `${API_HOST}/cotacao/historico/dividendos-mensal/${codigo}`,
+        {headers: headers}
       );
       return await data.json();
     };

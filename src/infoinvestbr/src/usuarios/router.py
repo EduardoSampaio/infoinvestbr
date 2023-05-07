@@ -29,23 +29,22 @@ def get_db():
         db.close()
 
 
-@router.post("/")
-async def create_usuario(usuario: UsuarioRequestSchema, db: Session = Depends(get_db),
-                         dependencies=[Depends(get_current_user)]):
+@router.post("/", dependencies=[Depends(get_current_user)])
+async def create_usuario(usuario: UsuarioRequestSchema, db: Session = Depends(get_db),):
     service.create_usuario(db, usuario)
     return Response(code=status.HTTP_201_CREATED, status="created", message="Usuário criado com sucesso!")\
         .dict(exclude_none=True)
 
 
-@router.put("/")
-async def update_usuario(usuario: UsuarioResponseSchema, db: Session = Depends(get_db), dependencies=[Depends(get_current_user)]):
+@router.put("/", dependencies=[Depends(get_current_user)])
+async def update_usuario(usuario: UsuarioResponseSchema, db: Session = Depends(get_db)):
     service.update_usuario(db, usuario)
     return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário atualizado com sucesso!")\
         .dict(exclude_none=True)
 
 
-@router.delete("/{id}")
-async def remover_usuario(usuario_id: UUID, db: Session = Depends(get_db), dependencies=[Depends(get_current_user)]):
+@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+async def remover_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     service.remove_usuario(db, usuario_id=usuario_id)
     return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário removido com sucesso!")\
         .dict(exclude_none=True)

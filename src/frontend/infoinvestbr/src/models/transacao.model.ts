@@ -11,4 +11,5 @@ export interface ITransacao {
     quantidade?: number
     total?: number
     corretagem?: number
+    outro?:number
 }

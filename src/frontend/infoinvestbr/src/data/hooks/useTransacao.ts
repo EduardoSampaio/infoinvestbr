@@ -86,6 +86,7 @@ export default function useTransacao() {
     }
 
     async function onSalvar(transacao: ITransacao) {
+        console.log(transacao)
         try {
             const response = await fetch(`${API_HOST}/transacoes`,
                 {

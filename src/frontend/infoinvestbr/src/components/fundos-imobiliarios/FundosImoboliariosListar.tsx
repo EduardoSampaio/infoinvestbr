@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import GridCustom from "../shared/GridCustom";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import useAuth from "@/data/hooks/useAuth";
 
 const columns: GridColDef[] = [
   {
@@ -87,6 +88,7 @@ const columns: GridColDef[] = [
 
 export default function FundosImoboliariosListar() {
   const router =useRouter();
+  const {headers} = useAuth();
   const handleEvent: GridEventListener<'rowClick'> = (
     params, // GridRowParams
     event, // MuiEvent<React.MouseEvent<HTMLElement>>
@@ -101,7 +103,7 @@ export default function FundosImoboliariosListar() {
   useEffect(() => { 
   const fetchData = async () => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-    const data = await fetch(`${API_HOST}/analises/fundos-imobiliarios?skip=0&limit=500`);
+    const data = await fetch(`${API_HOST}/analises/fundos-imobiliarios?skip=0&limit=500`,{headers: headers});
     return await data.json();
   }
   

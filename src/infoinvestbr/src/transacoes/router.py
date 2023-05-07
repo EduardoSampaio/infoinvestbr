@@ -28,23 +28,21 @@ def get_db():
         db.close()
 
 
-@router.post("/",  dependencies=[Depends(get_current_user)])
-async def create(transacao_request: TransacaoRequestCreateSchema, db: Session = Depends(get_db),
-                 usuario=Depends(get_current_user)):
+@router.post("/", dependencies=[Depends(get_current_user)])
+async def create(transacao_request: TransacaoRequestCreateSchema, db: Session = Depends(get_db)):
     response = service.create_transacao(db, transacao_request)
     return Response(code=status.HTTP_201_CREATED, status="Created", message="Transação criada com sucesso!",
                     result=response)
 
 
-@router.delete("/{transacao_id}",  dependencies=[Depends(get_current_user)])
-async def remove_by_usuario_id(transacao_id: int, db: Session = Depends(get_db), usuario=Depends(get_current_user)):
+@router.delete("/{transacao_id}", dependencies=[Depends(get_current_user)])
+async def remove_by_usuario_id(transacao_id: int, db: Session = Depends(get_db)):
     service.remover_transacao(db, transacao_id)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content", message="Transação removida com sucesso!")
 
 
-@router.put("/",  dependencies=[Depends(get_current_user)])
-async def update(transacao: TransacaoRequestUpdateSchema, db: Session = Depends(get_db),
-                 usuario=Depends(get_current_user)):
+@router.put("/", dependencies=[Depends(get_current_user)])
+async def update(transacao: TransacaoRequestUpdateSchema, db: Session = Depends(get_db)):
     service.update_transacao(db, transacao)
     return Response(code=status.HTTP_204_NO_CONTENT, status="No Content", message="Transação atualizada com sucesso!")
 

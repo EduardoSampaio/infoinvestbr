@@ -1,5 +1,5 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
+import Button from "../shared/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -9,10 +9,10 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useRef, useState } from "react";
-import { HiOutlinePlus } from "react-icons/hi";
 import { ITransacao } from "@/models/transacao.model";
 import { Autocomplete, InputAdornment, MenuItem } from "@mui/material";
 import { CORRETORAS, ACAO_TICKER, FUNDOS_TICKER } from "../shared/autocomplete";
+import useAuth from "@/data/hooks/useAuth";
 interface FormDialogProps {
   onSalvar: (transacao: ITransacao) => void;
   open: boolean;
@@ -34,7 +34,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
   const corretagem = useRef<HTMLInputElement>(null);
   const outros = useRef<HTMLInputElement>(null);
 
-  const USER = process.env.NEXT_PUBLIC_USER_ID;
+  const {usuario} = useAuth()
 
   const handleClose = () => {
     props.setOpenNewDialog({ open: false, value: undefined });
@@ -74,8 +74,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
 
   function renderTextFieldsCompra() {
     return (
-      <div className="flex flex-wrap mt-5">
-        <form>
+      <div className="flex flex-col mt-5">
           <div className="flex w-full">
             <TextField
               id="ordem"
@@ -112,7 +111,8 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               id="categoria"
               label="Categoria"
               variant="outlined"
-              className="ml-5 basis-full"
+              className="basis-full"
+              style={{marginRight:"20px"}}
               select
               required
               value={categoria}
@@ -129,7 +129,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Data Operação"
-                className="ml-5 basis-full"
+                className="basis-full"
                 format="DD/MM/YYYY"
                 inputRef={data}
               />
@@ -139,7 +139,8 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
             <Autocomplete
               id="ativo"
               options={carregarAtivo}
-              className="ml-5 basis-full"
+              className="basis-full"
+              style={{marginRight:"20px"}}
               renderInput={(params) => (
                 <TextField {...params} label="Ativos" value={codigo} required />
               )}
@@ -153,6 +154,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               label="Preço"
               variant="outlined"
               className="ml-5 basis-full"
+              style={{marginRight:"20px"}}
               required
               type="number"
               inputRef={preco}
@@ -167,7 +169,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               label="Quantidade"
               variant="outlined"
               type="number"
-              className="ml-5 basis-full"
+              className="basis-full"
               required
               InputLabelProps={{
                 shrink: true,
@@ -183,6 +185,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               variant="outlined"
               type="number"
               className="ml-5 basis-full"
+              style={{marginRight:"20px"}}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -202,13 +205,12 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               onChange={() => calcularTotal()}
             />
           </div>
-          <div className=" w-full h-10 m-5">
+          <div className=" w-full h-10 mt-5">
             <span className="font-bold">
-              Total {ordem === "1" ? "Compra" : "Venda"}: R${" "}
+              Total R$
               {total.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}
             </span>
           </div>
-        </form>
       </div>
     );
   }
@@ -222,39 +224,35 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
       preco: Number(preco.current?.value),
       ordem: Number(ordem),
       categoria: Number(categoria),
-      usuario_id: USER,
+      usuario_id: usuario?.id,
       corretagem: Number(corretagem.current?.value),
+      outro: Number(outros.current?.value),
     };
     props.onSalvar(transacao);
     handleClose();
   };
 
   return (
-    <div>
+    <div className="flex w-full justify-end mr-10">
       <Button
-        variant="outlined"
-        className="dark:text-white dark:bg-gray-700 mr-10"
+        className="dark:text-white dark:bg-gray-700 bg-gray-500 hover:bg-gray-400"
         onClick={() => props.setOpenNewDialog({ open: true, value: undefined })}
       >
         Nova Transação
       </Button>
-      <Dialog open={props.open} onClose={handleClose} className="w-full">
+      <Dialog open={props.open} onClose={handleClose}>
         <DialogTitle className="font-bold">Nova Transação</DialogTitle>
         <DialogContent>
-          <div className="flex flex-col h-[400px] w-full">
             {renderTextFieldsCompra()}
-          </div>
         </DialogContent>
-        <DialogActions className="flex w-full justify-center mb-10">
-          <div className="p-1">
+        <DialogActions>
+        <div className="w-full flex justify-center mb-10">
             <Button
               onClick={handleClose}
-              className="bg-gray-600 hover:bg-gray-800 text-white"
+              className="bg-gray-600 hover:bg-gray-800 text-white mr-10"
             >
               Cancelar
             </Button>
-          </div>
-          <div className="p-1">
             <Button
               className="bg-green-600 hover:bg-green-700 text-white"
               onClick={submit}
@@ -262,7 +260,7 @@ export default function DialogNovaTransacao(props: FormDialogProps) {
               Salvar
             </Button>
           </div>
-        </DialogActions>
+          </DialogActions>
       </Dialog>
     </div>
   );

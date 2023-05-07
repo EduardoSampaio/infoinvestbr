@@ -1,5 +1,5 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
+import Button from '../shared/Button';
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -36,14 +36,15 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
 
   function renderTextFields() {
     return (
-      <>
-        <div>
+      <div className="mt-5">
+        <div className="flex flex-nowrap mb-5">
           <TextField
             disabled
             id="ativo"
             label="Ativo"
             variant="outlined"
-            className="m-5"
+            className="basis-full"
+            style={{marginRight:"10px"}}
             defaultValue={props.transacao.codigo_ativo}
             contentEditable={false}
             aria-readonly={true}
@@ -56,7 +57,7 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             id="categoria"
             label="Categoria"
             variant="outlined"
-            className="m-5"
+            className="basis-full"
             value={props.transacao.categoria}
             contentEditable={false}
             aria-readonly={true}
@@ -64,12 +65,15 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
               readOnly: true,
             }}
           />
+          </div>
+          <div className="flex flex-nowrap mb-5">
           <TextField
             disabled
             id="ordem"
             label="Ordem"
             variant="outlined"
-            className="m-5"
+            className="basis-full"
+            style={{marginRight:"10px"}}
             value={props.transacao.ordem}
             contentEditable={false}
             aria-readonly={true}
@@ -82,7 +86,7 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             id="corretora"
             label="Corretora"
             variant="outlined"
-            className="m-5"
+            className="basis-full"
             defaultValue={props.transacao.corretora}
             required
             inputRef={corretora}
@@ -93,12 +97,12 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             }}
           />
         </div>
-        <div>
+        <div className="flex flex-nowrap">
           <TextField
             id="preco"
             label="Preço"
             variant="outlined"
-            className="m-5"
+            className="basis-full"
             defaultValue={props.transacao.preco}
             required
             type="number"
@@ -109,7 +113,8 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
             label="Quantidade"
             variant="outlined"
             type="number"
-            className="m-5"
+            className="basis-full"
+            style={{marginLeft: "10px", marginRight:"10px"}}
             defaultValue={props.transacao.quantidade}
             required
             InputLabelProps={{
@@ -120,14 +125,14 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="Data Operação"
-              className="ml-5 mt-5 w-[40%]"
+              className="basis-full"
               defaultValue={dayjs(props.transacao.data)}
               format="DD/MM/YYYY"
               inputRef={data}
             />
           </LocalizationProvider>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -152,20 +157,18 @@ export default function DialogEditarTransacao(props: FormDialogProps) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Editar Transação</DialogTitle>
         <DialogContent>
-          <div className="flex flex-col h-[400px]">
+          <div className="flex flex-col h-[250px]">
             {renderTextFields()}
           </div>
         </DialogContent>
-        <DialogActions className="flex w-full justify-center mb-10">
-          <div className="p-1">
+        <DialogActions className="flex w-full justify-center items-center mb-10">
+          <div className="w-full flex justify-center">
             <Button
               onClick={handleClose}
-              className="bg-gray-600 hover:bg-gray-800 text-white"
+              className="bg-gray-600 hover:bg-gray-800 text-white mr-10"
             >
               Cancelar
             </Button>
-          </div>
-          <div className="p-1">
             <Button
               className="bg-green-600 hover:bg-green-700 text-white"
               onClick={submit}

@@ -9,6 +9,7 @@ import * as echarts from "echarts";
 import BasicTable from "../shared/BasicTable";
 import { TOOLTIP_MSG } from "./tooltip";
 import { IAcao } from "@/models/acao.model";
+import useAuth from "@/data/hooks/useAuth";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -287,6 +288,7 @@ function getImage(imagem?: string) {
 
 export default function DetalhesAcoes() {
   const router = useRouter();
+  const {headers} = useAuth();
   const codigo = router.query.codigo?.toString();
   const [acao, setAcao] = useState<IAcao>({});
   const [chartLine, setChartLine] = useState<any>({
@@ -301,7 +303,7 @@ export default function DetalhesAcoes() {
       if (codigo === undefined) {
         return false;
       }
-      const data = await fetch(`${API_HOST}/analises/acao/${codigo}`);
+      const data = await fetch(`${API_HOST}/analises/acao/${codigo}`, {headers: headers});
       return await data.json();
     };
 
@@ -310,7 +312,8 @@ export default function DetalhesAcoes() {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`
+        `${API_HOST}/cotacao/codigo-ativo/${codigo}/chart?periodo=10y&intervalo=1mo`,
+        {headers: headers}
       );
       return await data.json();
     };
@@ -320,7 +323,8 @@ export default function DetalhesAcoes() {
         return false;
       }
       const data = await fetch(
-        `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`
+        `${API_HOST}/cotacao/historico/dividendos-anual/${codigo}`,
+        {headers: headers}
       );
       return await data.json();
     };

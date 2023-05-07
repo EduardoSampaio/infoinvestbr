@@ -77,8 +77,8 @@ export function AuthProvider(props: any) {
 
   async function configHeader(usuario: Usuario) {
     const headers = {
-      Authorization: `Bearer ${usuario.access_token}`,
-      Accept: "application/json",
+      "Authorization": `Bearer ${usuario.access_token}`,
+      "Content-Type": "application/json",
     };
     setHeaders(headers);
   }

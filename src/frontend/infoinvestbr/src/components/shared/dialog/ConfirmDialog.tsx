@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Button from './Button';
+import Button from '../Button';
 import Dialog from './Dialog';
 import { AiOutlineWarning } from "react-icons/ai";
 
