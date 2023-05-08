@@ -1,11 +1,11 @@
-from sqlalchemy import func, case
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from yfinance import Ticker
 from uuid import UUID
 
 from src.transacoes.models import Transacao
 from src.analise.models import Acao, FundosImobiliario
-from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema, \
+from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema,\
     PatrimonioSchemaResponse
 from fastapi import HTTPException, status
 from src.core.tipos import EnumTipoCategoria
@@ -51,17 +51,23 @@ def get_chart_composicao(db: Session, usuario_id: UUID):
     }
 
 
+def calcular_preco_medio(total, quantidade):
+    if quantidade == 0:
+        return total
+    else:
+        return total / quantidade
+
+
 def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
     query = db.query(Transacao.usuario_id,
                      Transacao.imagem,
                      Transacao.codigo_ativo,
                      Transacao.categoria,
-                     Transacao.preco,
                      func.sum(Transacao.quantidade).label("quantidade"),
                      func.sum(Transacao.total).label("total_investido")) \
         .distinct(Transacao.codigo_ativo) \
         .filter(Transacao.usuario_id == usuario_id) \
-        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria, Transacao.preco) \
+        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
         .all()
 
     patrimonio = get_patrimonio_by_usuario(query)
@@ -146,9 +152,9 @@ def get_patrimonio_by_usuario(query: any) -> list[PatrimonioSchemaResponse]:
     list_valores_acao = []
     list_valores_fundos = []
     for valor in query:
-        if valor.categoria == 'ACAO':
+        if valor.categoria == 'ACAO' and valor.quantidade != 0:
             list_valores_acao.append(convert_patrimonio_schema(valor, query))
-        else:
+        elif valor.categoria == 'FUNDO_IMOBILIARIO' and valor.quantidade != 0:
             list_valores_fundos.append(convert_patrimonio_schema(valor, query))
 
     obj = totalizacao(list_valores_acao, list_valores_fundos)
@@ -158,18 +164,18 @@ def get_patrimonio_by_usuario(query: any) -> list[PatrimonioSchemaResponse]:
 def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaResponse:
     ticker = yf.Ticker(f'{valor.codigo_ativo}.SA')
     preco_atual = get_preco_ultimo_fechamento(ticker)
-    variacao_total = calcular_variacao_total(preco_atual, valor.preco, valor.quantidade)
-    rentabilidade = calcular_rentabilidade(preco_atual, valor.preco)
+    preco_medio = float(valor.total_investido) / valor.quantidade
+    variacao_total = calcular_variacao_total(preco_atual, preco_medio, valor.quantidade)
+    rentabilidade = calcular_rentabilidade(preco_atual, preco_medio)
     percentual_ativo = calcular_percentual_ativo(valor, valores)
     percentual_carteira = calcular_percentual_carteira(valor, valores)
 
     return PatrimonioSchemaResponse(
-        usuario_id=valor.usuario_id,
         quantidade=valor.quantidade,
         codigo_ativo=valor.codigo_ativo,
-        preco_medio=valor.total_investido / valor.quantidade,
+        preco_medio=preco_medio,
         categoria=get_enum_categoria(valor.categoria),
-        total=float(valor.preco) * valor.quantidade,
+        total=valor.total_investido,
         rentabilidade=rentabilidade,
         variacao_total=variacao_total,
         percentual_ativo=percentual_ativo,
@@ -213,10 +219,10 @@ def calcular_percentual_ativo(valor: any, valores: []):
     percentual = 0.0
     for model in valores:
         if model.categoria == valor.categoria:
-            soma_ativos += float(model.quantidade) * float(model.preco)
+            soma_ativos += float(model.total_investido)
 
     if soma_ativos != 0:
-        percentual = (float(valor.quantidade) * float(valor.preco)) / float(soma_ativos) * 100
+        percentual = (float(valor.total_investido) / float(soma_ativos)) * 100
     return percentual
 
 
@@ -230,10 +236,10 @@ def calcular_percentual_carteira(valor: any, valores: []):
     soma_ativos = 0.0
     percentual = 0.0
     for model in valores:
-        soma_ativos += float(model.quantidade) * float(model.preco)
+        soma_ativos += float(model.total_investido)
 
     if soma_ativos != 0:
-        percentual = (float(valor.quantidade) * float(valor.preco)) / float(soma_ativos) * 100
+        percentual = (float(valor.total_investido) / float(soma_ativos)) * 100
     return percentual
 
 
@@ -366,14 +372,3 @@ def create_transacao_model(db, transacao):
         corretagem=transacao.corretagem,
         outro=transacao.outro
     )
-
-
-def validar_quantidade_venda(_transacao_db, db, transacao):
-    qtd_total = db.query(func.sum(Transacao.quantidade).label('total')).filter(
-        Transacao.usuario_id == _transacao_db.usuario_id
-        and _transacao_db.codigo_ativo == transacao.codigo_ativo).all()
-    if qtd_total is None or qtd_total.total < transacao.quantidade:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Quantidade Indisponível para venda"
-        )

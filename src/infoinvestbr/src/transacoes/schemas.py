@@ -53,7 +53,7 @@ class TransacaoResponseSchema:
                  quantidade: int,
                  preco: float,
                  total: float,
-                 usuario_id: int,
+                 usuario_id: UUID,
                  imagem: str):
         self.id = id
         self.codigo_ativo = codigo_ativo
@@ -78,7 +78,6 @@ class PatrimonioSchemaResponse:
     total: float
     percentual_ativo: float
     percentual_carteira: float
-    usuario_id: UUID
     variacao_diaria: float
     variacao_total: float
     rentabilidade: float
@@ -92,7 +91,6 @@ class PatrimonioSchemaResponse:
                 total: float,
                 percentual_ativo: float,
                 percentual_carteira: float,
-                usuario_id: int,
                 variacao_diaria: float,
                 variacao_total: float,
                 rentabilidade: float,
@@ -106,7 +104,6 @@ class PatrimonioSchemaResponse:
         self.total = total
         self.percentual_carteira = percentual_carteira
         self.percentual_ativo = percentual_ativo
-        self.usuario_id = usuario_id
         self.variacao_total = variacao_total
         self.variacao_diaria = variacao_diaria
         self.rentabilidade = rentabilidade
