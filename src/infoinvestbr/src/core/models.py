@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, String, DateTime
+from sqlalchemy import Boolean, Column, String, DateTime, Integer, Numeric, Date
 from sqlalchemy.orm import relationship
 from src.core.database import Base
 from datetime import datetime
@@ -24,3 +24,12 @@ class Usuario(Base):
         self.email = email
         self.senha = senha
         self.imagem = imagem
+
+
+class CotacaoAtivo(Base):
+    __tablename__ = "cotacao_ativos"
+
+    id = Column("ID", Integer, index=True, primary_key=True)
+    codigo = Column("CODIGO", String(30), index=True, unique=True, nullable=False)
+    preco = Column("PRECO", Numeric, nullable=False)
+    data = Column("DATA", Date, nullable=False)

@@ -7,6 +7,7 @@ import { ITotalizacao } from "@/models/totalizacao.model";
 import DashboardCarteira from "./DashboardCarteira";
 import useAuth from "@/data/hooks/useAuth";
 import useFetchApi from "@/data/hooks/useFetchApi";
+import useNotification from "@/data/hooks/useNotification";
 
 function formatNumberWithArrows(
   value?: number,
@@ -367,8 +368,10 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
 
 export default function ListaPatrimonio() {
   const [row, setRow] = useState<any>({ acoes: [], fundos: [] });
-  const { usuario, headers } = useAuth();
+  const [rowChart, setRowChart] = useState<any>({});
+  const { usuario } = useAuth();
   const { find } = useFetchApi();
+  const {setVisible} = useNotification()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -381,21 +384,26 @@ export default function ListaPatrimonio() {
     if (usuario?.id) {
       fetchData()
         .then((json) => {
+          const patrimonio = json.result.patrimonio;
+          const chart = json.result.chart;
+          setRowChart(chart);
           setRow({
-            acoes: json.result.acoes,
-            fundos: json.result.fundos,
-            ganho_acoes: json.result.ganho_acoes,
-            ganho_fundo: json.result.ganho_fundo,
-            total_patrimonio: json.result.total_patrimonio,
-            total_porcentagem_acao: json.result.total_porcentagem_acao,
-            total_porcentagem_fundo: json.result.total_porcentagem_fundo,
-            total_acao: json.result.total_acao,
-            total_fundo: json.result.total_fundo,
-            total_investido: json.result.total_investido,
-            rentabilidade_total: json.result.rentabilidade_total,
-            ganhos_totais: json.result.ganhos_totais,
+            acoes: patrimonio.acoes,
+            fundos: patrimonio.fundos,
+            ganho_acoes: patrimonio.ganho_acoes,
+            ganho_fundo: patrimonio.ganho_fundo,
+            total_patrimonio: patrimonio.total_patrimonio,
+            total_porcentagem_acao: patrimonio.total_porcentagem_acao,
+            total_porcentagem_fundo: patrimonio.total_porcentagem_fundo,
+            total_acao: patrimonio.total_acao,
+            total_fundo: patrimonio.total_fundo,
+            total_investido: patrimonio.total_investido,
+            rentabilidade_total: patrimonio.rentabilidade_total,
+            ganhos_totais: patrimonio.ganhos_totais,
           });
-        })
+        }).catch(result => { 
+          setVisible?.( `${result.error}`,'error')
+      })
     }
   }, [usuario?.id]);
 
@@ -466,7 +474,7 @@ export default function ListaPatrimonio() {
           </div>
         </div>
       </div>
-      <DashboardCarteira />
+      <DashboardCarteira rows={rowChart}/>
       {renderGridsAtivoAcao(row, "Ações")}
       {renderGridsAtivoFundo(row, "Fundos Imobiliários")}
     </div>

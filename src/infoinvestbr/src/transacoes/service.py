@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from yfinance import Ticker
 from uuid import UUID
 
+from src.core.models import CotacaoAtivo
 from src.transacoes.models import Transacao
 from src.analise.models import Acao, FundosImobiliario
 from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpdateSchema, TransacaoRequestCreateSchema,\
@@ -10,31 +11,20 @@ from src.transacoes.schemas import TransacaoResponseSchema, TransacaoRequestUpda
 from fastapi import HTTPException, status
 from src.core.tipos import EnumTipoCategoria
 import datetime
-import yfinance as yf
 
 
-def get_chart_composicao(db: Session, usuario_id: UUID):
-    valores = db.query(Transacao.codigo_ativo,
-                       Transacao.categoria,
-                       func.sum(Transacao.quantidade).label("quantidade"),
-                       func.sum(Transacao.total).label("total_investido")) \
-        .distinct(Transacao.codigo_ativo) \
-        .filter(Transacao.usuario_id == usuario_id) \
-        .group_by(Transacao.codigo_ativo, Transacao.categoria) \
-        .all()
+def get_chart_patrimonio(valores: any):
     soma_total = 0.0
     soma_total_acoes = 0.0
     soma_total_fundos = 0.0
     valor_acao = 0.0
     valor_fundo = 0.0
     for valor in valores:
-        ticker = yf.Ticker(f'{valor.codigo_ativo}.SA')
-        preco_atual = get_preco_ultimo_fechamento(ticker)
-        soma_total += float(preco_atual) * valor.quantidade
+        soma_total += float(valor.preco) * valor.quantidade
         if valor.categoria == "ACAO" and valor.quantidade != 0:
-            soma_total_acoes += float(preco_atual) * valor.quantidade
+            soma_total_acoes += float(valor.preco) * valor.quantidade
         elif valor.categoria == "FUNDO_IMOBILIARIO" and valor.quantidade != 0:
-            soma_total_fundos += float(preco_atual) * valor.quantidade
+            soma_total_fundos += float(valor.preco) * valor.quantidade
 
     list_ativos = []
     if soma_total != 0:
@@ -54,19 +44,34 @@ def get_chart_composicao(db: Session, usuario_id: UUID):
 
 
 def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
-    query = db.query(Transacao.usuario_id,
-                     Transacao.imagem,
-                     Transacao.codigo_ativo,
-                     Transacao.categoria,
-                     func.sum(Transacao.quantidade).label("quantidade"),
-                     func.sum(Transacao.total).label("total_investido")) \
-        .distinct(Transacao.codigo_ativo) \
-        .filter(Transacao.usuario_id == usuario_id) \
-        .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
-        .all()
+    count = db.query(CotacaoAtivo).count()
+    if count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="A Carteira esta sendo atualizado no momento por favor tente mais tarde"
+        )
+    else:
+        query = db.query(Transacao.usuario_id,
+                         Transacao.imagem,
+                         Transacao.codigo_ativo,
+                         Transacao.categoria,
+                         CotacaoAtivo.preco,
+                         func.sum(Transacao.quantidade).label("quantidade"),
+                         func.sum(Transacao.total).label("total_investido")) \
+            .join(CotacaoAtivo, CotacaoAtivo.codigo == Transacao.codigo_ativo) \
+            .filter(CotacaoAtivo.codigo == Transacao.codigo_ativo) \
+            .distinct(Transacao.codigo_ativo) \
+            .filter(Transacao.usuario_id == usuario_id) \
+            .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria,
+                      CotacaoAtivo.preco) \
+            .all()
 
-    patrimonio = calcular_patrimonio(query)
-    return patrimonio
+        patrimonio = calcular_patrimonio(query)
+        chart = get_chart_patrimonio(query)
+        return {
+            "patrimonio": patrimonio,
+            "chart": chart
+        }
 
 
 def create_transacao(db: Session, transacao: TransacaoRequestCreateSchema):
@@ -157,8 +162,7 @@ def calcular_patrimonio(query: any) -> list[PatrimonioSchemaResponse]:
 
 
 def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaResponse:
-    ticker = yf.Ticker(f'{valor.codigo_ativo}.SA')
-    preco_atual = get_preco_ultimo_fechamento(ticker)
+    preco_atual = valor.preco
     preco_medio = float(valor.total_investido) / valor.quantidade
     variacao_total = calcular_variacao_total(preco_atual, preco_medio, valor.quantidade)
     rentabilidade = calcular_rentabilidade(preco_atual, preco_medio)
@@ -178,7 +182,7 @@ def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaRespon
         variacao_diaria=0,
         percentual_carteira=percentual_carteira,
         imagem=valor.imagem,
-        preco=get_preco_ultimo_fechamento(ticker)
+        preco=preco_atual
     )
 
 
@@ -216,10 +220,7 @@ def calcular_percentual_ativo(valor: any, valores: [], preco_atual: float):
     percentual = 0.0
     for model in valores:
         if model.categoria == valor.categoria:
-            ticker = yf.Ticker(f'{model.codigo_ativo}.SA')
-            preco_atual_ativo = get_preco_ultimo_fechamento(ticker)
-            if preco_atual_ativo is not None:
-                soma_ativos += float(preco_atual_ativo) * model.quantidade
+            soma_ativos += float(model.preco) * model.quantidade
 
     if soma_ativos != 0:
         percentual = (float(preco_atual) * valor.quantidade / float(soma_ativos)) * 100
@@ -237,10 +238,7 @@ def calcular_percentual_carteira(valor: any, valores: [], preco_atual: float):
     soma_ativos = 0.0
     percentual = 0.0
     for model in valores:
-        ticker = yf.Ticker(f'{model.codigo_ativo}.SA')
-        preco_atual_ativo = get_preco_ultimo_fechamento(ticker)
-        if preco_atual_ativo is not None:
-            soma_ativos += float(preco_atual_ativo) * model.quantidade
+        soma_ativos += float(model.preco) * model.quantidade
 
     if soma_ativos != 0:
         percentual = (float(preco_atual) * valor.quantidade / float(soma_ativos)) * 100

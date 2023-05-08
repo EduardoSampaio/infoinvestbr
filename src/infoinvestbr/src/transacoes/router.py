@@ -48,21 +48,13 @@ async def update(transacao: TransacaoRequestUpdateSchema, db: Session = Depends(
 
 
 @router.get("/{usuario_id}", dependencies=[Depends(get_current_user)])
-# @cache(expire=60, coder=JsonCoder)
 async def get_transacao_by_usuario_id(usuario_id: UUID, db: Session = Depends(get_db)):
     transacoes = service.get_transacoes_by_usuario_id(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="OK", result=transacoes)
 
 
 @router.get("/{usuarios_id}/patrimonio", dependencies=[Depends(get_current_user)])
-# @cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_patrimonio_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     patrimonios = service.get_patrimonio_by_usuario_id(db, usuario_id)
     return Response(code=status.HTTP_200_OK, status="OK", result=patrimonios)
-
-
-@router.get("/{usuarios_id}/composicao", dependencies=[Depends(get_current_user)])
-# @cache(expire=60, coder=JsonCoder)
-async def get_patrimonio_by_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
-    composicao = service.get_chart_composicao(db, usuario_id)
-    return Response(code=status.HTTP_200_OK, status="OK", result=composicao)

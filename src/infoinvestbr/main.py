@@ -1,3 +1,5 @@
+from datetime import datetime, date
+
 from fastapi import FastAPI, HTTPException, Request
 from redis import asyncio as aioredis
 from fastapi.responses import JSONResponse
@@ -10,23 +12,23 @@ from pathlib import Path
 from functools import lru_cache
 import uvicorn
 import logging
-from datetime import datetime
 
 from src.core.config import settings
-from src.core.database import engine
+from src.core.database import engine, SessionLocal
+from src.core.models import CotacaoAtivo
 from src.usuarios import router as routerUsuario
 from src.core.provider import router as routerProvider
 from src.proventos import router as routerProvento
 from src.transacoes import router as routerTransacao
 from src.analise import router as routerAnalise
 from src.cotacoes import router as routerCotacao
-from src.core import models as core
+from src.core import models as core, task
 from src.analise import models as analise
 from src.transacoes import models as transacao
 from src.proventos import models as proventos
 from src.core.exceptions import CodigoAtivoException
 from src.core.custom_logging import CustomizeLogger
-
+from src.core import job
 
 core.Base.metadata.create_all(bind=engine)
 analise.Base.metadata.create_all(bind=engine)
@@ -48,14 +50,20 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
+job.scheduler.start()
+
 
 @app.on_event("startup")
 async def startup():
     redis = await aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="info-invest")
+    db = SessionLocal()
+    data = date.today()
+    result = db.query(CotacaoAtivo).filter(CotacaoAtivo.data == data).first()
+    if result is None:
+        job.scheduler.modify_job(job_id="job_atualizacao_cotacao_preco", next_run_time=datetime.now())
 
 
-# Exceptions
 @app.exception_handler(CodigoAtivoException)
 async def handle_http_codigo_exception(request: Request, exc: CodigoAtivoException):
     return JSONResponse(

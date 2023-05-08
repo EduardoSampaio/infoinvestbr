@@ -65,15 +65,15 @@ async def get_by_codigo_by_intervalo(codigo_ativo: str, inicio: datetime.date, f
 
 
 @router.get("/historico/dividendos-anual/{codigo}", dependencies=[Depends(get_current_user)])
-@cache(expire=60, coder=JsonCoder)
-async def get_historico_dividendo(codigo: str):
+@cache(expire=43200, coder=JsonCoder)
+async def get_historico_dividendo_anual(codigo: str):
     valor = service.get_historico_dividendo_anual(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 
 
 @router.get("/historico/dividendos-mensal/{codigo}", dependencies=[Depends(get_current_user)])
-@cache(expire=60, coder=JsonCoder)
-async def get_historico_dividendo(codigo: str):
+@cache(expire=43200, coder=JsonCoder)
+async def get_historico_dividendo_mensal(codigo: str):
     valor = service.get_historico_dividendo_mensal(codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=valor).dict(exclude_none=True)
 

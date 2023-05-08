@@ -29,42 +29,42 @@ def get_db():
 
 
 @router.get("/acao")
-@cache(expire=1440, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_acoes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes(db, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios/setor/{setor}")
-@cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_fundos_imobiliarios(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios_setor(db, setor, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
 
 
 @router.get("/acao/setor/{setor}")
-@cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_acoes_by_setor(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     acoes = service.get_acoes_by_setor(db, setor, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios")
-@cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_fundos_imobiliarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     fundos_imobiliarios = service.get_fundos_imobiliarios(db, skip, limit)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliarios).dict(exclude_none=True)
 
 
 @router.get("/acao/{codigo}")
-@cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_acoes_by_codigo(codigo: str, db: Session = Depends(get_db)):
     acao = service.get_acoes_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acao).dict(exclude_none=True)
 
 
 @router.get("/fundos-imobiliarios/{codigo}")
-@cache(expire=60, coder=JsonCoder)
+@cache(expire=43200, coder=JsonCoder)
 async def get_fundos_imobiliarios_by_codigo(codigo: str, db: Session = Depends(get_db)):
     fundos_imobiliario = service.get_fundos_imobiliarios_by_codigo(db, codigo)
     return Response(code=status.HTTP_200_OK, status="Ok", result=fundos_imobiliario).dict(exclude_none=True)

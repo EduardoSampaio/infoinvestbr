@@ -84,42 +84,18 @@ function renderChartAtivos(row: any[]): ReactEChartsProps["option"] {
   };
 }
 
-export default function DashboardCarteira() {
-  const [row, setRow] = useState<any>({});
-  const {usuario} = useAuth()
-  const {find} = useFetchApi()
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      return await  find(
-        `${API_HOST}/transacoes/{usuarios_id}/composicao?usuario_id=${usuario?.id}`,
-      );
-    };
-
-    if(usuario?.id) {
-      fetchData()
-        .then((json) => {
-          setRow({
-            composicao: json.result.composicao,
-            ativos: json.result.ativos,
-          });
-        })
-        .catch((error) => console.log(error));
-    }
-  },[usuario?.id]);
-
+export default function DashboardCarteira(props: any) {
   return (
     <div className="w-full">
       <div className="w-full flex lg:flex-wrap xl:flex-nowrap sm:flex-wrap xs: flex-wrap">
         <div className="w-full mr-5 mb-5">
           <CardTitle titulo="Composição ativos">
-            <ReactECharts option={renderChartAtivos(row.ativos)} />
+            <ReactECharts option={renderChartAtivos(props.rows?.ativos)} />
           </CardTitle>
         </div>
         <div className="w-full mb-5">
           <CardTitle titulo="Composição Carteira">
-            <ReactECharts option={renderChartComposicao(row.composicao)} />
+            <ReactECharts option={renderChartComposicao(props.rows?.composicao)} />
           </CardTitle>
         </div>
       </div>
