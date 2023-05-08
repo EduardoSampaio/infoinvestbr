@@ -28,11 +28,13 @@ def get_chart_composicao(db: Session, usuario_id: UUID):
     valor_acao = 0.0
     valor_fundo = 0.0
     for valor in valores:
-        soma_total += float(valor.total_investido)
+        ticker = yf.Ticker(f'{valor.codigo_ativo}.SA')
+        preco_atual = get_preco_ultimo_fechamento(ticker)
+        soma_total += float(preco_atual) * valor.quantidade
         if valor.categoria == "ACAO" and valor.quantidade != 0:
-            soma_total_acoes += float(valor.total_investido)
+            soma_total_acoes += float(preco_atual) * valor.quantidade
         elif valor.categoria == "FUNDO_IMOBILIARIO" and valor.quantidade != 0:
-            soma_total_fundos += float(valor.total_investido)
+            soma_total_fundos += float(preco_atual) * valor.quantidade
 
     list_ativos = []
     if soma_total != 0:
@@ -51,13 +53,6 @@ def get_chart_composicao(db: Session, usuario_id: UUID):
     }
 
 
-def calcular_preco_medio(total, quantidade):
-    if quantidade == 0:
-        return total
-    else:
-        return total / quantidade
-
-
 def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
     query = db.query(Transacao.usuario_id,
                      Transacao.imagem,
@@ -70,7 +65,7 @@ def get_patrimonio_by_usuario_id(db: Session, usuario_id: UUID):
         .group_by(Transacao.usuario_id, Transacao.imagem, Transacao.codigo_ativo, Transacao.categoria) \
         .all()
 
-    patrimonio = get_patrimonio_by_usuario(query)
+    patrimonio = calcular_patrimonio(query)
     return patrimonio
 
 
@@ -148,7 +143,7 @@ def validar_codigo(db: Session, codigo: str, categoria: EnumTipoCategoria):
             return exist
 
 
-def get_patrimonio_by_usuario(query: any) -> list[PatrimonioSchemaResponse]:
+def calcular_patrimonio(query: any) -> list[PatrimonioSchemaResponse]:
     list_valores_acao = []
     list_valores_fundos = []
     for valor in query:
@@ -167,15 +162,16 @@ def convert_patrimonio_schema(valor: any, valores: []) -> PatrimonioSchemaRespon
     preco_medio = float(valor.total_investido) / valor.quantidade
     variacao_total = calcular_variacao_total(preco_atual, preco_medio, valor.quantidade)
     rentabilidade = calcular_rentabilidade(preco_atual, preco_medio)
-    percentual_ativo = calcular_percentual_ativo(valor, valores)
-    percentual_carteira = calcular_percentual_carteira(valor, valores)
+    percentual_ativo = calcular_percentual_ativo(valor, valores, preco_atual)
+    percentual_carteira = calcular_percentual_carteira(valor, valores, preco_atual)
+    total = preco_atual * valor.quantidade
 
     return PatrimonioSchemaResponse(
         quantidade=valor.quantidade,
         codigo_ativo=valor.codigo_ativo,
         preco_medio=preco_medio,
         categoria=get_enum_categoria(valor.categoria),
-        total=valor.total_investido,
+        total=total,
         rentabilidade=rentabilidade,
         variacao_total=variacao_total,
         percentual_ativo=percentual_ativo,
@@ -208,38 +204,46 @@ def calcular_variacao_total(preco_atual: float, preco_inicial: float, quantidade
     return variacao_total
 
 
-def calcular_percentual_ativo(valor: any, valores: []):
+def calcular_percentual_ativo(valor: any, valores: [], preco_atual: float):
     """
      percentual_ativo = (total_ativo / soma(list_model) mesma categoria) * 100
     :param valor:
     :param valores:
+    :param preco_atual:
     :return:
     """
     soma_ativos = 0.0
     percentual = 0.0
     for model in valores:
         if model.categoria == valor.categoria:
-            soma_ativos += float(model.total_investido)
+            ticker = yf.Ticker(f'{model.codigo_ativo}.SA')
+            preco_atual_ativo = get_preco_ultimo_fechamento(ticker)
+            if preco_atual_ativo is not None:
+                soma_ativos += float(preco_atual_ativo) * model.quantidade
 
     if soma_ativos != 0:
-        percentual = (float(valor.total_investido) / float(soma_ativos)) * 100
+        percentual = (float(preco_atual) * valor.quantidade / float(soma_ativos)) * 100
     return percentual
 
 
-def calcular_percentual_carteira(valor: any, valores: []):
+def calcular_percentual_carteira(valor: any, valores: [], preco_atual: float):
     """
      percentual_carteira = (total_ativo / soma(list_model)) * 100
     :param valor:
     :param valores:
+      :param preco_atual:
     :return:
     """
     soma_ativos = 0.0
     percentual = 0.0
     for model in valores:
-        soma_ativos += float(model.total_investido)
+        ticker = yf.Ticker(f'{model.codigo_ativo}.SA')
+        preco_atual_ativo = get_preco_ultimo_fechamento(ticker)
+        if preco_atual_ativo is not None:
+            soma_ativos += float(preco_atual_ativo) * model.quantidade
 
     if soma_ativos != 0:
-        percentual = (float(valor.total_investido) / float(soma_ativos)) * 100
+        percentual = (float(preco_atual) * valor.quantidade / float(soma_ativos)) * 100
     return percentual
 
 
@@ -250,7 +254,11 @@ def convert_date_us(datestr: str):
 
 
 def get_preco_ultimo_fechamento(ticker: Ticker) -> float:
-    return ticker.history(period="1mo").tail(1)['Close'][0]
+    result = ticker.history(period="1mo")
+    if result.empty:
+        return 0.0
+    else:
+        return result.tail(1)['Close'][0]
 
 
 def totalizacao(list_valores_acoes: list[PatrimonioSchemaResponse],
