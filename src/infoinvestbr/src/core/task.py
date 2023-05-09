@@ -28,6 +28,7 @@ def job_atualizacao_cotacao_preco():
             db.delete(db_ativo)
         db.add_all(list_ativos)
         db.commit()
+    db.close()
     logger.info(f"Fim da atualização de preço data {datetime.now()}")
 
 

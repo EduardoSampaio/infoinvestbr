@@ -4,23 +4,23 @@ from src.analise.models import Acao, FundosImobiliario
 from src.analise.schemas import AcaoRequestSchema, AcaoResponseSchema, FundosImobiliarioRequestSchema, \
     FundosImobiliarioResponseSchema
 import logging as logger
-import yfinance as yf
+
+
+from src.core.database import SessionLocal
+from src.core.models import CotacaoAtivo
 
 
 def convert_to_schema_acao(model: Acao):
     if model is None:
         return {}
 
-    preco = 0
-    current_ticker = yf.Ticker(f'{model.codigo}.SA')
-    history = current_ticker.history(period='1d')['Close']
-    if not history.empty:
-        preco = history[0]
+    db = SessionLocal()
+    cotacao = db.query(CotacaoAtivo.preco).filter(CotacaoAtivo.codigo == model.codigo).first()
+    db.close()
 
     response = AcaoResponseSchema()
     response.id = model.id
     response.codigo = model.codigo
-
     response.pl = formatar_numeros(model.pl)
     response.pvp = formatar_numeros(model.pvp, 4)
     response.psr = formatar_numeros(model.psr, 4)
@@ -40,7 +40,7 @@ def convert_to_schema_acao(model: Acao):
     response.patrimonio_liquido = formatar_numeros(model.patrimonio_liquido)
     response.div_bruta_patrim = formatar_numeros(model.div_bruta_patrim)
     response.cresc_rec_5a = formatar_numeros(model.cresc_rec_5a, porcentagem=True)
-    response.preco = formatar_numeros(preco, 2)
+    response.preco = formatar_numeros(cotacao.preco, 2)
     response.lpa = model.lpa
     response.vpa = model.vpa
     response.setor = model.setor
@@ -58,12 +58,9 @@ def convert_to_schema_fundos(model: FundosImobiliario):
     if model is None:
         return {}
 
-    preco = 0
-    current_ticker = yf.Ticker(f'{model.codigo}.SA')
-    history = current_ticker.history(period='1d')['Close']
-    if not history.empty:
-        preco = history[0]
-
+    db = SessionLocal()
+    cotacao = db.query(CotacaoAtivo).filter(CotacaoAtivo.codigo == model.codigo).first()
+    db.close()
     response = FundosImobiliarioResponseSchema()
     response.id = model.id
     response.codigo = model.codigo
@@ -93,7 +90,7 @@ def convert_to_schema_fundos(model: FundosImobiliario):
     response.rentab_patr_acumulada = formatar_numeros(model.rentab_patr_acumulada, 4, True)
     response.vacancia_fisica = formatar_numeros(model.vacancia_fisica, 4, True)
     response.vacancia_financeira = formatar_numeros(model.vacancia_financeira, 4, True)
-    response.preco = formatar_numeros(preco, 2)
+    response.preco = formatar_numeros(cotacao.preco, 2)
 
     return response
 
