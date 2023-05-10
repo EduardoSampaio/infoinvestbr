@@ -30,7 +30,7 @@ def get_usuario_by_email(db: Session, email: str) -> Usuario:
     return usuario
 
 
-def create_usuario(db: Session, usuario: UsuarioRequestSchema) -> Usuario:
+def create_usuario(db: Session, usuario: UsuarioRequestSchema):
     hashed_senha = bcrypt_context.hash(usuario.senha)
     _usuario = Usuario(nome=usuario.nome, email=usuario.email, senha=hashed_senha)
     db.add(_usuario)
@@ -39,7 +39,7 @@ def create_usuario(db: Session, usuario: UsuarioRequestSchema) -> Usuario:
     return _usuario
 
 
-def create_usuario_google(db: Session, nome: str, email: str, imagem: str) -> Usuario:
+def create_usuario_google(db: Session, nome: str, email: str, imagem: str):
     _usuario = Usuario(nome=nome, email=email, imagem=imagem)
     db.add(_usuario)
     db.commit()

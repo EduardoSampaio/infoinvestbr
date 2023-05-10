@@ -9,8 +9,7 @@ from src.usuarios.utils import create_refresh_token, create_access_token, get_cu
 from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
-from  src.core.config import settings
-
+from src.core.config import settings
 
 router = APIRouter(
     prefix="/api/v1/usuarios",
@@ -29,24 +28,24 @@ def get_db():
         db.close()
 
 
-@router.post("/", dependencies=[Depends(get_current_user)])
-async def create_usuario(usuario: UsuarioRequestSchema, db: Session = Depends(get_db),):
+@router.post("/")
+async def create_usuario(usuario: UsuarioRequestSchema, db: Session = Depends(get_db)):
     service.create_usuario(db, usuario)
-    return Response(code=status.HTTP_201_CREATED, status="created", message="Usuário criado com sucesso!")\
+    return Response(code=status.HTTP_201_CREATED, status="created", message="Usuário criado com sucesso!") \
         .dict(exclude_none=True)
 
 
 @router.put("/", dependencies=[Depends(get_current_user)])
 async def update_usuario(usuario: UsuarioResponseSchema, db: Session = Depends(get_db)):
     service.update_usuario(db, usuario)
-    return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário atualizado com sucesso!")\
+    return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário atualizado com sucesso!") \
         .dict(exclude_none=True)
 
 
-@router.delete("/{id}", dependencies=[Depends(get_current_user)])
+@router.delete("/{id}")
 async def remover_usuario(usuario_id: UUID, db: Session = Depends(get_db)):
     service.remove_usuario(db, usuario_id=usuario_id)
-    return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário removido com sucesso!")\
+    return Response(code=status.HTTP_204_NO_CONTENT, status="no content", message="Usuário removido com sucesso!") \
         .dict(exclude_none=True)
 
 
@@ -72,6 +71,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": usuario.email, "scopes": form_data.scopes},
         expires_delta=access_token_expires,
     )
-    return {"access_token": access_token,
-            "refresh_token": create_refresh_token(form_data.username),
-            "token_type": "bearer"}
+    return {
+        "id": usuario.id,
+        "imagem": usuario.imagem,
+        "nome": usuario.nome,
+        "email": usuario.email,
+        "access_token": access_token,
+        "token_type": "bearer"
+    }

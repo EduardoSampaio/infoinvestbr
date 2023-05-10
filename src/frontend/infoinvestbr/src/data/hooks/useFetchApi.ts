@@ -10,7 +10,7 @@ export default function useFetchApi() {
         try {
             const response = await fetch(url, { headers: headers });
             const data = await response.json()
-            console.log(data)
+            
             if(response.status === 401){
                 Cookies.remove("infoinvest-auth");
                 route?.push("/acessoNegado")
@@ -119,10 +119,43 @@ export default function useFetchApi() {
         }
     }
 
+    async function save_anomimo(url: string, value: any): Promise<ResponseModel> {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(value)
+            });
+            const data = await response.json()
+            if(response.status === 401){
+                Cookies.remove("infoinvest-auth");
+                route?.push("/acessoNegado")
+            }
+            else if (!response.ok) {
+                throw Error(data.message)
+            }
+
+            const responseModel: ResponseModel = {
+                message: data.message,
+            };
+
+            return Promise.resolve(responseModel);
+
+        } catch (error) {
+            const responseModel: ResponseModel = {
+                error: error?.toString(),
+            };
+            return Promise.reject(responseModel);
+        }
+    }
+
     return {
         find,
         save,
         update,
-        remove
+        remove,
+        save_anomimo
     }
 }

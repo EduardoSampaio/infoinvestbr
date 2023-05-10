@@ -9,14 +9,15 @@ import {
 } from "react";
 import Cookies from "js-cookie";
 import jwt_decode from "jwt-decode";
+import { error } from "console";
 
 interface AuthContextProps {
   usuario?: Usuario;
   carregando?: boolean;
   mudarStatusCarregando?: (valor: boolean) => void;
   cadastrar?: (email: string, senha: string) => Promise<void>;
-  login?: (email: string, senha: string) => Promise<void>;
   loginGoogle?: (response: any) => void;
+  login?: (formData: FormData) => Promise<Usuario | undefined>;
   logout?: () => Promise<void>;
   route?: NextRouter;
   headers?: any;
@@ -74,6 +75,39 @@ export function AuthProvider(props: any) {
     }
   }
 
+  async function login(formData: FormData) {
+    try {
+      setCarregando(true);
+      const retorno = await fetch(`${API_HOST}/usuarios/token/`, {
+        method: "POST",
+        body: formData,
+      })
+
+      const data = await retorno.json();
+      if(!retorno?.ok) {
+        throw Error(data.message)
+      }
+      else if (data !== undefined && data?.access_token) {
+        usuario.id = data.id;
+        usuario.nome = data.nome;
+        usuario.access_token = data.access_token;
+        usuario.token_type = data.token_type;
+        usuario.is_authenticated = true;
+        usuario.imagem = '';
+        setUsuario(usuario);
+        gerenciarCookie(usuario);
+        configHeader(usuario);
+        route.push("/");
+        return Promise.resolve(usuario)
+      }
+
+    }catch(error){
+      return Promise.reject(error)
+    }finally {
+      setCarregando(false);
+    }
+  }
+
   async function configHeader(usuario: Usuario) {
     const headers = {
       "Authorization": `Bearer ${usuario.access_token}`,
@@ -118,6 +152,7 @@ export function AuthProvider(props: any) {
         usuario,
         carregando,
         loginGoogle,
+        login,
         mudarStatusCarregando,
         logout,
         headers,

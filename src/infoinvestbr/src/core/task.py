@@ -26,6 +26,7 @@ def job_atualizacao_cotacao_preco():
     else:
         for db_ativo in db_ativos:
             db.delete(db_ativo)
+            db.commit()
         db.add_all(list_ativos)
         db.commit()
     db.close()

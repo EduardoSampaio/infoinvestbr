@@ -1,10 +1,14 @@
+import SnackBarCustom from "@/components/shared/SnackbarCustom";
 import Cadastro from "@/components/usuarios/Cadastro";
 import Login from "@/components/usuarios/Login";
+import useNotification from "@/data/hooks/useNotification";
 import Image from "next/image";
 import { useState } from "react";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"Login" | "Cadastro">("Login");
+  const { type,message,handleClose, showNotification } = useNotification();
+
 
   function changeMode() {
     if (mode === "Login") {
@@ -35,6 +39,19 @@ export default function LoginPage() {
         ) : (
           <Cadastro changeMode={changeMode} />
         )}
+            {showNotification ? (
+            <SnackBarCustom
+              severity={type}
+              handleClose={() => handleClose?.()}
+              openSnack={showNotification}
+              variant="filled"
+              vertical="top"
+              horizontal="right"
+              message={message}
+            />
+          ) : (
+            false
+          )}
       </div>
     </div>
   );

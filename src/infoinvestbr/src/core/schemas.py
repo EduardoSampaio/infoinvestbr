@@ -26,7 +26,6 @@ class Response(GenericModel, Generic[T]):
 class UsuarioBaseSchema(BaseModel):
     nome: str
     email: str
-    imagem: Optional[str] = None
 
     @validator('nome', always=True, pre=True)
     def validar_nome(cls, v):

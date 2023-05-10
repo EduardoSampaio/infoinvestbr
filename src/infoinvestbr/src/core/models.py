@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, String, DateTime, Integer, Numeric, Date
+from sqlalchemy import Boolean, Column, String, DateTime, Integer, Numeric, Date, text
 from sqlalchemy.orm import relationship
 from src.core.database import Base
 from datetime import datetime
@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import UUID
 class Usuario(Base):
     __tablename__ = "usuarios"
 
-    id = Column("USUARIO_ID", UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4())
+    id = Column("USUARIO_ID", UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     nome = Column("NOME", String(30), nullable=False)
     imagem = Column("IMAGEM", String(200), nullable=True)
     email = Column("EMAIL", String(30), unique=True, index=True, nullable=False)
