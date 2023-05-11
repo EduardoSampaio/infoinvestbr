@@ -1,15 +1,15 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
 import BoxIndicador from "../shared/BoxIndicador";
-import { Chip } from "@mui/material";
+import { Chip, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import * as echarts from "echarts";
 import { IFundoImobiliario } from "@/models/fundos.model";
 import CardTitle from "../shared/Indicadores";
 import { TOOLTIP_MSG } from "../fundos-imobiliarios/tooltip";
-import useAuth from "@/data/hooks/useAuth";
 import useFetchApi from "@/data/hooks/useFetchApi";
+import Loading from "../shared/Loading";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -125,86 +125,92 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
   return optionBar;
 }
 
-function renderizarIndicadores(fundo: IFundoImobiliario) {
+function renderizarIndicadores(fundo: IFundoImobiliario, isLoading: boolean) {
   return (
     <CardTitle titulo="Indicadores">
-      <BoxIndicador
-        valor={`R$${fundo?.preco}`}
-        indicador="Preço"
-        tooltip={TOOLTIP_MSG.PRECO}
-      />
-      <BoxIndicador
-        valor={`${fundo?.dividend_yield}%`}
-        indicador="DY"
-        tooltip={TOOLTIP_MSG.DY}
-      />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <BoxIndicador
+            valor={`R$${fundo?.preco}`}
+            indicador="Preço"
+            tooltip={TOOLTIP_MSG.PRECO}
+          />
+          <BoxIndicador
+            valor={`${fundo?.dividend_yield}%`}
+            indicador="DY"
+            tooltip={TOOLTIP_MSG.DY}
+          />
 
-      <BoxIndicador
-        valor={`R$ ${fundo?.dividendo}`}
-        indicador="Ultimo Dividendo"
-        tooltip={TOOLTIP_MSG.ULTIMO_DY}
-      />
+          <BoxIndicador
+            valor={`R$ ${fundo?.dividendo}`}
+            indicador="Ultimo Dividendo"
+            tooltip={TOOLTIP_MSG.ULTIMO_DY}
+          />
 
-      <BoxIndicador
-        valor={`${fundo?.p_vpa}`}
-        indicador="P/VPA"
-        tooltip={TOOLTIP_MSG.P_VPA}
-      />
+          <BoxIndicador
+            valor={`${fundo?.p_vpa}`}
+            indicador="P/VPA"
+            tooltip={TOOLTIP_MSG.P_VPA}
+          />
 
-      <BoxIndicador
-        valor={`R$ ${fundo?.vpa}`}
-        indicador="VPA"
-        tooltip={TOOLTIP_MSG.VPA}
-      />
+          <BoxIndicador
+            valor={`R$ ${fundo?.vpa}`}
+            indicador="VPA"
+            tooltip={TOOLTIP_MSG.VPA}
+          />
 
-      <BoxIndicador
-        valor={`${fundo?.liquidez_diaria?.toLocaleString("pt-br", {
-          minimumFractionDigits: 0,
-        })}`}
-        indicador="Liquidez Diária"
-        tooltip={TOOLTIP_MSG.LIQUIDEZ_DIARIA}
-      />
+          <BoxIndicador
+            valor={`${fundo?.liquidez_diaria?.toLocaleString("pt-br", {
+              minimumFractionDigits: 0,
+            })}`}
+            indicador="Liquidez Diária"
+            tooltip={TOOLTIP_MSG.LIQUIDEZ_DIARIA}
+          />
 
-      <BoxIndicador
-        valor={`R$ ${fundo?.patrimonio_liq?.toLocaleString("pt-br", {
-          minimumFractionDigits: 2,
-        })}`}
-        indicador="Patrimônio Líquido"
-        tooltip={TOOLTIP_MSG.PATRIMONIO_LIQ}
-      />
-      <BoxIndicador
-        valor={`${fundo?.dy_ano}%`}
-        indicador="DY no Ano"
-        tooltip={TOOLTIP_MSG.DY_ANO}
-      />
+          <BoxIndicador
+            valor={`R$ ${fundo?.patrimonio_liq?.toLocaleString("pt-br", {
+              minimumFractionDigits: 2,
+            })}`}
+            indicador="Patrimônio Líquido"
+            tooltip={TOOLTIP_MSG.PATRIMONIO_LIQ}
+          />
+          <BoxIndicador
+            valor={`${fundo?.dy_ano}%`}
+            indicador="DY no Ano"
+            tooltip={TOOLTIP_MSG.DY_ANO}
+          />
 
-      <BoxIndicador
-        valor={`${fundo?.variacao_preco}%`}
-        indicador="Variação do Preço"
-        tooltip={TOOLTIP_MSG.VARIACAO_PRECO}
-      />
+          <BoxIndicador
+            valor={`${fundo?.variacao_preco}%`}
+            indicador="Variação do Preço"
+            tooltip={TOOLTIP_MSG.VARIACAO_PRECO}
+          />
 
-      <BoxIndicador
-        valor={`${fundo?.rentab_periodo}%`}
-        indicador="Rent. Período"
-        tooltip={TOOLTIP_MSG.RENTAB_PERIODO}
-      />
+          <BoxIndicador
+            valor={`${fundo?.rentab_periodo}%`}
+            indicador="Rent. Período"
+            tooltip={TOOLTIP_MSG.RENTAB_PERIODO}
+          />
 
-      <BoxIndicador
-        valor={`${fundo?.vacancia_financeira}%`}
-        indicador="Vacância Financeira"
-        tooltip={TOOLTIP_MSG.VACANCIA_FIANCEIRA}
-      />
-      <BoxIndicador
-        valor={`${fundo?.vacancia_fisica}%`}
-        indicador="Vacância Física"
-        tooltip={TOOLTIP_MSG.VACANCIA_FISICA}
-      />
-      <BoxIndicador
-        valor={`${fundo?.quantidade_ativos}`}
-        indicador="Quantidade de Ativos"
-        tooltip={TOOLTIP_MSG.QTD_ATIVOS}
-      />
+          <BoxIndicador
+            valor={`${fundo?.vacancia_financeira}%`}
+            indicador="Vacância Financeira"
+            tooltip={TOOLTIP_MSG.VACANCIA_FIANCEIRA}
+          />
+          <BoxIndicador
+            valor={`${fundo?.vacancia_fisica}%`}
+            indicador="Vacância Física"
+            tooltip={TOOLTIP_MSG.VACANCIA_FISICA}
+          />
+          <BoxIndicador
+            valor={`${fundo?.quantidade_ativos}`}
+            indicador="Quantidade de Ativos"
+            tooltip={TOOLTIP_MSG.QTD_ATIVOS}
+          />
+        </>
+      )}
     </CardTitle>
   );
 }
@@ -220,12 +226,15 @@ export default function DetalhesFundosImobiliario() {
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
   const { find } = useFetchApi();
 
+  const [isIndicadores, setIsIndicadores] = useState<boolean>(true);
+  const [isHistorico, setIsHistorico] = useState<boolean>(true);
+  const [isPagamento, setIsPagamento] = useState<boolean>(true);
+
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 
     const fetchDataIndicadores = async () => {
-      return await find(
-        `${API_HOST}/analises/fundos-imobiliarios/${codigo}`)
+      return await find(`${API_HOST}/analises/fundos-imobiliarios/${codigo}`);
     };
 
     const fetchDataGrafico = async () => {
@@ -242,16 +251,23 @@ export default function DetalhesFundosImobiliario() {
 
     if (codigo !== undefined) {
       fetchDataIndicadores()
-        .then((json) => setFundo(json.result))
-        .catch();
+        .then((json) => {
+          setFundo(json.result);
+        })
+        .catch()
+        .finally(() => setIsIndicadores(false));
 
       fetchDataGrafico()
-        .then((json) => setChartLine(json.result))
-        .catch();
+        .then((json) => {
+          setChartLine(json.result);
+        })
+        .catch()
+        .finally(() => setIsHistorico(false));
 
       fetchDataBarGrafico()
         .then((json) => setChartBar(json.result))
-        .catch();
+        .catch()
+        .finally(() => setIsPagamento(false));
     }
   }, [router, codigo]);
 
@@ -276,27 +292,39 @@ export default function DetalhesFundosImobiliario() {
           />
         </div>
       </div>
-      {renderizarIndicadores(fundo)}
-      <CardTitle titulo="Histórico de Cotações">
+      <div className="w-full">
         <div className="w-full">
-          <ReactECharts
-            option={renderChartHistoricoCotacoes(
-              chartLine?.datas,
-              chartLine?.fechamento
-            )}
-          />
+          {renderizarIndicadores(fundo, isIndicadores)}
         </div>
-      </CardTitle>
-      <CardTitle titulo="Histórico Pagamento de Dividendo Mensais">
-        <div className="w-full">
-          <ReactECharts
-            option={renderChartHistoricoPagamento(
-              chartBar?.datas,
-              chartBar?.valores
-            )}
-          />
-        </div>
-      </CardTitle>
+        <CardTitle titulo="Histórico de Cotações">
+          {isHistorico ? (
+            <Loading />
+          ) : (
+            <div className="w-full">
+              <ReactECharts
+                option={renderChartHistoricoCotacoes(
+                  chartLine?.datas,
+                  chartLine?.fechamento
+                )}
+              />
+            </div>
+          )}
+        </CardTitle>
+        <CardTitle titulo="Histórico Pagamento de Dividendo Mensais">
+          {isPagamento ? (
+            <Loading />
+          ) : (
+            <div className="w-full">
+              <ReactECharts
+                option={renderChartHistoricoPagamento(
+                  chartBar?.datas,
+                  chartBar?.valores
+                )}
+              />
+            </div>
+          )}
+        </CardTitle>
+      </div>
     </div>
   );
 }

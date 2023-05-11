@@ -10,6 +10,7 @@ import {
   ptBR,
 } from "@mui/x-data-grid";
 import Box from '@mui/material/Box';
+import Image from "next/image";
 
 interface GridCustomProp {
   rows: any;
@@ -21,6 +22,7 @@ interface GridCustomProp {
   classNameGrid?: string
   className?: string
   id?: any
+  isLoading?: boolean;
 }
 
 const style = {
@@ -79,6 +81,7 @@ export default function GridCustom(props: GridCustomProp) {
         className={props.classNameGrid}
         getRowId={(row) => props?.id ? row[props?.id] : row.id}
         rows={rows}
+        loading={props.isLoading}
       />
     </div>
   );

@@ -97,17 +97,20 @@ export default function AcoesListar() {
     router.push(`/acoes/${params.row.codigo}/detalhes`);
   };
   const [rows, setRows] = useState<IAcao[]>([]);
+  const [isLoading, setLoading] = useState(true);
 
   
   useEffect(() => {
     const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
     find(`${API_HOST}/analises/acao?skip=0&limit=500`)
-    .then(data => setRows(data.result))
+    .then(data => {
+      setRows(data.result)
+    }).finally(() => setLoading(false))
   }, []);
 
   return (
     <div className="w-full flex">
-      <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} showToolBar={true}/>
+      <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} showToolBar={true} isLoading={isLoading}/>
     </div>
   );
 }

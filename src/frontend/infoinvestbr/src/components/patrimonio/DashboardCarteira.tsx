@@ -3,6 +3,7 @@ import CardTitle from "../shared/Indicadores";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import useAuth from "@/data/hooks/useAuth";
 import useFetchApi from "@/data/hooks/useFetchApi";
+import Loading from "../shared/Loading";
 
 
 function renderChartComposicao(row: any[]):ReactEChartsProps["option"] {
@@ -90,12 +91,26 @@ export default function DashboardCarteira(props: any) {
       <div className="w-full flex lg:flex-wrap xl:flex-nowrap sm:flex-wrap xs: flex-wrap">
         <div className="w-full mr-5 mb-5">
           <CardTitle titulo="Composição ativos">
-            <ReactECharts option={renderChartAtivos(props.rows?.ativos)} />
+            {props.isLoading ? (
+              <div className="w-full h-[500px] flex justify-center items-center">
+                <Loading />
+              </div>
+
+            ): (
+              <ReactECharts option={renderChartAtivos(props.rows?.ativos)} />
+            )}
           </CardTitle>
         </div>
         <div className="w-full mb-5">
           <CardTitle titulo="Composição Carteira">
+          {props.isLoading ? (
+              <div className="w-full h-[500px] flex justify-center items-center">
+                <Loading />
+              </div>
+
+            ): (
             <ReactECharts option={renderChartComposicao(props.rows?.composicao)} />
+            )}
           </CardTitle>
         </div>
       </div>

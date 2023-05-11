@@ -11,6 +11,7 @@ import { TOOLTIP_MSG } from "./tooltip";
 import { IAcao } from "@/models/acao.model";
 import useAuth from "@/data/hooks/useAuth";
 import useFetchApi from "@/data/hooks/useFetchApi";
+import Loading from "../shared/Loading";
 
 function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
   const option: ReactEChartsProps["option"] = {
@@ -114,97 +115,103 @@ function renderChartHistoricoPagamento(datas: any, series: any) {
   return optionBar;
 }
 
-function renderizarIndicadores(acao: IAcao) {
+function renderizarIndicadores(acao: IAcao, isIndicadores: boolean) {
   return (
     <CardTitle titulo="Indicadores Fundamentalistas">
-      <BoxIndicador
-        valor={`R$${acao?.preco}`}
-        indicador="Preço"
-        tooltip={TOOLTIP_MSG.PRECO}
-      />
-      <BoxIndicador
-        valor={`${acao?.dividend_yield}%`}
-        indicador="D.Y"
-        tooltip={TOOLTIP_MSG.DY}
-      />
-      <BoxIndicador
-        valor={`${acao?.pl}`}
-        indicador="P/L"
-        tooltip={TOOLTIP_MSG.PL}
-      />
-      <BoxIndicador
-        valor={`${acao?.pvp}`}
-        indicador="P/VP"
-        tooltip={TOOLTIP_MSG.PVP}
-      />
-      {/* <BoxIndicador valor={`${acao.lpa}`} indicador="LPA" tooltip={TOOLTIP_MSG.LPA}/>
+      {isIndicadores ? (
+        <Loading />
+      ) : (
+        <>
+          <BoxIndicador
+            valor={`R$${acao?.preco}`}
+            indicador="Preço"
+            tooltip={TOOLTIP_MSG.PRECO}
+          />
+          <BoxIndicador
+            valor={`${acao?.dividend_yield}%`}
+            indicador="D.Y"
+            tooltip={TOOLTIP_MSG.DY}
+          />
+          <BoxIndicador
+            valor={`${acao?.pl}`}
+            indicador="P/L"
+            tooltip={TOOLTIP_MSG.PL}
+          />
+          <BoxIndicador
+            valor={`${acao?.pvp}`}
+            indicador="P/VP"
+            tooltip={TOOLTIP_MSG.PVP}
+          />
+          {/* <BoxIndicador valor={`${acao.lpa}`} indicador="LPA" tooltip={TOOLTIP_MSG.LPA}/>
       <BoxIndicador valor={`${acao.vpa}`} indicador="VPA" tooltip={TOOLTIP_MSG.VPA}/> */}
-      <BoxIndicador
-        valor={`${acao?.psr}`}
-        indicador="PSR"
-        tooltip={TOOLTIP_MSG.PSR}
-      />
-      <BoxIndicador
-        valor={`${acao?.p_ativo}`}
-        indicador="P/ATIVO"
-        tooltip={TOOLTIP_MSG.P_ATIVO}
-      />
-      <BoxIndicador
-        valor={`${acao?.p_cap_giro}`}
-        indicador="P/CAP.GIRO"
-        tooltip={TOOLTIP_MSG.P_CAP_GIRO}
-      />
-      <BoxIndicador
-        valor={`${acao?.p_ativ_circ_liq}`}
-        indicador="P/ATIVO CIRC. LIQ."
-        tooltip={TOOLTIP_MSG.P_ATIVO_CIRC}
-      />
-      <BoxIndicador
-        valor={`${acao?.ev_ebit}`}
-        indicador="EV/EBIT"
-        tooltip={TOOLTIP_MSG.EV_BIT}
-      />
-      <BoxIndicador
-        valor={`${acao?.ev_ebitda}`}
-        indicador="EV/EBITA"
-        tooltip={TOOLTIP_MSG.EV_EBITDA}
-      />
-      <BoxIndicador
-        valor={`${acao?.margem_ebit}%`}
-        indicador="MARGEM EBIT"
-        tooltip={TOOLTIP_MSG.MARGEM_EBIT}
-      />
-      <BoxIndicador
-        valor={`${acao?.margem_liquida}%`}
-        indicador="MARGEM LIQ"
-        tooltip={TOOLTIP_MSG.MARGEM_LIQ_EBIT}
-      />
-      <BoxIndicador
-        valor={`${acao?.liq_corrente}`}
-        indicador="LIQ.CORRENTE"
-        tooltip={TOOLTIP_MSG.LIQ_CORRENTE}
-      />
-      <BoxIndicador
-        valor={`${acao?.roe}%`}
-        indicador="ROE"
-        tooltip={TOOLTIP_MSG.ROE}
-      />
-      <BoxIndicador
-        valor={`${acao?.roic}%`}
-        indicador="ROIC"
-        tooltip={TOOLTIP_MSG.ROIC}
-      />
-      {/* <BoxIndicador valor={`${acao.patrimonio_liquido}`} indicador="PATRIM.LIQ." tooltip={TOOLTIP_MSG.PATRIM_LIQ}/> */}
-      <BoxIndicador
-        valor={`${acao?.div_bruta_patrim}`}
-        indicador="DIV.BRUTA.PATRIM."
-        tooltip={TOOLTIP_MSG.DIVIDA_LIQUIDA_PATRIM_LIQ}
-      />
-      <BoxIndicador
-        valor={`${acao?.cresc_rec_5a}%`}
-        indicador="CRESC.REC.5A"
-        tooltip={TOOLTIP_MSG.CAGR_RECEITA_5A}
-      />
+          <BoxIndicador
+            valor={`${acao?.psr}`}
+            indicador="PSR"
+            tooltip={TOOLTIP_MSG.PSR}
+          />
+          <BoxIndicador
+            valor={`${acao?.p_ativo}`}
+            indicador="P/ATIVO"
+            tooltip={TOOLTIP_MSG.P_ATIVO}
+          />
+          <BoxIndicador
+            valor={`${acao?.p_cap_giro}`}
+            indicador="P/CAP.GIRO"
+            tooltip={TOOLTIP_MSG.P_CAP_GIRO}
+          />
+          <BoxIndicador
+            valor={`${acao?.p_ativ_circ_liq}`}
+            indicador="P/ATIVO CIRC. LIQ."
+            tooltip={TOOLTIP_MSG.P_ATIVO_CIRC}
+          />
+          <BoxIndicador
+            valor={`${acao?.ev_ebit}`}
+            indicador="EV/EBIT"
+            tooltip={TOOLTIP_MSG.EV_BIT}
+          />
+          <BoxIndicador
+            valor={`${acao?.ev_ebitda}`}
+            indicador="EV/EBITA"
+            tooltip={TOOLTIP_MSG.EV_EBITDA}
+          />
+          <BoxIndicador
+            valor={`${acao?.margem_ebit}%`}
+            indicador="MARGEM EBIT"
+            tooltip={TOOLTIP_MSG.MARGEM_EBIT}
+          />
+          <BoxIndicador
+            valor={`${acao?.margem_liquida}%`}
+            indicador="MARGEM LIQ"
+            tooltip={TOOLTIP_MSG.MARGEM_LIQ_EBIT}
+          />
+          <BoxIndicador
+            valor={`${acao?.liq_corrente}`}
+            indicador="LIQ.CORRENTE"
+            tooltip={TOOLTIP_MSG.LIQ_CORRENTE}
+          />
+          <BoxIndicador
+            valor={`${acao?.roe}%`}
+            indicador="ROE"
+            tooltip={TOOLTIP_MSG.ROE}
+          />
+          <BoxIndicador
+            valor={`${acao?.roic}%`}
+            indicador="ROIC"
+            tooltip={TOOLTIP_MSG.ROIC}
+          />
+          {/* <BoxIndicador valor={`${acao.patrimonio_liquido}`} indicador="PATRIM.LIQ." tooltip={TOOLTIP_MSG.PATRIM_LIQ}/> */}
+          <BoxIndicador
+            valor={`${acao?.div_bruta_patrim}`}
+            indicador="DIV.BRUTA.PATRIM."
+            tooltip={TOOLTIP_MSG.DIVIDA_LIQUIDA_PATRIM_LIQ}
+          />
+          <BoxIndicador
+            valor={`${acao?.cresc_rec_5a}%`}
+            indicador="CRESC.REC.5A"
+            tooltip={TOOLTIP_MSG.CAGR_RECEITA_5A}
+          />
+        </>
+      )}
     </CardTitle>
   );
 }
@@ -297,6 +304,10 @@ export default function DetalhesAcoes() {
   });
   const [chartBar, setChartBar] = useState<any>({ datas: "", valores: "" });
 
+  const [isIndicadores, setIsIndicadores] = useState<boolean>(true);
+  const [isHistorico, setIsHistorico] = useState<boolean>(true);
+  const [isPagamento, setIsPagamento] = useState<boolean>(true);
+
   const { find } = useFetchApi();
 
   useEffect(() => {
@@ -318,11 +329,17 @@ export default function DetalhesAcoes() {
     };
 
     if (codigo !== undefined) {
-      fetchDataIndicadores().then((json) => setAcao(json.result));
+      fetchDataIndicadores()
+        .then((json) => setAcao(json.result))
+        .finally(() => setIsIndicadores(false));
 
-      fetchDataGrafico().then((json) => setChartLine(json.result));
+      fetchDataGrafico()
+        .then((json) => setChartLine(json.result))
+        .finally(() => setIsHistorico(false));
 
-      fetchDataBarGrafico().then((json) => setChartBar(json.result));
+      fetchDataBarGrafico()
+        .then((json) => setChartBar(json.result))
+        .finally(() => setIsPagamento(false));
     }
   }, [router, codigo]);
 
@@ -347,35 +364,43 @@ export default function DetalhesAcoes() {
           />
         </div>
       </div>
-      {renderizarIndicadores(acao)}
+      {renderizarIndicadores(acao, isIndicadores)}
       <CardTitle titulo="Histórico de Cotações">
-        <div className="w-full">
-          <ReactECharts
-            option={renderChartHistoricoCotacoes(
-              chartLine?.datas,
-              chartLine?.fechamento
-            )}
-          />
-        </div>
+        {isHistorico ? (
+          <Loading />
+        ) : (
+          <div className="w-full">
+            <ReactECharts
+              option={renderChartHistoricoCotacoes(
+                chartLine?.datas,
+                chartLine?.fechamento
+              )}
+            />
+          </div>
+        )}
       </CardTitle>
       <CardTitle titulo="Histórico Pagamento de Dividendo Anuais">
-        <div className="w-full">
-          <ReactECharts
-            option={renderChartHistoricoPagamento(
-              chartBar?.datas,
-              chartBar?.valores
-            )}
-          />
-        </div>
+        {isPagamento ? (
+          <Loading />
+        ) : (
+          <div className="w-full">
+            <ReactECharts
+              option={renderChartHistoricoPagamento(
+                chartBar?.datas,
+                chartBar?.valores
+              )}
+            />
+          </div>
+        )}
       </CardTitle>
-      <CardTitle titulo="Histórico de Dividendos do Ano">
+      {/* <CardTitle titulo="Histórico de Dividendos do Ano">
         <div className="w-full h-[500px] overflow-y-scroll">
           <BasicTable
             columns={dataDividendo.columns}
             rows={dataDividendo.rows}
           />
         </div>
-      </CardTitle>
+      </CardTitle> */}
     </div>
   );
 }

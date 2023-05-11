@@ -101,6 +101,7 @@ export default function FundosImobiliariosListar() {
 
   const [rows, setRows] = useState<any[]>([])
   const {find} = useFetchApi();
+  const [isLoading, setLoading] = useState(true);
  
   useEffect(() => { 
   const fetchData = async () => {
@@ -109,14 +110,18 @@ export default function FundosImobiliariosListar() {
   }
   
     fetchData()
-    .then((json) => setRows(json.result))
-    .catch();
+    .then((json) => {
+      setLoading(false)
+      setRows(json.result)
+    })
+    .catch((error) => console.log(error))
+    .finally(() => setLoading(false))
   },[])
 
   return (
     <div className="w-full flex">
       <div className="w-full">
-          <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} showToolBar={true}/>
+          <GridCustom columns={columns} rows={rows} onRowClick={handleEvent} showToolBar={true} isLoading={isLoading}/>
       </div>
     </div>
     );

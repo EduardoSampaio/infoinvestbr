@@ -143,7 +143,8 @@ export default function ListarTransacoes(props: any) {
     deleteHandle,
     onSalvar,
     openNewDialog,
-    setOpenNewDialog
+    setOpenNewDialog,
+    isLoading
   } = useTransacao();
 
   function renderDialogs() {
@@ -172,8 +173,13 @@ export default function ListarTransacoes(props: any) {
           columns={createColumns(onEditar, onDeletar)}
           rows={transacoes}
           disableRowSelectionOnClick
+          isLoading={isLoading}
         />
       </div>
     </div>
   );
 }
+function useState(arg0: boolean): [any, any] {
+  throw new Error("Function not implemented.");
+}
+

@@ -198,7 +198,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
+function renderGridsAtivoAcao(row: ITotalizacao, titulo: string, isLoading: boolean) {
   return (
     <div
       className={`flex flex-col h-auto
@@ -276,13 +276,14 @@ function renderGridsAtivoAcao(row: ITotalizacao, titulo: string) {
           className="px-10 pt-0"
           disableRowSelectionOnClick
           id={"codigo_ativo"}
+          isLoading={isLoading}
         />
       </div>
     </div>
   );
 }
 
-function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
+function renderGridsAtivoFundo(row: ITotalizacao, titulo: string, isLoading: boolean) {
   return (
     <div
       className={`flex flex-col h-auto
@@ -360,6 +361,7 @@ function renderGridsAtivoFundo(row: ITotalizacao, titulo: string) {
           className="px-10 pt-0"
           disableRowSelectionOnClick
           id={"codigo_ativo"}
+          isLoading={isLoading}
         />
       </div>
     </div>
@@ -372,6 +374,7 @@ export default function ListaPatrimonio() {
   const { usuario } = useAuth();
   const { find } = useFetchApi();
   const {setVisible} = useNotification()
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -403,7 +406,7 @@ export default function ListaPatrimonio() {
           });
         }).catch(result => { 
           setVisible?.( `${result.error}`,'error')
-      })
+      }).finally(() => setLoading(false))
     }
   }, [usuario?.id]);
 
@@ -474,9 +477,9 @@ export default function ListaPatrimonio() {
           </div>
         </div>
       </div>
-      <DashboardCarteira rows={rowChart}/>
-      {renderGridsAtivoAcao(row, "Ações")}
-      {renderGridsAtivoFundo(row, "Fundos Imobiliários")}
+      <DashboardCarteira rows={rowChart} isLoading={isLoading}/>
+      {renderGridsAtivoAcao(row, "Ações" , isLoading)}
+      {renderGridsAtivoFundo(row, "Fundos Imobiliários", isLoading)}
     </div>
   );
 }

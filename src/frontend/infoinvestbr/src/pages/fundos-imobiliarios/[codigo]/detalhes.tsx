@@ -1,4 +1,5 @@
 import DetalhesFundosImobiliario from "@/components/fundos-imobiliarios/DetalhesFundosImobiliario";
+import Loading from "@/components/shared/Loading";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 import { useRouter } from "next/router";

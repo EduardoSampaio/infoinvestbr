@@ -8,6 +8,7 @@ interface SnackConfig {
     open: boolean
     message: string
     type: 'success' | 'error' | 'info' | 'warning'
+    isLoading?: boolean
 }
 
 export default function useTransacao() {
@@ -21,6 +22,8 @@ export default function useTransacao() {
     const USER = usuario?.id
     const {save, remove, update, find} = useFetchApi();
     const {setVisible} = useNotification();
+    const [isLoading, setLoading] = useState(true);
+  
 
     const deleteHandle = () => {
         remove(`${API_HOST}/transacoes/${confirmOpen.value}`)
@@ -65,13 +68,14 @@ export default function useTransacao() {
     }
 
     async function onListar() {
+        setLoading(true)
         if(usuario?.id) {
             find(`${API_HOST}/transacoes/${USER}`)
                 .then((json) => {
                     setTransacoes(json.result)              
                 }).catch(result => {
                     setVisible?.( `${result.error}`,'error')
-                });
+                }).finally(() => setLoading(false));
         }
     }
 
@@ -90,6 +94,7 @@ export default function useTransacao() {
         setConfirmOpen,
         deleteHandle,
         openNewDialog,
-        setOpenNewDialog
+        setOpenNewDialog,
+        isLoading
     }
 }
