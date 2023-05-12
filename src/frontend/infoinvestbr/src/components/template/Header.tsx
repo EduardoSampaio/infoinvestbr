@@ -8,7 +8,7 @@ import { Perfil } from "./Perfil";
 export default function Header() {
   return (
     <div
-      className={`flex w-full h-12 max-w-[100%] bg-white dark:bg-primary-gray`}
+      className={`flex w-full h-12 bg-white dark:bg-primary-gray`}
     >
       <Logo />
       <NavMenu />
