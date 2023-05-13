@@ -8,13 +8,13 @@ interface MenuItemProps {
   titulo: string;
   children?: any;
   url?: string;
-  activeUrlOpt?: string;
+  activeUrlOpt?: string[];
 }
 
 export default function MenuItemDropDown(props: MenuItemProps) {
   const router = useRouter();
   const active =
-    router.pathname === props.url || router.pathname === props.activeUrlOpt
+    router.pathname === props.url || props.activeUrlOpt?.includes(router.pathname)
       ? `
   bg-gray-100 text-black border-b-2 border-black 
   dark:bg-gray-500 dark:text-white dark:border-white dark:hover:border-white

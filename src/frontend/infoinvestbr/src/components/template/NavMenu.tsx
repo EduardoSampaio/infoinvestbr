@@ -20,7 +20,7 @@ export default function NavMenu() {
           icon={HiBuildingLibrary}
           titulo="Ações"
           url="/acoes/listar"
-          activeUrlOpt="/acoes/[codigo]/detalhes"
+          activeUrlOpt={["/acoes/[codigo]/detalhes","/acoes/setor/[setor]"]}
         >
           <MenuDropDownLink titulo="Todos os setores" url="/acoes/listar" />
           <MenuDropDownLink titulo="Bens Industriais" url="/acoes/setor/Bens industriais" />
@@ -39,7 +39,7 @@ export default function NavMenu() {
           icon={HiBuildingLibrary}
           titulo="FIIS"
           url="/fundos-imobiliarios/listar"
-          activeUrlOpt="/fundos-imobiliarios/[codigo]/detalhes"
+          activeUrlOpt={["/fundos-imobiliarios/[codigo]/detalhes","/fundos-imobiliarios/setor/[setor]"]}
         >
           <MenuDropDownLink
             titulo="Todos os segmentos"
