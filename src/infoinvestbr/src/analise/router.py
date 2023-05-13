@@ -43,9 +43,9 @@ async def get_fundos_imobiliarios(setor: str, db: Session = Depends(get_db)):
 
 
 @router.get("/acao/setor/{setor}")
-@cache(expire=43200, coder=JsonCoder)
-async def get_acoes_by_setor(setor: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    acoes = service.get_acoes_by_setor(db, setor, skip, limit)
+# @cache(expire=43200, coder=JsonCoder)
+async def get_acoes_by_setor(setor: str, db: Session = Depends(get_db)):
+    acoes = service.get_acoes_by_setor(db, setor)
     return Response(code=status.HTTP_200_OK, status="Ok", result=acoes).dict(exclude_none=True)
 
 

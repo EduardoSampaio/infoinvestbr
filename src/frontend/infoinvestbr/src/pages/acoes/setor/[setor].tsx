@@ -1,3 +1,4 @@
+import AcaoSetor from "@/components/acoes/AcoesSetor";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 import { useRouter } from "next/router"
@@ -12,7 +13,7 @@ export default function Setor(){
     return (
     <Layout>
         <Card sizeText="text-sm" breadcrumbs={breadcrumbs} current={currentBreadcrumbs} className="flex">
-            <div><h2>setor</h2></div>
+            <AcaoSetor />
         </Card>
     </Layout>
     )

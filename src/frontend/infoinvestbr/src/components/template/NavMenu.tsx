@@ -23,21 +23,21 @@ export default function NavMenu() {
           activeUrlOpt="/acoes/[codigo]/detalhes"
         >
           <MenuDropDownLink titulo="Todos os setores" url="/acoes/listar" />
-          <MenuDropDownLink titulo="Bens Industriais" url="/acoes/setor/Bens Industriais" />
-          <MenuDropDownLink titulo="Consumo cíclico" url="/acoes/setor/Consumo cíclico" />
-          <MenuDropDownLink titulo="Consumo não ciclico" url="/acoes/setor/Consumo não ciclico" />
+          <MenuDropDownLink titulo="Bens Industriais" url="/acoes/setor/Bens industriais" />
+          <MenuDropDownLink titulo="Consumo Cíclico" url="/acoes/setor/Consumo Cíclico" />
+          <MenuDropDownLink titulo="Consumo não Cíclico" url="/acoes/setor/Consumo não Cíclico" />
           <MenuDropDownLink titulo="Comunicações" url="/acoes/setor/Comunicações" />
-          <MenuDropDownLink titulo="Financeiro" url="/acoes/setor/Financeiro" />
-          <MenuDropDownLink titulo="Materiais Básicos" url="/acoes/setor/" />
+          <MenuDropDownLink titulo="Financeiros" url="/acoes/setor/Financeiros" />
+          <MenuDropDownLink titulo="Materiais Básicos" url="/acoes/setor/Materiais Básicos" />
           <MenuDropDownLink titulo="Petroleo, Gás, Biocombustíveis" url="/acoes/setor/Petroleo, Gás, Biocombustíveis" />
           <MenuDropDownLink titulo="Saúde" url="/acoes/setor/Saúde" />
-          <MenuDropDownLink titulo="Tecnologia de informação" url="/acoes/setor/Tecnologia de informação" />
+          <MenuDropDownLink titulo="Tecnologia de informação" url="/acoes/setor/Tecnologia da Informação" />
           <MenuDropDownLink titulo="Utilidade Pública" url="/acoes/setor/Utilidade Pública" />
         </MenuItemDropDown>
         <MenuItemDropDown
           key={3}
           icon={HiBuildingLibrary}
-          titulo="Fundos Imobliários"
+          titulo="FIIS"
           url="/fundos-imobiliarios/listar"
           activeUrlOpt="/fundos-imobiliarios/[codigo]/detalhes"
         >
@@ -54,7 +54,7 @@ export default function NavMenu() {
           <MenuDropDownLink titulo="Renda" url="/fundos-imobiliarios/setor/Renda" />
           <MenuDropDownLink titulo="Residencial" url="/fundos-imobiliarios/setor/Residencial" />
           <MenuDropDownLink titulo="Shoppings" url="/fundos-imobiliarios/setor/Shoppings" />
-          <MenuDropDownLink titulo="Títulos e Val. Mob" url="/fundos-imobiliarios/setor/Títulos e Val. Mob" />
+          <MenuDropDownLink titulo="Títulos e Val. Mob" url="/fundos-imobiliarios/setor/Títulos e Val. Mob." />
         </MenuItemDropDown>
         <MenuItem
           icon={HiWallet}

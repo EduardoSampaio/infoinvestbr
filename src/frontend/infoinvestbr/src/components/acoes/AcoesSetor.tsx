@@ -2,18 +2,19 @@ import useFetchApi from "@/data/hooks/useFetchApi";
 import { IFundoImobiliario } from "@/models/fundos.model";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import BlocoFundoImobiliario from "./BlocoFundosImobiliario";
+import BlocoAcoes from "./BlocoAcoes";
+import { IAcao } from "@/models/acao.model";
 
-export default function FundosImobiliarioSetor(props: any) {
+export default function AcaoSetor(props: any) {
   const router = useRouter();
-  const [rows, setRows] = useState<IFundoImobiliario[]>([]);
+  const [rows, setRows] = useState<IAcao[]>([]);
   const { find } = useFetchApi();
   const setor = router.query.setor?.toString();
 
   useEffect(() => {
     const fetchData = async () => {
       const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
-      return await find(`${API_HOST}/analises/fundos-imobiliarios/setor/${setor}`);
+      return await find(`${API_HOST}/analises/acao/setor/${setor}`);
     };
 
     if (setor !== undefined) {
@@ -29,7 +30,7 @@ export default function FundosImobiliarioSetor(props: any) {
 
   return (
     <div className="min-h-[600px] w-full flex flex-wrap">
-        {rows.map((fundo, index)=>  <BlocoFundoImobiliario fundo={fundo} key={index}/>)}
+        {rows.map((acao, index)=>  <BlocoAcoes acao={acao} key={index}/>)}
     </div>
   )
 }

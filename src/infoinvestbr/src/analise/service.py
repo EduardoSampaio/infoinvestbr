@@ -100,8 +100,8 @@ def get_acoes(db: Session, skip: int = 0, limit: int = 100):
     return acoes
 
 
-def get_acoes_by_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):
-    acoes = db.query(Acao).filter(Acao.setor == setor).offset(skip).limit(limit).all()
+def get_acoes_by_setor(db: Session, setor: str):
+    acoes = db.query(Acao).filter(Acao.setor == setor).all()
     return acoes
 
 
