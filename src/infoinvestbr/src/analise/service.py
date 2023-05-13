@@ -110,8 +110,8 @@ def get_fundos_imobiliarios(db: Session, skip: int = 0, limit: int = 100):
     return fundos
 
 
-def get_fundos_imobiliarios_setor(db: Session, setor: str, skip: int = 0, limit: int = 100):
-    fundos = db.query(FundosImobiliario).filter(FundosImobiliario.setor == setor).offset(skip).limit(limit).all()
+def get_fundos_imobiliarios_setor(db: Session, setor: str):
+    fundos = db.query(FundosImobiliario).filter(FundosImobiliario.setor == setor).all()
     return fundos
 
 
