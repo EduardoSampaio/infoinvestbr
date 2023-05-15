@@ -35,7 +35,7 @@ export default function MenuItemDropDown(props: MenuItemProps) {
         className={
         `hidden group-hover:block group-hover:bg
         absolute z-40 min-h-[200px] w-[20%] 
-      bg-white dark:bg-gray-600 shadow-2xl rounded-xl top-[6%]
+      bg-white dark:bg-gray-600 shadow-2xl rounded-xl mt-10
       `}
       >
         {/* <div className="w-full flex justify-center">

@@ -313,7 +313,7 @@ export default function Home() {
             <TaxasEmoedas />
           </Card>
         </div>
-        <div className="flex max-sm:flex-wrap sm:flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap">
+        {/* <div className="flex max-sm:flex-wrap sm:flex-wrap md:flex-wrap lg:flex-nowrap xl:flex-nowrap">
           <Card
             className="basis-full h-[320px]"
             titulo="Ações Maiores Altas"
@@ -342,7 +342,7 @@ export default function Home() {
           >
             <AltasEBaixas ticker={tickersFiisBaixa} />
           </Card>
-        </div>
+        </div> */}
       </div>
     </Layout>
   );
