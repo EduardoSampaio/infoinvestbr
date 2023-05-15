@@ -418,7 +418,7 @@ export default function ListaPatrimonio() {
           border-2 dark:border-gray-600 m-2.5 justify-center items-center`}
         >
           <div className="flex flex-col w-full justify-center items-center">
-            <h3 className=" text-gray-400">Total Bruto</h3>
+            <h3 className=" text-gray-400">Total</h3>
             <h2 className="font-semibold">
               R${" "}
               {row?.total_patrimonio?.toLocaleString("pt-BR", {

@@ -3,6 +3,7 @@ import TaxasEmoedas from "@/components/dashboard/TaxasEMoedas";
 import Card from "@/components/template/Card";
 import Layout from "@/components/template/Layout";
 import { ITicker } from "@/models/ticker.model";
+import { Autocomplete, TextField } from "@mui/material";
 
 const tickersAlta: ITicker[] = [
   {
@@ -296,10 +297,8 @@ const tickersFiisBaixa: ITicker[] = [
   },
 ];
 
-
-
 export default function Home() {
-  const breadcrumbs: LinkModel = {titulo: 'Home', link: '/'}
+  const breadcrumbs: LinkModel = { titulo: "Home", link: "/" };
 
   return (
     <Layout>

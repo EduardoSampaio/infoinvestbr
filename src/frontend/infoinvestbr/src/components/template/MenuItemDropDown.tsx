@@ -32,8 +32,11 @@ export default function MenuItemDropDown(props: MenuItemProps) {
       {<props.icon className="text-2xl" />}
       <span className="text-xs">{props.titulo}</span>
       <div
-        className={`hidden group-hover:block absolute z-40 min-h-[200px] w-[20%] 
-      bg-white dark:bg-gray-600 shadow-2xl rounded-xl top-[6%]`}
+        className={
+        `hidden group-hover:block group-hover:bg
+        absolute z-40 min-h-[200px] w-[20%] 
+      bg-white dark:bg-gray-600 shadow-2xl rounded-xl top-[6%]
+      `}
       >
         {/* <div className="w-full flex justify-center">
           <div className="absolute -top-2 h-[20px] w-[20px] bg-white dark:bg-gray-600 rotate-45"></div>

@@ -6,10 +6,8 @@ import { Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ReactECharts, ReactEChartsProps } from "../shared/ReactECharts";
 import * as echarts from "echarts";
-import BasicTable from "../shared/BasicTable";
 import { TOOLTIP_MSG } from "./tooltip";
 import { IAcao } from "@/models/acao.model";
-import useAuth from "@/data/hooks/useAuth";
 import useFetchApi from "@/data/hooks/useFetchApi";
 import Loading from "../shared/Loading";
 
@@ -44,8 +42,8 @@ function renderChartHistoricoCotacoes(datas: any[], series: any[]) {
     dataZoom: [
       {
         type: "inside",
-        start: 0,
-        end: 10,
+        start: 100,
+        end: 0,
       },
       {
         start: 0,

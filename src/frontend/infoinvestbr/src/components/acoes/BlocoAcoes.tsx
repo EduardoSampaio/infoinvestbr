@@ -8,7 +8,7 @@ interface BlocoAcoesProps {
 }
 
 function getImage(imagem?: string) {
-  return imagem === undefined || imagem === "None"
+  return imagem === undefined || imagem === null
     ? "/img/acao.svg"
     : `/img/acoes/${imagem}.jpg`;
 }
@@ -20,7 +20,7 @@ export default function BlocoAcoes(
   return (
     <Link href={`/acoes/${props.acao.codigo}/detalhes`}>
       <div className="w-[200px] h-200px flex flex-col m-5 dark:text-white border p-2 
-      cursor-pointer hover:bg-gray-200">
+      cursor-pointer hover:bg-gray-200 dark:hover:text-black">
         <div className="flex">
           <div className="m-5">
             <Image src={getImage(props.acao.imagem)} alt="acao" width={"40"} height={"40"} />
