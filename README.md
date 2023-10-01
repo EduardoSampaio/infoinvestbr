@@ -1,5 +1,5 @@
 # infoinvestbr
-Projeto Final Pós Graduação Arquitetura de Sistema Distribuídos PUC MINAS
+Projeto Final Pós Graduação Arquitetura de Software Distribuídos PUC MINAS
 Sistema de Gerenciamento de Renda Váriavel
 
 ## Apresentação
